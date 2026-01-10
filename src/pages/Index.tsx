@@ -1,13 +1,32 @@
 import { motion } from "framer-motion";
-import { Plus, Calendar, Flame, Clock } from "lucide-react";
+import { Plus, Calendar, Flame, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { InsightCard } from "@/components/home/InsightCard";
 import { QuickStat } from "@/components/home/QuickStat";
 import { RecentSession } from "@/components/home/RecentSession";
+import { useRecentSessions, useSessionStats } from "@/hooks/useSessionLogs";
+import { useAuth } from "@/hooks/useAuth";
+import { Skeleton } from "@/components/ui/skeleton";
+import { formatDistanceToNow } from "date-fns";
 
 const Index = () => {
+  const { user } = useAuth();
+  const { data: recentSessions, isLoading: sessionsLoading } = useRecentSessions(3);
+  const { data: stats, isLoading: statsLoading } = useSessionStats();
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
+
+  const formatSessionTime = (dateString: string) => {
+    return formatDistanceToNow(new Date(dateString), { addSuffix: true });
+  };
+
   return (
     <AppLayout>
       <div className="gradient-hero min-h-screen">
@@ -18,7 +37,7 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
           >
-            <p className="text-sm text-muted-foreground mb-1">Good evening</p>
+            <p className="text-sm text-muted-foreground mb-1">{getGreeting()}</p>
             <h1 className="font-serif text-2xl font-medium text-foreground">
               Your Cannabis Journal
             </h1>
@@ -40,38 +59,56 @@ const Index = () => {
             </Link>
           </motion.div>
 
-          {/* Insight Card */}
-          <InsightCard
-            icon="sleep"
-            title="Sleep Pattern Detected"
-            description="Lower doses in the evening have correlated with better sleep quality for you over the past 2 weeks."
-            stat="82%"
-            statLabel="positive outcomes this week"
-          />
+          {/* Insight Card - Show when there's data */}
+          {stats && stats.totalSessions > 0 ? (
+            <InsightCard
+              icon="sleep"
+              title="Keep Building Your Data"
+              description={`You've logged ${stats.totalSessions} session${stats.totalSessions > 1 ? 's' : ''}. Keep tracking to unlock personalized insights about your patterns.`}
+              stat={`${stats.uniqueStrains}`}
+              statLabel="strains tried"
+            />
+          ) : (
+            <InsightCard
+              icon="sparkles"
+              title="Start Your Journey"
+              description="Log your first session to begin discovering how cannabis affects you. Personalized insights await!"
+            />
+          )}
 
           {/* Quick Stats */}
           <div className="grid grid-cols-3 gap-3">
-            <QuickStat
-              icon={Calendar}
-              label="This Week"
-              value="4"
-              trend="neutral"
-              delay={0.2}
-            />
-            <QuickStat
-              icon={Flame}
-              label="Streak"
-              value="12 days"
-              trend="up"
-              delay={0.25}
-            />
-            <QuickStat
-              icon={Clock}
-              label="Avg Time"
-              value="8:30pm"
-              trend="neutral"
-              delay={0.3}
-            />
+            {statsLoading ? (
+              <>
+                <Skeleton className="h-20 rounded-xl" />
+                <Skeleton className="h-20 rounded-xl" />
+                <Skeleton className="h-20 rounded-xl" />
+              </>
+            ) : (
+              <>
+                <QuickStat
+                  icon={Calendar}
+                  label="This Week"
+                  value={String(stats?.thisWeek || 0)}
+                  trend="neutral"
+                  delay={0.2}
+                />
+                <QuickStat
+                  icon={TrendingUp}
+                  label="Total"
+                  value={String(stats?.totalSessions || 0)}
+                  trend="up"
+                  delay={0.25}
+                />
+                <QuickStat
+                  icon={Flame}
+                  label="Strains"
+                  value={String(stats?.uniqueStrains || 0)}
+                  trend="neutral"
+                  delay={0.3}
+                />
+              </>
+            )}
           </div>
 
           {/* Recent Sessions */}
@@ -80,36 +117,43 @@ const Index = () => {
               <h2 className="font-serif text-lg font-medium text-foreground">
                 Recent Sessions
               </h2>
-              <Link
-                to="/insights"
-                className="text-sm text-primary font-medium hover:underline"
-              >
-                View all
-              </Link>
+              {recentSessions && recentSessions.length > 0 && (
+                <Link
+                  to="/insights"
+                  className="text-sm text-primary font-medium hover:underline"
+                >
+                  View all
+                </Link>
+              )}
             </div>
 
             <div className="space-y-2">
-              <RecentSession
-                intent="Sleep"
-                strain="Granddaddy Purple"
-                outcome="positive"
-                timeAgo="Yesterday, 9:45 PM"
-                delay={0.35}
-              />
-              <RecentSession
-                intent="Relaxation"
-                strain="Blue Dream"
-                outcome="positive"
-                timeAgo="2 days ago"
-                delay={0.4}
-              />
-              <RecentSession
-                intent="Focus"
-                strain="Jack Herer"
-                outcome="neutral"
-                timeAgo="3 days ago"
-                delay={0.45}
-              />
+              {sessionsLoading ? (
+                <>
+                  <Skeleton className="h-20 rounded-xl" />
+                  <Skeleton className="h-20 rounded-xl" />
+                </>
+              ) : recentSessions && recentSessions.length > 0 ? (
+                recentSessions.map((session, index) => (
+                  <RecentSession
+                    key={session.id}
+                    intent={session.intent}
+                    strain={session.strain_name}
+                    outcome={session.outcome as "positive" | "neutral" | "negative" || "neutral"}
+                    timeAgo={formatSessionTime(session.created_at)}
+                    delay={0.35 + index * 0.05}
+                  />
+                ))
+              ) : (
+                <div className="text-center py-8 bg-secondary/30 rounded-xl">
+                  <p className="text-muted-foreground text-sm">
+                    No sessions logged yet
+                  </p>
+                  <p className="text-muted-foreground text-xs mt-1">
+                    Tap "Log a Session" to get started
+                  </p>
+                </div>
+              )}
             </div>
           </section>
 

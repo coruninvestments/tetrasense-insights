@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { useCreateSessionLog } from "@/hooks/useSessionLogs";
+import { toast } from "sonner";
 
 const intents = [
   { id: "sleep", label: "Sleep", emoji: "🌙" },
@@ -38,21 +40,63 @@ type Step = "intent" | "strain" | "method" | "dose" | "effects" | "done";
 
 export default function LogSession() {
   const navigate = useNavigate();
+  const createSession = useCreateSessionLog();
+  
   const [step, setStep] = useState<Step>("intent");
   const [selectedIntent, setSelectedIntent] = useState<string>("");
   const [strain, setStrain] = useState("");
   const [selectedMethod, setSelectedMethod] = useState<string>("");
   const [dose, setDose] = useState(1); // 0 = low, 1 = medium, 2 = high
   const [selectedEffects, setSelectedEffects] = useState<string[]>([]);
+  const [saving, setSaving] = useState(false);
 
   const steps: Step[] = ["intent", "strain", "method", "dose", "effects", "done"];
   const currentStepIndex = steps.indexOf(step);
-  const progress = ((currentStepIndex + 1) / (steps.length)) * 100;
+  const progress = ((currentStepIndex + 1) / steps.length) * 100;
 
-  const goNext = () => {
-    const nextIndex = currentStepIndex + 1;
-    if (nextIndex < steps.length) {
-      setStep(steps[nextIndex]);
+  const doseLabels = ["Low", "Medium", "High"];
+
+  const goNext = async () => {
+    if (step === "effects") {
+      // Save session to database
+      setSaving(true);
+      try {
+        // Determine outcome based on effects
+        const negativeEffects = selectedEffects.filter((e) =>
+          ["anxious", "paranoid"].includes(e)
+        );
+        const positiveEffects = selectedEffects.filter((e) =>
+          ["relaxed", "euphoric", "focused", "creative"].includes(e)
+        );
+
+        let outcome = "neutral";
+        if (positiveEffects.length > negativeEffects.length) {
+          outcome = "positive";
+        } else if (negativeEffects.length > positiveEffects.length) {
+          outcome = "negative";
+        }
+
+        await createSession.mutateAsync({
+          intent: selectedIntent,
+          strain_name: strain,
+          method: selectedMethod,
+          dose: doseLabels[dose].toLowerCase(),
+          effects: selectedEffects,
+          outcome,
+        });
+
+        setStep("done");
+        toast.success("Session logged successfully!");
+      } catch (error: any) {
+        toast.error(error.message || "Failed to save session");
+      } finally {
+        setSaving(false);
+      }
+    } else {
+      const nextIndex = currentStepIndex + 1;
+      if (nextIndex < steps.length) {
+        setStep(steps[nextIndex]);
+      }
     }
   };
 
@@ -71,8 +115,6 @@ export default function LogSession() {
         : [...prev, effectId]
     );
   };
-
-  const doseLabels = ["Low", "Medium", "High"];
 
   return (
     <AppLayout showNav={false}>
@@ -343,9 +385,10 @@ export default function LogSession() {
                     variant="primary"
                     size="lg"
                     className="w-full"
+                    disabled={saving}
                     onClick={goNext}
                   >
-                    Save Session
+                    {saving ? "Saving..." : "Save Session"}
                     <Check className="w-4 h-4" />
                   </Button>
                 </div>

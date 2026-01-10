@@ -1,43 +1,68 @@
 import { motion } from "framer-motion";
 import { Lock, ChevronRight, TrendingUp, Moon, Brain, AlertCircle } from "lucide-react";
-import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/layout/AppLayout";
-
-const insights = [
-  {
-    id: "1",
-    icon: Moon,
-    title: "Sleep Quality Correlation",
-    description: "Lower doses before 9 PM correlate with 23% better sleep quality for you.",
-    isPremium: false,
-  },
-  {
-    id: "2",
-    icon: Brain,
-    title: "Best Strains for Focus",
-    description: "Jack Herer and Green Crack show the highest focus ratings in your logs.",
-    isPremium: true,
-  },
-  {
-    id: "3",
-    icon: AlertCircle,
-    title: "Anxiety Warning",
-    description: "High doses of sativas tend to increase your anxiety by 40%.",
-    isPremium: true,
-  },
-  {
-    id: "4",
-    icon: TrendingUp,
-    title: "Weekly Pattern",
-    description: "Your consumption is highest on Fridays and Saturdays.",
-    isPremium: false,
-  },
-];
+import { useProfile } from "@/hooks/useProfile";
+import { useSessionLogs, useSessionStats } from "@/hooks/useSessionLogs";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Insights() {
-  const isPremium = false; // Simulated subscription status
+  const { data: profile } = useProfile();
+  const { data: sessions, isLoading: sessionsLoading } = useSessionLogs();
+  const { data: stats, isLoading: statsLoading } = useSessionStats();
+  
+  const isPremium = profile?.is_premium || false;
+
+  // Calculate real insights from session data
+  const topIntent = sessions?.reduce((acc, session) => {
+    acc[session.intent] = (acc[session.intent] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  
+  const topIntentName = topIntent ? Object.entries(topIntent).sort((a, b) => b[1] - a[1])[0]?.[0] : null;
+  
+  const topStrain = sessions?.reduce((acc, session) => {
+    acc[session.strain_name] = (acc[session.strain_name] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  
+  const topStrainName = topStrain ? Object.entries(topStrain).sort((a, b) => b[1] - a[1])[0]?.[0] : null;
+  
+  const positiveRate = sessions?.length 
+    ? Math.round((sessions.filter(s => s.outcome === "positive").length / sessions.length) * 100)
+    : 0;
+
+  const insights = [
+    {
+      id: "1",
+      icon: Moon,
+      title: "Sleep Quality Correlation",
+      description: "Lower doses before 9 PM correlate with better sleep quality.",
+      isPremium: false,
+    },
+    {
+      id: "2",
+      icon: Brain,
+      title: "Best Strains for Focus",
+      description: "Track more sessions to discover your best focus strains.",
+      isPremium: true,
+    },
+    {
+      id: "3",
+      icon: AlertCircle,
+      title: "Anxiety Warning",
+      description: "High doses of sativas may increase anxiety for some users.",
+      isPremium: true,
+    },
+    {
+      id: "4",
+      icon: TrendingUp,
+      title: "Weekly Pattern",
+      description: "Log more sessions to see your weekly patterns.",
+      isPremium: false,
+    },
+  ];
 
   return (
     <AppLayout>
@@ -57,7 +82,7 @@ export default function Insights() {
         </header>
 
         <div className="px-5 pb-8 space-y-6">
-          {/* Premium Banner (if not subscribed) */}
+          {/* Premium Banner */}
           {!isPremium && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -74,7 +99,7 @@ export default function Insights() {
                         Unlock All Insights
                       </h3>
                       <p className="text-sm text-primary-foreground/80 mb-4">
-                        Get personalized patterns, trend analysis, and predictive insights.
+                        Get personalized patterns and predictive insights.
                       </p>
                       <Button
                         variant="secondary"
@@ -95,40 +120,49 @@ export default function Insights() {
             <h2 className="font-serif text-lg font-medium text-foreground mb-4">
               Your Stats
             </h2>
-            <div className="grid grid-cols-2 gap-3">
-              <Card variant="glass" className="p-4">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-                  Total Sessions
-                </p>
-                <p className="text-2xl font-serif font-medium text-foreground">
-                  47
-                </p>
-              </Card>
-              <Card variant="glass" className="p-4">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-                  Avg. Positive Rate
-                </p>
-                <p className="text-2xl font-serif font-medium text-success">
-                  78%
-                </p>
-              </Card>
-              <Card variant="glass" className="p-4">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-                  Top Intent
-                </p>
-                <p className="text-lg font-serif font-medium text-foreground">
-                  Sleep
-                </p>
-              </Card>
-              <Card variant="glass" className="p-4">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-                  Favorite Strain
-                </p>
-                <p className="text-lg font-serif font-medium text-foreground truncate">
-                  Blue Dream
-                </p>
-              </Card>
-            </div>
+            {statsLoading || sessionsLoading ? (
+              <div className="grid grid-cols-2 gap-3">
+                <Skeleton className="h-20 rounded-xl" />
+                <Skeleton className="h-20 rounded-xl" />
+                <Skeleton className="h-20 rounded-xl" />
+                <Skeleton className="h-20 rounded-xl" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                <Card variant="glass" className="p-4">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                    Total Sessions
+                  </p>
+                  <p className="text-2xl font-serif font-medium text-foreground">
+                    {stats?.totalSessions || 0}
+                  </p>
+                </Card>
+                <Card variant="glass" className="p-4">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                    Positive Rate
+                  </p>
+                  <p className="text-2xl font-serif font-medium text-success">
+                    {positiveRate}%
+                  </p>
+                </Card>
+                <Card variant="glass" className="p-4">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                    Top Intent
+                  </p>
+                  <p className="text-lg font-serif font-medium text-foreground capitalize">
+                    {topIntentName || "—"}
+                  </p>
+                </Card>
+                <Card variant="glass" className="p-4">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                    Favorite Strain
+                  </p>
+                  <p className="text-lg font-serif font-medium text-foreground truncate">
+                    {topStrainName || "—"}
+                  </p>
+                </Card>
+              </div>
+            )}
           </section>
 
           {/* Insights List */}
