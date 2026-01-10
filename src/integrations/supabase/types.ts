@@ -14,7 +14,120 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          age_range: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          is_premium: boolean | null
+          sensitivity_flags: string[] | null
+          updated_at: string
+          user_id: string
+          weight_range: string | null
+        }
+        Insert: {
+          age_range?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          is_premium?: boolean | null
+          sensitivity_flags?: string[] | null
+          updated_at?: string
+          user_id: string
+          weight_range?: string | null
+        }
+        Update: {
+          age_range?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          is_premium?: boolean | null
+          sensitivity_flags?: string[] | null
+          updated_at?: string
+          user_id?: string
+          weight_range?: string | null
+        }
+        Relationships: []
+      }
+      session_logs: {
+        Row: {
+          created_at: string
+          dose: string
+          effects: string[] | null
+          id: string
+          intent: string
+          method: string
+          notes: string | null
+          outcome: string | null
+          strain_name: string
+          strain_type: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dose: string
+          effects?: string[] | null
+          id?: string
+          intent: string
+          method: string
+          notes?: string | null
+          outcome?: string | null
+          strain_name: string
+          strain_type?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dose?: string
+          effects?: string[] | null
+          id?: string
+          intent?: string
+          method?: string
+          notes?: string | null
+          outcome?: string | null
+          strain_name?: string
+          strain_type?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      strains: {
+        Row: {
+          cbd_range: string | null
+          common_effects: string[] | null
+          common_negatives: string[] | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          thc_range: string | null
+          type: string
+        }
+        Insert: {
+          cbd_range?: string | null
+          common_effects?: string[] | null
+          common_negatives?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          thc_range?: string | null
+          type: string
+        }
+        Update: {
+          cbd_range?: string | null
+          common_effects?: string[] | null
+          common_negatives?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          thc_range?: string | null
+          type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

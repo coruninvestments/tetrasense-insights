@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
-import { TrendingUp, Moon, Brain } from "lucide-react";
+import { TrendingUp, Moon, Brain, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface InsightCardProps {
   title: string;
   description: string;
-  icon?: "trending" | "sleep" | "focus";
+  icon?: "trending" | "sleep" | "focus" | "sparkles";
   stat?: string;
   statLabel?: string;
 }
@@ -14,6 +14,7 @@ const iconMap = {
   trending: TrendingUp,
   sleep: Moon,
   focus: Brain,
+  sparkles: Sparkles,
 };
 
 export function InsightCard({

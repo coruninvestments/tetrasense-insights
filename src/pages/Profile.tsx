@@ -1,9 +1,14 @@
 import { motion } from "framer-motion";
 import { User, Settings, Shield, Bell, ChevronRight, LogOut, Crown } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
+import { useSessionStats } from "@/hooks/useSessionLogs";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 const menuItems = [
   { icon: User, label: "Edit Profile", path: "/profile/edit" },
@@ -13,7 +18,22 @@ const menuItems = [
 ];
 
 export default function Profile() {
-  const isPremium = false;
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+  const { data: profile, isLoading: profileLoading } = useProfile();
+  const { data: stats, isLoading: statsLoading } = useSessionStats();
+
+  const isPremium = profile?.is_premium || false;
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success("Signed out successfully");
+      navigate("/auth");
+    } catch (error) {
+      toast.error("Failed to sign out");
+    }
+  };
 
   return (
     <AppLayout>
@@ -28,9 +48,13 @@ export default function Profile() {
               <User className="w-8 h-8 text-muted-foreground" />
             </div>
             <div>
-              <h1 className="font-serif text-xl font-medium text-foreground">
-                Welcome
-              </h1>
+              {profileLoading ? (
+                <Skeleton className="h-6 w-32 mb-1" />
+              ) : (
+                <h1 className="font-serif text-xl font-medium text-foreground">
+                  {profile?.display_name || user?.email?.split("@")[0] || "Welcome"}
+                </h1>
+              )}
               <p className="text-sm text-muted-foreground">
                 {isPremium ? "Premium Member" : "Free Account"}
               </p>
@@ -70,18 +94,34 @@ export default function Profile() {
               Your Journey
             </h2>
             <div className="grid grid-cols-3 gap-3">
-              <Card variant="glass" className="p-4 text-center">
-                <p className="text-2xl font-serif font-medium text-foreground">47</p>
-                <p className="text-xs text-muted-foreground">Sessions</p>
-              </Card>
-              <Card variant="glass" className="p-4 text-center">
-                <p className="text-2xl font-serif font-medium text-foreground">12</p>
-                <p className="text-xs text-muted-foreground">Day Streak</p>
-              </Card>
-              <Card variant="glass" className="p-4 text-center">
-                <p className="text-2xl font-serif font-medium text-foreground">8</p>
-                <p className="text-xs text-muted-foreground">Strains</p>
-              </Card>
+              {statsLoading ? (
+                <>
+                  <Skeleton className="h-20 rounded-xl" />
+                  <Skeleton className="h-20 rounded-xl" />
+                  <Skeleton className="h-20 rounded-xl" />
+                </>
+              ) : (
+                <>
+                  <Card variant="glass" className="p-4 text-center">
+                    <p className="text-2xl font-serif font-medium text-foreground">
+                      {stats?.totalSessions || 0}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Sessions</p>
+                  </Card>
+                  <Card variant="glass" className="p-4 text-center">
+                    <p className="text-2xl font-serif font-medium text-foreground">
+                      {stats?.thisWeek || 0}
+                    </p>
+                    <p className="text-xs text-muted-foreground">This Week</p>
+                  </Card>
+                  <Card variant="glass" className="p-4 text-center">
+                    <p className="text-2xl font-serif font-medium text-foreground">
+                      {stats?.uniqueStrains || 0}
+                    </p>
+                    <p className="text-xs text-muted-foreground">Strains</p>
+                  </Card>
+                </>
+              )}
             </div>
           </section>
 
@@ -111,7 +151,11 @@ export default function Profile() {
           </section>
 
           {/* Sign Out */}
-          <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10">
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+            onClick={handleSignOut}
+          >
             <LogOut className="w-5 h-5 mr-2" />
             Sign Out
           </Button>

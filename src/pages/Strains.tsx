@@ -1,60 +1,11 @@
 import { motion } from "framer-motion";
-import { Search, Filter } from "lucide-react";
+import { Search } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { AppLayout } from "@/components/layout/AppLayout";
-
-const strains = [
-  {
-    id: "1",
-    name: "Blue Dream",
-    type: "Hybrid",
-    effects: ["Relaxed", "Creative", "Euphoric"],
-    thc: "17-24%",
-    description: "A balanced hybrid known for gentle cerebral invigoration",
-  },
-  {
-    id: "2",
-    name: "Granddaddy Purple",
-    type: "Indica",
-    effects: ["Sleepy", "Relaxed", "Hungry"],
-    thc: "17-27%",
-    description: "A famous indica with potent physical relaxation effects",
-  },
-  {
-    id: "3",
-    name: "Jack Herer",
-    type: "Sativa",
-    effects: ["Focused", "Creative", "Euphoric"],
-    thc: "15-24%",
-    description: "A clear-headed, creative sativa named after the cannabis activist",
-  },
-  {
-    id: "4",
-    name: "OG Kush",
-    type: "Hybrid",
-    effects: ["Relaxed", "Euphoric", "Sleepy"],
-    thc: "19-26%",
-    description: "A legendary strain with stress-relieving and mood-enhancing effects",
-  },
-  {
-    id: "5",
-    name: "Girl Scout Cookies",
-    type: "Hybrid",
-    effects: ["Euphoric", "Relaxed", "Creative"],
-    thc: "25-28%",
-    description: "A potent hybrid with full-body relaxation and cerebral euphoria",
-  },
-  {
-    id: "6",
-    name: "Northern Lights",
-    type: "Indica",
-    effects: ["Sleepy", "Relaxed", "Happy"],
-    thc: "16-21%",
-    description: "A classic indica known for dreamy, peaceful relaxation",
-  },
-];
+import { useStrains } from "@/hooks/useStrains";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const typeColors = {
   Indica: "bg-purple-100 text-purple-700",
@@ -62,15 +13,75 @@ const typeColors = {
   Hybrid: "bg-emerald-100 text-emerald-700",
 };
 
+// Fallback strains for when database is empty
+const fallbackStrains = [
+  {
+    id: "1",
+    name: "Blue Dream",
+    type: "Hybrid",
+    common_effects: ["Relaxed", "Creative", "Euphoric"],
+    thc_range: "17-24%",
+    description: "A balanced hybrid known for gentle cerebral invigoration",
+  },
+  {
+    id: "2",
+    name: "Granddaddy Purple",
+    type: "Indica",
+    common_effects: ["Sleepy", "Relaxed", "Hungry"],
+    thc_range: "17-27%",
+    description: "A famous indica with potent physical relaxation effects",
+  },
+  {
+    id: "3",
+    name: "Jack Herer",
+    type: "Sativa",
+    common_effects: ["Focused", "Creative", "Euphoric"],
+    thc_range: "15-24%",
+    description: "A clear-headed, creative sativa named after the cannabis activist",
+  },
+  {
+    id: "4",
+    name: "OG Kush",
+    type: "Hybrid",
+    common_effects: ["Relaxed", "Euphoric", "Sleepy"],
+    thc_range: "19-26%",
+    description: "A legendary strain with stress-relieving and mood-enhancing effects",
+  },
+  {
+    id: "5",
+    name: "Girl Scout Cookies",
+    type: "Hybrid",
+    common_effects: ["Euphoric", "Relaxed", "Creative"],
+    thc_range: "25-28%",
+    description: "A potent hybrid with full-body relaxation and cerebral euphoria",
+  },
+  {
+    id: "6",
+    name: "Northern Lights",
+    type: "Indica",
+    common_effects: ["Sleepy", "Relaxed", "Happy"],
+    thc_range: "16-21%",
+    description: "A classic indica known for dreamy, peaceful relaxation",
+  },
+];
+
 export default function Strains() {
   const [search, setSearch] = useState("");
   const [selectedType, setSelectedType] = useState<string | null>(null);
+  
+  const { data: dbStrains, isLoading } = useStrains(search, selectedType);
 
-  const filteredStrains = strains.filter((strain) => {
-    const matchesSearch = strain.name.toLowerCase().includes(search.toLowerCase());
-    const matchesType = !selectedType || strain.type === selectedType;
-    return matchesSearch && matchesType;
-  });
+  // Use database strains if available, otherwise use fallback
+  const strains = dbStrains && dbStrains.length > 0 ? dbStrains : fallbackStrains;
+
+  // Filter fallback strains locally if using them
+  const filteredStrains = dbStrains && dbStrains.length > 0 
+    ? strains 
+    : strains.filter((strain) => {
+        const matchesSearch = strain.name.toLowerCase().includes(search.toLowerCase());
+        const matchesType = !selectedType || strain.type === selectedType;
+        return matchesSearch && matchesType;
+      });
 
   return (
     <AppLayout>
@@ -116,51 +127,67 @@ export default function Strains() {
         </header>
 
         <div className="px-5 pb-8 space-y-3">
-          {filteredStrains.map((strain, index) => (
-            <motion.div
-              key={strain.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-            >
-              <Link to={`/strains/${strain.id}`}>
-                <Card variant="interactive" className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <h3 className="font-serif text-lg font-medium text-foreground">
-                        {strain.name}
-                      </h3>
-                      <span
-                        className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium mt-1 ${
-                          typeColors[strain.type as keyof typeof typeColors]
-                        }`}
-                      >
-                        {strain.type}
-                      </span>
+          {isLoading ? (
+            <>
+              <Skeleton className="h-32 rounded-xl" />
+              <Skeleton className="h-32 rounded-xl" />
+              <Skeleton className="h-32 rounded-xl" />
+            </>
+          ) : filteredStrains.length > 0 ? (
+            filteredStrains.map((strain, index) => (
+              <motion.div
+                key={strain.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <Link to={`/strains/${strain.id}`}>
+                  <Card variant="interactive" className="p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h3 className="font-serif text-lg font-medium text-foreground">
+                          {strain.name}
+                        </h3>
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium mt-1 ${
+                            typeColors[strain.type as keyof typeof typeColors]
+                          }`}
+                        >
+                          {strain.type}
+                        </span>
+                      </div>
+                      {strain.thc_range && (
+                        <span className="text-sm text-muted-foreground">
+                          THC {strain.thc_range}
+                        </span>
+                      )}
                     </div>
-                    <span className="text-sm text-muted-foreground">
-                      THC {strain.thc}
-                    </span>
-                  </div>
 
-                  <p className="text-sm text-muted-foreground mb-3">
-                    {strain.description}
-                  </p>
+                    {strain.description && (
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {strain.description}
+                      </p>
+                    )}
 
-                  <div className="flex flex-wrap gap-1.5">
-                    {strain.effects.map((effect) => (
-                      <span
-                        key={effect}
-                        className="px-2 py-1 rounded-md bg-secondary text-xs text-secondary-foreground"
-                      >
-                        {effect}
-                      </span>
-                    ))}
-                  </div>
-                </Card>
-              </Link>
-            </motion.div>
-          ))}
+                    <div className="flex flex-wrap gap-1.5">
+                      {strain.common_effects?.map((effect) => (
+                        <span
+                          key={effect}
+                          className="px-2 py-1 rounded-md bg-secondary text-xs text-secondary-foreground"
+                        >
+                          {effect}
+                        </span>
+                      ))}
+                    </div>
+                  </Card>
+                </Link>
+              </motion.div>
+            ))
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">No strains found</p>
+            </div>
+          )}
         </div>
       </div>
     </AppLayout>
