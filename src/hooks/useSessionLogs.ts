@@ -2,27 +2,52 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
+export type SessionIntent = 'sleep' | 'relaxation' | 'creativity' | 'focus' | 'pain_relief' | 'social' | 'recreation';
+export type SessionMethod = 'smoke' | 'vape' | 'edible' | 'tincture' | 'topical' | 'other';
+export type DoseLevel = 'low' | 'medium' | 'high';
+
+export interface EffectSliders {
+  sleepiness: number;
+  relaxation: number;
+  anxiety: number;
+  focus: number;
+  pain_relief: number;
+  euphoria: number;
+}
+
 export interface SessionLog {
   id: string;
   user_id: string;
+  created_at: string;
+  local_time: string | null;
   intent: string;
-  strain_name: string;
+  strain_id: string | null;
+  strain_name_text: string;
   strain_type: string | null;
   method: string;
   dose: string;
-  effects: string[];
+  dose_level: DoseLevel | null;
+  dose_amount_mg: number | null;
+  effect_sleepiness: number | null;
+  effect_relaxation: number | null;
+  effect_anxiety: number | null;
+  effect_focus: number | null;
+  effect_pain_relief: number | null;
+  effect_euphoria: number | null;
+  effects: string[] | null;
   notes: string | null;
   outcome: string | null;
-  created_at: string;
 }
 
 export interface CreateSessionLogInput {
-  intent: string;
-  strain_name: string;
+  intent: SessionIntent;
+  strain_id?: string | null;
+  strain_name_text: string;
   strain_type?: string;
-  method: string;
-  dose: string;
-  effects: string[];
+  method: SessionMethod;
+  dose_level: DoseLevel;
+  dose_amount_mg?: number | null;
+  effects: EffectSliders;
   notes?: string;
   outcome?: string;
 }
@@ -99,11 +124,11 @@ export function useSessionStats() {
       // Get unique strains
       const { data: strains, error: strainsError } = await supabase
         .from("session_logs")
-        .select("strain_name");
+        .select("strain_name_text");
 
       if (strainsError) throw strainsError;
 
-      const uniqueStrains = new Set(strains?.map((s) => s.strain_name)).size;
+      const uniqueStrains = new Set(strains?.map((s) => s.strain_name_text)).size;
 
       return {
         thisWeek: weekSessions?.length || 0,
@@ -123,11 +148,42 @@ export function useCreateSessionLog() {
     mutationFn: async (input: CreateSessionLogInput) => {
       if (!user) throw new Error("Not authenticated");
 
+      // Capture local time
+      const now = new Date();
+      const localTime = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true 
+      });
+
+      // Map old dose field for backwards compatibility
+      const doseMap: Record<DoseLevel, string> = {
+        low: 'low',
+        medium: 'medium', 
+        high: 'high'
+      };
+
       const { data, error } = await supabase
         .from("session_logs")
         .insert({
           user_id: user.id,
-          ...input,
+          intent: input.intent,
+          strain_id: input.strain_id || null,
+          strain_name_text: input.strain_name_text,
+          strain_type: input.strain_type || null,
+          method: input.method,
+          dose: doseMap[input.dose_level],
+          dose_level: input.dose_level,
+          dose_amount_mg: input.dose_amount_mg || null,
+          local_time: localTime,
+          effect_sleepiness: input.effects.sleepiness,
+          effect_relaxation: input.effects.relaxation,
+          effect_anxiety: input.effects.anxiety,
+          effect_focus: input.effects.focus,
+          effect_pain_relief: input.effects.pain_relief,
+          effect_euphoria: input.effects.euphoria,
+          notes: input.notes || null,
+          outcome: input.outcome || null,
         })
         .select()
         .single();

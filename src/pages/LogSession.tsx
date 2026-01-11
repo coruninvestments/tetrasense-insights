@@ -4,36 +4,39 @@ import { ArrowLeft, Check, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { useCreateSessionLog } from "@/hooks/useSessionLogs";
+import { EffectSlider } from "@/components/log/EffectSlider";
+import { useCreateSessionLog, SessionIntent, SessionMethod, DoseLevel, EffectSliders } from "@/hooks/useSessionLogs";
+import { useStrains } from "@/hooks/useStrains";
 import { toast } from "sonner";
 
-const intents = [
+const intents: { id: SessionIntent; label: string; emoji: string }[] = [
   { id: "sleep", label: "Sleep", emoji: "🌙" },
-  { id: "anxiety", label: "Anxiety Relief", emoji: "😌" },
-  { id: "focus", label: "Focus", emoji: "🎯" },
-  { id: "pain", label: "Pain Relief", emoji: "💆" },
   { id: "relaxation", label: "Relaxation", emoji: "🧘" },
+  { id: "focus", label: "Focus", emoji: "🎯" },
+  { id: "pain_relief", label: "Pain Relief", emoji: "💆" },
   { id: "creativity", label: "Creativity", emoji: "🎨" },
+  { id: "social", label: "Social", emoji: "👥" },
+  { id: "recreation", label: "Recreation", emoji: "🎉" },
 ];
 
-const methods = [
-  { id: "smoke", label: "Smoke" },
-  { id: "vape", label: "Vape" },
-  { id: "edible", label: "Edible" },
-  { id: "tincture", label: "Tincture" },
-  { id: "other", label: "Other" },
+const methods: { id: SessionMethod; label: string; emoji: string }[] = [
+  { id: "smoke", label: "Smoke", emoji: "🚬" },
+  { id: "vape", label: "Vape", emoji: "💨" },
+  { id: "edible", label: "Edible", emoji: "🍪" },
+  { id: "tincture", label: "Tincture", emoji: "💧" },
+  { id: "topical", label: "Topical", emoji: "🧴" },
+  { id: "other", label: "Other", emoji: "✨" },
 ];
 
-const effects = [
-  { id: "relaxed", label: "Relaxed" },
-  { id: "sleepy", label: "Sleepy" },
-  { id: "euphoric", label: "Euphoric" },
-  { id: "focused", label: "Focused" },
-  { id: "creative", label: "Creative" },
-  { id: "anxious", label: "Anxious" },
-  { id: "paranoid", label: "Paranoid" },
-  { id: "hungry", label: "Hungry" },
+const effectsConfig = [
+  { key: "sleepiness" as const, label: "Sleepiness", emoji: "😴" },
+  { key: "relaxation" as const, label: "Relaxation", emoji: "😌" },
+  { key: "anxiety" as const, label: "Anxiety", emoji: "😰" },
+  { key: "focus" as const, label: "Focus", emoji: "🎯" },
+  { key: "pain_relief" as const, label: "Pain Relief", emoji: "🩹" },
+  { key: "euphoria" as const, label: "Euphoria", emoji: "🤩" },
 ];
 
 type Step = "intent" | "strain" | "method" | "dose" | "effects" | "done";
@@ -41,48 +44,69 @@ type Step = "intent" | "strain" | "method" | "dose" | "effects" | "done";
 export default function LogSession() {
   const navigate = useNavigate();
   const createSession = useCreateSessionLog();
+  const { data: strains } = useStrains();
   
   const [step, setStep] = useState<Step>("intent");
-  const [selectedIntent, setSelectedIntent] = useState<string>("");
-  const [strain, setStrain] = useState("");
-  const [selectedMethod, setSelectedMethod] = useState<string>("");
-  const [dose, setDose] = useState(1); // 0 = low, 1 = medium, 2 = high
-  const [selectedEffects, setSelectedEffects] = useState<string[]>([]);
+  const [selectedIntent, setSelectedIntent] = useState<SessionIntent | "">("");
+  const [strainText, setStrainText] = useState("");
+  const [selectedStrainId, setSelectedStrainId] = useState<string | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<SessionMethod | "">("");
+  const [doseLevel, setDoseLevel] = useState<DoseLevel>("medium");
+  const [doseAmountMg, setDoseAmountMg] = useState<string>("");
+  const [effects, setEffects] = useState<EffectSliders>({
+    sleepiness: 0,
+    relaxation: 0,
+    anxiety: 0,
+    focus: 0,
+    pain_relief: 0,
+    euphoria: 0,
+  });
+  const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
 
   const steps: Step[] = ["intent", "strain", "method", "dose", "effects", "done"];
   const currentStepIndex = steps.indexOf(step);
   const progress = ((currentStepIndex + 1) / steps.length) * 100;
 
-  const doseLabels = ["Low", "Medium", "High"];
+  const doseLevels: { id: DoseLevel; label: string; description: string }[] = [
+    { id: "low", label: "Low", description: "Microdose or low tolerance" },
+    { id: "medium", label: "Medium", description: "Standard session" },
+    { id: "high", label: "High", description: "Above usual intake" },
+  ];
+
+  const handleStrainSelect = (name: string, id?: string) => {
+    setStrainText(name);
+    setSelectedStrainId(id || null);
+  };
+
+  const updateEffect = (key: keyof EffectSliders, value: number) => {
+    setEffects(prev => ({ ...prev, [key]: value }));
+  };
+
+  const calculateOutcome = (): string => {
+    const positiveScore = effects.relaxation + effects.focus + effects.euphoria + effects.pain_relief;
+    const negativeScore = effects.anxiety * 2; // Weight anxiety more heavily
+    const neutralScore = effects.sleepiness;
+
+    if (positiveScore > negativeScore + neutralScore) return "positive";
+    if (negativeScore > positiveScore) return "negative";
+    return "neutral";
+  };
 
   const goNext = async () => {
     if (step === "effects") {
-      // Save session to database
       setSaving(true);
       try {
-        // Determine outcome based on effects
-        const negativeEffects = selectedEffects.filter((e) =>
-          ["anxious", "paranoid"].includes(e)
-        );
-        const positiveEffects = selectedEffects.filter((e) =>
-          ["relaxed", "euphoric", "focused", "creative"].includes(e)
-        );
-
-        let outcome = "neutral";
-        if (positiveEffects.length > negativeEffects.length) {
-          outcome = "positive";
-        } else if (negativeEffects.length > positiveEffects.length) {
-          outcome = "negative";
-        }
-
         await createSession.mutateAsync({
-          intent: selectedIntent,
-          strain_name: strain,
-          method: selectedMethod,
-          dose: doseLabels[dose].toLowerCase(),
-          effects: selectedEffects,
-          outcome,
+          intent: selectedIntent as SessionIntent,
+          strain_id: selectedStrainId,
+          strain_name_text: strainText,
+          method: selectedMethod as SessionMethod,
+          dose_level: doseLevel,
+          dose_amount_mg: doseAmountMg ? parseFloat(doseAmountMg) : null,
+          effects,
+          notes: notes || undefined,
+          outcome: calculateOutcome(),
         });
 
         setStep("done");
@@ -108,13 +132,12 @@ export default function LogSession() {
     }
   };
 
-  const toggleEffect = (effectId: string) => {
-    setSelectedEffects((prev) =>
-      prev.includes(effectId)
-        ? prev.filter((e) => e !== effectId)
-        : [...prev, effectId]
-    );
-  };
+  // Filter strains for suggestions
+  const strainSuggestions = strains?.filter(s => 
+    s.name.toLowerCase().includes(strainText.toLowerCase())
+  ).slice(0, 5) || [];
+
+  const popularStrains = ["Blue Dream", "OG Kush", "Granddaddy Purple", "Jack Herer", "Girl Scout Cookies"];
 
   return (
     <AppLayout showNav={false}>
@@ -205,26 +228,48 @@ export default function LogSession() {
                   Which strain?
                 </h2>
                 <p className="text-muted-foreground mb-6">
-                  Enter the strain name or search
+                  Enter the strain name or select from suggestions
                 </p>
 
-                <input
+                <Input
                   type="text"
-                  value={strain}
-                  onChange={(e) => setStrain(e.target.value)}
+                  value={strainText}
+                  onChange={(e) => {
+                    setStrainText(e.target.value);
+                    setSelectedStrainId(null);
+                  }}
                   placeholder="e.g., Blue Dream, OG Kush..."
-                  className="w-full h-14 px-5 rounded-xl bg-secondary border-0 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="h-14"
                 />
+
+                {strainText && strainSuggestions.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {strainSuggestions.map((strain) => (
+                      <button
+                        key={strain.id}
+                        onClick={() => handleStrainSelect(strain.name, strain.id)}
+                        className={`w-full text-left px-4 py-2 rounded-lg text-sm ${
+                          selectedStrainId === strain.id
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-secondary hover:bg-secondary/80"
+                        }`}
+                      >
+                        <span className="font-medium">{strain.name}</span>
+                        <span className="text-xs ml-2 opacity-70">{strain.type}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 <div className="mt-4">
                   <p className="text-xs text-muted-foreground mb-2">Popular strains</p>
                   <div className="flex flex-wrap gap-2">
-                    {["Blue Dream", "OG Kush", "Granddaddy Purple", "Jack Herer", "Girl Scout Cookies"].map((s) => (
+                    {popularStrains.map((s) => (
                       <button
                         key={s}
-                        onClick={() => setStrain(s)}
+                        onClick={() => handleStrainSelect(s)}
                         className={`px-3 py-1.5 rounded-full text-sm ${
-                          strain === s
+                          strainText === s
                             ? "bg-primary text-primary-foreground"
                             : "bg-secondary text-secondary-foreground"
                         }`}
@@ -240,7 +285,7 @@ export default function LogSession() {
                     variant="primary"
                     size="lg"
                     className="w-full"
-                    disabled={!strain}
+                    disabled={!strainText}
                     onClick={goNext}
                   >
                     Continue
@@ -260,22 +305,20 @@ export default function LogSession() {
                   Select your consumption method
                 </p>
 
-                <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
                   {methods.map((method) => (
                     <Card
                       key={method.id}
                       variant="interactive"
-                      className={`p-4 flex items-center justify-between ${
+                      className={`p-4 ${
                         selectedMethod === method.id
                           ? "ring-2 ring-primary bg-primary/5"
                           : ""
                       }`}
                       onClick={() => setSelectedMethod(method.id)}
                     >
-                      <span className="font-medium">{method.label}</span>
-                      {selectedMethod === method.id && (
-                        <Check className="w-5 h-5 text-primary" />
-                      )}
+                      <span className="text-2xl mb-2 block">{method.emoji}</span>
+                      <span className="text-sm font-medium">{method.label}</span>
                     </Card>
                   ))}
                 </div>
@@ -301,43 +344,47 @@ export default function LogSession() {
                 <h2 className="font-serif text-2xl font-medium text-foreground mb-2">
                   How much?
                 </h2>
-                <p className="text-muted-foreground mb-8">
+                <p className="text-muted-foreground mb-6">
                   Estimate your dose level
                 </p>
 
-                <div className="px-4">
-                  <div className="relative">
-                    <input
-                      type="range"
-                      min={0}
-                      max={2}
-                      value={dose}
-                      onChange={(e) => setDose(Number(e.target.value))}
-                      className="w-full h-2 bg-secondary rounded-full appearance-none cursor-pointer accent-primary"
-                    />
-                    <div className="flex justify-between mt-3">
-                      {doseLabels.map((label, i) => (
-                        <span
-                          key={label}
-                          className={`text-sm ${
-                            dose === i
-                              ? "text-primary font-medium"
-                              : "text-muted-foreground"
-                          }`}
-                        >
-                          {label}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+                <div className="space-y-3">
+                  {doseLevels.map((level) => (
+                    <Card
+                      key={level.id}
+                      variant="interactive"
+                      className={`p-4 flex items-center justify-between ${
+                        doseLevel === level.id
+                          ? "ring-2 ring-primary bg-primary/5"
+                          : ""
+                      }`}
+                      onClick={() => setDoseLevel(level.id)}
+                    >
+                      <div>
+                        <span className="font-medium block">{level.label}</span>
+                        <span className="text-xs text-muted-foreground">{level.description}</span>
+                      </div>
+                      {doseLevel === level.id && (
+                        <Check className="w-5 h-5 text-primary" />
+                      )}
+                    </Card>
+                  ))}
+                </div>
 
-                  <Card variant="glass" className="mt-8 p-4">
-                    <p className="text-sm text-muted-foreground">
-                      {dose === 0 && "A small amount — good for microdosing or low tolerance"}
-                      {dose === 1 && "A standard session — your typical amount"}
-                      {dose === 2 && "A larger amount — above your usual intake"}
-                    </p>
-                  </Card>
+                <div className="mt-6">
+                  <label className="text-sm text-muted-foreground mb-2 block">
+                    Dose amount (optional)
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      value={doseAmountMg}
+                      onChange={(e) => setDoseAmountMg(e.target.value)}
+                      placeholder="e.g., 10"
+                      className="flex-1"
+                    />
+                    <span className="text-sm text-muted-foreground">mg</span>
+                  </div>
                 </div>
 
                 <div className="mt-8">
@@ -358,26 +405,34 @@ export default function LogSession() {
             {step === "effects" && (
               <div>
                 <h2 className="font-serif text-2xl font-medium text-foreground mb-2">
-                  How do you feel?
+                  Rate your experience
                 </h2>
                 <p className="text-muted-foreground mb-6">
-                  Select all that apply
+                  Slide to rate each effect from 0-10
                 </p>
 
-                <div className="flex flex-wrap gap-2">
-                  {effects.map((effect) => (
-                    <button
-                      key={effect.id}
-                      onClick={() => toggleEffect(effect.id)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                        selectedEffects.includes(effect.id)
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-secondary text-secondary-foreground"
-                      }`}
-                    >
-                      {effect.label}
-                    </button>
+                <div className="space-y-6">
+                  {effectsConfig.map((effect) => (
+                    <EffectSlider
+                      key={effect.key}
+                      label={effect.label}
+                      emoji={effect.emoji}
+                      value={effects[effect.key]}
+                      onChange={(value) => updateEffect(effect.key, value)}
+                    />
                   ))}
+                </div>
+
+                <div className="mt-6">
+                  <label className="text-sm text-muted-foreground mb-2 block">
+                    Notes (optional)
+                  </label>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Any additional thoughts about this session..."
+                    className="w-full h-24 px-4 py-3 rounded-xl bg-secondary border-0 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                  />
                 </div>
 
                 <div className="mt-8">
