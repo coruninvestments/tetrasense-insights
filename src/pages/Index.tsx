@@ -7,6 +7,7 @@ import { InsightCard } from "@/components/home/InsightCard";
 import { QuickStat } from "@/components/home/QuickStat";
 import { RecentSession } from "@/components/home/RecentSession";
 import { useRecentSessions, useSessionStats } from "@/hooks/useSessionLogs";
+import { useInsights } from "@/hooks/useInsights";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
@@ -15,6 +16,7 @@ const Index = () => {
   const { user } = useAuth();
   const { data: recentSessions, isLoading: sessionsLoading } = useRecentSessions(3);
   const { data: stats, isLoading: statsLoading } = useSessionStats();
+  const { data: insights } = useInsights();
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -59,12 +61,20 @@ const Index = () => {
             </Link>
           </motion.div>
 
-          {/* Insight Card - Show when there's data */}
-          {stats && stats.totalSessions > 0 ? (
+          {/* Insight Card - Show dynamic insights */}
+          {insights?.patterns && insights.patterns.length > 0 ? (
             <InsightCard
-              icon="sleep"
-              title="Keep Building Your Data"
-              description={`You've logged ${stats.totalSessions} session${stats.totalSessions > 1 ? 's' : ''}. Keep tracking to unlock personalized insights about your patterns.`}
+              icon={insights.patterns[0].icon}
+              title={insights.patterns[0].title}
+              description={insights.patterns[0].description}
+              stat={`${insights.weeklyPositiveRate}%`}
+              statLabel="positive this week"
+            />
+          ) : stats && stats.totalSessions > 0 ? (
+            <InsightCard
+              icon="trending"
+              title="Building Your Insights"
+              description={`You've logged ${stats.totalSessions} session${stats.totalSessions > 1 ? 's' : ''}. ${insights?.streak ? `Current streak: ${insights.streak} day${insights.streak > 1 ? 's' : ''}!` : 'Keep tracking to discover patterns.'}`}
               stat={`${stats.uniqueStrains}`}
               statLabel="strains tried"
             />
@@ -77,9 +87,10 @@ const Index = () => {
           )}
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-4 gap-2">
             {statsLoading ? (
               <>
+                <Skeleton className="h-20 rounded-xl" />
                 <Skeleton className="h-20 rounded-xl" />
                 <Skeleton className="h-20 rounded-xl" />
                 <Skeleton className="h-20 rounded-xl" />
@@ -87,25 +98,32 @@ const Index = () => {
             ) : (
               <>
                 <QuickStat
-                  icon={Calendar}
-                  label="This Week"
-                  value={String(stats?.thisWeek || 0)}
-                  trend="neutral"
+                  icon={Flame}
+                  label="Streak"
+                  value={`${insights?.streak || 0}d`}
+                  trend={insights?.streak && insights.streak >= 3 ? "up" : "neutral"}
                   delay={0.2}
                 />
                 <QuickStat
                   icon={TrendingUp}
-                  label="Total"
-                  value={String(stats?.totalSessions || 0)}
-                  trend="up"
+                  label="Positive"
+                  value={`${insights?.weeklyPositiveRate || 0}%`}
+                  trend={insights?.weeklyPositiveRate && insights.weeklyPositiveRate >= 70 ? "up" : "neutral"}
                   delay={0.25}
+                />
+                <QuickStat
+                  icon={Calendar}
+                  label="Avg Time"
+                  value={insights?.avgSessionTimeLabel || "—"}
+                  trend="neutral"
+                  delay={0.3}
                 />
                 <QuickStat
                   icon={Flame}
                   label="Strains"
                   value={String(stats?.uniqueStrains || 0)}
                   trend="neutral"
-                  delay={0.3}
+                  delay={0.35}
                 />
               </>
             )}
