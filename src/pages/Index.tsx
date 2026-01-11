@@ -138,7 +138,7 @@ const Index = () => {
                   <RecentSession
                     key={session.id}
                     intent={session.intent}
-                    strain={session.strain_name}
+                    strain={session.strain_name_text}
                     outcome={session.outcome as "positive" | "neutral" | "negative" || "neutral"}
                     timeAgo={formatSessionTime(session.created_at)}
                     delay={0.35 + index * 0.05}

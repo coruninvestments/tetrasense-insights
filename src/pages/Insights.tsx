@@ -23,7 +23,7 @@ export default function Insights() {
   const topIntentName = topIntent ? Object.entries(topIntent).sort((a, b) => b[1] - a[1])[0]?.[0] : null;
   
   const topStrain = sessions?.reduce((acc, session) => {
-    acc[session.strain_name] = (acc[session.strain_name] || 0) + 1;
+    acc[session.strain_name_text] = (acc[session.strain_name_text] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
   

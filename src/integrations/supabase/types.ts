@@ -54,43 +54,81 @@ export type Database = {
         Row: {
           created_at: string
           dose: string
+          dose_amount_mg: number | null
+          dose_level: Database["public"]["Enums"]["dose_level"] | null
+          effect_anxiety: number | null
+          effect_euphoria: number | null
+          effect_focus: number | null
+          effect_pain_relief: number | null
+          effect_relaxation: number | null
+          effect_sleepiness: number | null
           effects: string[] | null
           id: string
           intent: string
+          local_time: string | null
           method: string
           notes: string | null
           outcome: string | null
-          strain_name: string
+          strain_id: string | null
+          strain_name_text: string
           strain_type: string | null
           user_id: string
         }
         Insert: {
           created_at?: string
           dose: string
+          dose_amount_mg?: number | null
+          dose_level?: Database["public"]["Enums"]["dose_level"] | null
+          effect_anxiety?: number | null
+          effect_euphoria?: number | null
+          effect_focus?: number | null
+          effect_pain_relief?: number | null
+          effect_relaxation?: number | null
+          effect_sleepiness?: number | null
           effects?: string[] | null
           id?: string
           intent: string
+          local_time?: string | null
           method: string
           notes?: string | null
           outcome?: string | null
-          strain_name: string
+          strain_id?: string | null
+          strain_name_text: string
           strain_type?: string | null
           user_id: string
         }
         Update: {
           created_at?: string
           dose?: string
+          dose_amount_mg?: number | null
+          dose_level?: Database["public"]["Enums"]["dose_level"] | null
+          effect_anxiety?: number | null
+          effect_euphoria?: number | null
+          effect_focus?: number | null
+          effect_pain_relief?: number | null
+          effect_relaxation?: number | null
+          effect_sleepiness?: number | null
           effects?: string[] | null
           id?: string
           intent?: string
+          local_time?: string | null
           method?: string
           notes?: string | null
           outcome?: string | null
-          strain_name?: string
+          strain_id?: string | null
+          strain_name_text?: string
           strain_type?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "session_logs_strain_id_fkey"
+            columns: ["strain_id"]
+            isOneToOne: false
+            referencedRelation: "strains"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       strains: {
         Row: {
@@ -136,7 +174,22 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      dose_level: "low" | "medium" | "high"
+      session_intent:
+        | "sleep"
+        | "relaxation"
+        | "creativity"
+        | "focus"
+        | "pain_relief"
+        | "social"
+        | "recreation"
+      session_method:
+        | "smoke"
+        | "vape"
+        | "edible"
+        | "tincture"
+        | "topical"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -263,6 +316,25 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      dose_level: ["low", "medium", "high"],
+      session_intent: [
+        "sleep",
+        "relaxation",
+        "creativity",
+        "focus",
+        "pain_relief",
+        "social",
+        "recreation",
+      ],
+      session_method: [
+        "smoke",
+        "vape",
+        "edible",
+        "tincture",
+        "topical",
+        "other",
+      ],
+    },
   },
 } as const
