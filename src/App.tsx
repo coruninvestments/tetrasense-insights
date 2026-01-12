@@ -9,11 +9,11 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import LogSession from "./pages/LogSession";
 import Strains from "./pages/Strains";
+import StrainDetail from "./pages/StrainDetail";
 import Learn from "./pages/Learn";
 import Insights from "./pages/Insights";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
-
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -53,7 +53,7 @@ const App = () => (
               path="/strains/:id"
               element={
                 <ProtectedRoute>
-                  <Strains />
+                  <StrainDetail />
                 </ProtectedRoute>
               }
             />
