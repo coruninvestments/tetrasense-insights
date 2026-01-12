@@ -130,37 +130,84 @@ export type Database = {
           },
         ]
       }
+      strain_aliases: {
+        Row: {
+          alias_name: string
+          created_at: string
+          id: string
+          strain_id: string
+        }
+        Insert: {
+          alias_name: string
+          created_at?: string
+          id?: string
+          strain_id: string
+        }
+        Update: {
+          alias_name?: string
+          created_at?: string
+          id?: string
+          strain_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strain_aliases_strain_id_fkey"
+            columns: ["strain_id"]
+            isOneToOne: false
+            referencedRelation: "strains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       strains: {
         Row: {
+          cbd_max: number | null
+          cbd_min: number | null
           cbd_range: string | null
           common_effects: string[] | null
           common_negatives: string[] | null
           created_at: string
           description: string | null
           id: string
+          is_pending: boolean | null
           name: string
+          submitted_by: string | null
+          thc_max: number | null
+          thc_min: number | null
           thc_range: string | null
           type: string
         }
         Insert: {
+          cbd_max?: number | null
+          cbd_min?: number | null
           cbd_range?: string | null
           common_effects?: string[] | null
           common_negatives?: string[] | null
           created_at?: string
           description?: string | null
           id?: string
+          is_pending?: boolean | null
           name: string
+          submitted_by?: string | null
+          thc_max?: number | null
+          thc_min?: number | null
           thc_range?: string | null
           type: string
         }
         Update: {
+          cbd_max?: number | null
+          cbd_min?: number | null
           cbd_range?: string | null
           common_effects?: string[] | null
           common_negatives?: string[] | null
           created_at?: string
           description?: string | null
           id?: string
+          is_pending?: boolean | null
           name?: string
+          submitted_by?: string | null
+          thc_max?: number | null
+          thc_min?: number | null
           thc_range?: string | null
           type?: string
         }
