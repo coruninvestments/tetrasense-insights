@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { AppLayout } from "@/components/layout/AppLayout";
-import { useStrains } from "@/hooks/useStrains";
+import { useStrains, formatPotencyRange } from "@/hooks/useStrains";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const typeColors = {
@@ -20,6 +20,8 @@ const fallbackStrains = [
     name: "Blue Dream",
     type: "Hybrid",
     common_effects: ["Relaxed", "Creative", "Euphoric"],
+    thc_min: 17,
+    thc_max: 24,
     thc_range: "17-24%",
     description: "A balanced hybrid known for gentle cerebral invigoration",
   },
@@ -28,6 +30,8 @@ const fallbackStrains = [
     name: "Granddaddy Purple",
     type: "Indica",
     common_effects: ["Sleepy", "Relaxed", "Hungry"],
+    thc_min: 17,
+    thc_max: 27,
     thc_range: "17-27%",
     description: "A famous indica with potent physical relaxation effects",
   },
@@ -36,6 +40,8 @@ const fallbackStrains = [
     name: "Jack Herer",
     type: "Sativa",
     common_effects: ["Focused", "Creative", "Euphoric"],
+    thc_min: 15,
+    thc_max: 24,
     thc_range: "15-24%",
     description: "A clear-headed, creative sativa named after the cannabis activist",
   },
@@ -44,6 +50,8 @@ const fallbackStrains = [
     name: "OG Kush",
     type: "Hybrid",
     common_effects: ["Relaxed", "Euphoric", "Sleepy"],
+    thc_min: 19,
+    thc_max: 26,
     thc_range: "19-26%",
     description: "A legendary strain with stress-relieving and mood-enhancing effects",
   },
@@ -52,6 +60,8 @@ const fallbackStrains = [
     name: "Girl Scout Cookies",
     type: "Hybrid",
     common_effects: ["Euphoric", "Relaxed", "Creative"],
+    thc_min: 25,
+    thc_max: 28,
     thc_range: "25-28%",
     description: "A potent hybrid with full-body relaxation and cerebral euphoria",
   },
@@ -60,6 +70,8 @@ const fallbackStrains = [
     name: "Northern Lights",
     type: "Indica",
     common_effects: ["Sleepy", "Relaxed", "Happy"],
+    thc_min: 16,
+    thc_max: 21,
     thc_range: "16-21%",
     description: "A classic indica known for dreamy, peaceful relaxation",
   },
@@ -156,9 +168,9 @@ export default function Strains() {
                           {strain.type}
                         </span>
                       </div>
-                      {strain.thc_range && (
+                      {(strain.thc_min !== null || strain.thc_max !== null || strain.thc_range) && (
                         <span className="text-sm text-muted-foreground">
-                          THC {strain.thc_range}
+                          THC {formatPotencyRange(strain.thc_min ?? null, strain.thc_max ?? null) || strain.thc_range}
                         </span>
                       )}
                     </div>

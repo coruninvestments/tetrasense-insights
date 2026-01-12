@@ -7,8 +7,8 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { EffectSlider } from "@/components/log/EffectSlider";
+import { StrainPicker } from "@/components/log/StrainPicker";
 import { useCreateSessionLog, SessionIntent, SessionMethod, DoseLevel, EffectSliders } from "@/hooks/useSessionLogs";
-import { useStrains } from "@/hooks/useStrains";
 import { toast } from "sonner";
 
 const intents: { id: SessionIntent; label: string; emoji: string }[] = [
@@ -44,7 +44,6 @@ type Step = "intent" | "strain" | "method" | "dose" | "effects" | "done";
 export default function LogSession() {
   const navigate = useNavigate();
   const createSession = useCreateSessionLog();
-  const { data: strains } = useStrains();
   
   const [step, setStep] = useState<Step>("intent");
   const [selectedIntent, setSelectedIntent] = useState<SessionIntent | "">("");
@@ -74,9 +73,9 @@ export default function LogSession() {
     { id: "high", label: "High", description: "Above usual intake" },
   ];
 
-  const handleStrainSelect = (name: string, id?: string) => {
+  const handleStrainSelect = (name: string, id: string | null, isPending?: boolean) => {
     setStrainText(name);
-    setSelectedStrainId(id || null);
+    setSelectedStrainId(id);
   };
 
   const updateEffect = (key: keyof EffectSliders, value: number) => {
@@ -132,12 +131,6 @@ export default function LogSession() {
     }
   };
 
-  // Filter strains for suggestions
-  const strainSuggestions = strains?.filter(s => 
-    s.name.toLowerCase().includes(strainText.toLowerCase())
-  ).slice(0, 5) || [];
-
-  const popularStrains = ["Blue Dream", "OG Kush", "Granddaddy Purple", "Jack Herer", "Girl Scout Cookies"];
 
   return (
     <AppLayout showNav={false}>
@@ -228,57 +221,14 @@ export default function LogSession() {
                   Which strain?
                 </h2>
                 <p className="text-muted-foreground mb-6">
-                  Enter the strain name or select from suggestions
+                  Search our library or add a custom strain
                 </p>
 
-                <Input
-                  type="text"
+                <StrainPicker
                   value={strainText}
-                  onChange={(e) => {
-                    setStrainText(e.target.value);
-                    setSelectedStrainId(null);
-                  }}
-                  placeholder="e.g., Blue Dream, OG Kush..."
-                  className="h-14"
+                  selectedStrainId={selectedStrainId}
+                  onSelect={handleStrainSelect}
                 />
-
-                {strainText && strainSuggestions.length > 0 && (
-                  <div className="mt-2 space-y-1">
-                    {strainSuggestions.map((strain) => (
-                      <button
-                        key={strain.id}
-                        onClick={() => handleStrainSelect(strain.name, strain.id)}
-                        className={`w-full text-left px-4 py-2 rounded-lg text-sm ${
-                          selectedStrainId === strain.id
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-secondary hover:bg-secondary/80"
-                        }`}
-                      >
-                        <span className="font-medium">{strain.name}</span>
-                        <span className="text-xs ml-2 opacity-70">{strain.type}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                <div className="mt-4">
-                  <p className="text-xs text-muted-foreground mb-2">Popular strains</p>
-                  <div className="flex flex-wrap gap-2">
-                    {popularStrains.map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => handleStrainSelect(s)}
-                        className={`px-3 py-1.5 rounded-full text-sm ${
-                          strainText === s
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-secondary text-secondary-foreground"
-                        }`}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </div>
 
                 <div className="mt-8">
                   <Button
