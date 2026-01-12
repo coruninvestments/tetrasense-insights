@@ -215,7 +215,28 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      strain_community_stats: {
+        Row: {
+          avg_anxiety: number | null
+          avg_euphoria: number | null
+          avg_focus: number | null
+          avg_pain_relief: number | null
+          avg_relaxation: number | null
+          avg_sleepiness: number | null
+          percent_positive_outcome: number | null
+          strain_id: string | null
+          total_sessions: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_logs_strain_id_fkey"
+            columns: ["strain_id"]
+            isOneToOne: false
+            referencedRelation: "strains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
