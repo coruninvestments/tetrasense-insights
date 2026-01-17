@@ -159,6 +159,13 @@ export function useCreateSessionLog() {
         throw new Error("Strain name is required");
       }
 
+      // Compute default outcome from effect sliders if not provided
+      const { sleepiness, relaxation, focus, pain_relief, anxiety } = input.effects;
+      const hasPositiveEffect = relaxation >= 6 || sleepiness >= 6 || focus >= 6 || pain_relief >= 6;
+      const hasLowAnxiety = anxiety <= 5;
+      const computedOutcome = hasPositiveEffect && hasLowAnxiety ? "positive" : "neutral";
+      const finalOutcome = input.outcome ?? computedOutcome;
+
       // Capture local time
       const now = new Date();
       const localTime = now.toLocaleTimeString('en-US', { 
@@ -194,7 +201,7 @@ export function useCreateSessionLog() {
           effect_pain_relief: input.effects.pain_relief,
           effect_euphoria: input.effects.euphoria,
           notes: input.notes || null,
-          outcome: input.outcome || null,
+          outcome: finalOutcome,
         })
         .select()
         .single();
