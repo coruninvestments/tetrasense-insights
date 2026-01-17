@@ -4,7 +4,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useStrain, formatPotencyRange } from "@/hooks/useStrains";
-import { useStrainCommunityStats, hasEnoughData, MIN_SESSIONS_FOR_DISPLAY } from "@/hooks/useStrainCommunityStats";
+import { useStrainCommunityStats, hasEnoughData, hasAggregateData, MIN_SESSIONS_FOR_DISPLAY } from "@/hooks/useStrainCommunityStats";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
