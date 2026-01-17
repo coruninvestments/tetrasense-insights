@@ -153,6 +153,12 @@ export function useCreateSessionLog() {
     mutationFn: async (input: CreateSessionLogInput) => {
       if (!user) throw new Error("Not authenticated");
 
+      // Normalize and validate strain name
+      const normalizedStrainName = input.strain_name_text.trim();
+      if (!normalizedStrainName) {
+        throw new Error("Strain name is required");
+      }
+
       // Capture local time
       const now = new Date();
       const localTime = now.toLocaleTimeString('en-US', { 
@@ -174,7 +180,7 @@ export function useCreateSessionLog() {
           user_id: user.id,
           intent: input.intent,
           strain_id: input.strain_id || null,
-          strain_name_text: input.strain_name_text,
+          strain_name_text: normalizedStrainName,
           strain_type: input.strain_type || null,
           method: input.method,
           dose: doseMap[input.dose_level],
