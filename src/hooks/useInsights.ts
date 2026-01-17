@@ -18,12 +18,20 @@ export interface PatternInsight {
   icon: "sleep" | "focus" | "trending" | "sparkles";
 }
 
+// Stable day key helper - produces YYYY-MM-DD regardless of locale
+function toDayKey(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 function calculateStreak(sessions: SessionLog[]): number {
   if (!sessions.length) return 0;
 
-  // Get unique dates with sessions (in local timezone)
+  // Get unique dates with sessions using stable day keys
   const datesWithSessions = new Set(
-    sessions.map((s) => new Date(s.created_at).toLocaleDateString())
+    sessions.map((s) => toDayKey(new Date(s.created_at)))
   );
 
   const today = new Date();
@@ -31,22 +39,22 @@ function calculateStreak(sessions: SessionLog[]): number {
   let currentDate = new Date(today);
 
   // Check if there's a session today or yesterday to start the streak
-  const todayStr = today.toLocaleDateString();
+  const todayKey = toDayKey(today);
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = yesterday.toLocaleDateString();
+  const yesterdayKey = toDayKey(yesterday);
 
-  if (!datesWithSessions.has(todayStr) && !datesWithSessions.has(yesterdayStr)) {
+  if (!datesWithSessions.has(todayKey) && !datesWithSessions.has(yesterdayKey)) {
     return 0;
   }
 
   // If no session today, start from yesterday
-  if (!datesWithSessions.has(todayStr)) {
+  if (!datesWithSessions.has(todayKey)) {
     currentDate = yesterday;
   }
 
   // Count consecutive days going backwards
-  while (datesWithSessions.has(currentDate.toLocaleDateString())) {
+  while (datesWithSessions.has(toDayKey(currentDate))) {
     streak++;
     currentDate.setDate(currentDate.getDate() - 1);
   }
