@@ -111,12 +111,65 @@ function getTimeLabel(hour: number | null): string {
   return "Night";
 }
 
+/**
+ * Confidence scoring thresholds
+ * 
+ * HIGH confidence requires:
+ *   - Sample size ≥ 5 sessions AND
+ *   - Strong effect signal (large difference, high rate, etc.)
+ * 
+ * MEDIUM confidence requires:
+ *   - Sample size 3-4 sessions OR
+ *   - Moderate effect signal with smaller sample
+ * 
+ * LOW confidence:
+ *   - Minimum threshold met but weak signal or very small sample
+ */
+type ConfidenceLevel = "low" | "medium" | "high";
+
+interface ConfidenceFactors {
+  sampleSize: number;
+  effectStrength: "weak" | "moderate" | "strong";
+}
+
+/**
+ * Calculate confidence level based on sample size and effect strength
+ * 
+ * Logic:
+ * - High: ≥5 samples AND strong effect
+ * - Medium: (3-4 samples AND moderate+ effect) OR (≥5 samples AND moderate effect)
+ * - Low: minimum threshold met but weak signal or very small sample
+ */
+function calculateConfidence(factors: ConfidenceFactors): ConfidenceLevel {
+  const { sampleSize, effectStrength } = factors;
+  
+  // High confidence: large sample AND strong signal
+  if (sampleSize >= 5 && effectStrength === "strong") {
+    return "high";
+  }
+  
+  // Medium confidence: decent sample with moderate+ signal, or large sample with moderate signal
+  if (
+    (sampleSize >= 3 && effectStrength === "strong") ||
+    (sampleSize >= 5 && effectStrength === "moderate") ||
+    (sampleSize >= 4 && effectStrength === "moderate")
+  ) {
+    return "medium";
+  }
+  
+  // Low confidence: minimum threshold met but weak signal
+  return "low";
+}
+
 function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
   const patterns: PatternInsight[] = [];
 
   if (sessions.length < 3) return patterns;
 
+  // ─────────────────────────────────────────────────────────────────────────────
   // Pattern 1: Sleep intent + low dose → higher sleepiness/relaxation
+  // Compares low vs high dose sleepiness ratings for sleep-intent sessions
+  // ─────────────────────────────────────────────────────────────────────────────
   const sleepSessions = sessions.filter((s) => s.intent === "sleep");
   if (sleepSessions.length >= 2) {
     const lowDoseSleep = sleepSessions.filter((s) => s.dose_level === "low");
@@ -130,20 +183,35 @@ function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
         highDoseSleep.reduce((sum, s) => sum + (s.effect_sleepiness || 0), 0) /
         highDoseSleep.length;
 
-      if (avgLowSleepiness > avgHighSleepiness + 1) {
+      const difference = avgLowSleepiness - avgHighSleepiness;
+      
+      if (difference > 1) {
+        // Effect strength based on how much better low dose performs
+        // Strong: >3 point difference, Moderate: >2, Weak: >1
+        const effectStrength: ConfidenceFactors["effectStrength"] = 
+          difference > 3 ? "strong" : difference > 2 ? "moderate" : "weak";
+        
+        const confidence = calculateConfidence({
+          sampleSize: lowDoseSleep.length + highDoseSleep.length,
+          effectStrength,
+        });
+
         patterns.push({
           id: "sleep-low-dose",
           title: "Lower Doses May Help Sleep",
           description:
             "Based on your data, lower doses for sleep intent tend to result in higher sleepiness ratings without excess effects.",
-          confidence: lowDoseSleep.length >= 3 ? "medium" : "low",
+          confidence,
           icon: "sleep",
         });
       }
     }
   }
 
+  // ─────────────────────────────────────────────────────────────────────────────
   // Pattern 2: Anxiety correlation with dose
+  // Detects if higher doses correlate with increased anxiety ratings
+  // ─────────────────────────────────────────────────────────────────────────────
   const sessionsWithAnxiety = sessions.filter(
     (s) => s.effect_anxiety !== null && s.effect_anxiety !== undefined
   );
@@ -163,20 +231,35 @@ function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
         lowDoseAnxiety.reduce((sum, s) => sum + (s.effect_anxiety || 0), 0) /
         lowDoseAnxiety.length;
 
-      if (avgHighAnxiety > avgLowAnxiety + 2) {
+      const difference = avgHighAnxiety - avgLowAnxiety;
+
+      if (difference > 2) {
+        // Effect strength based on anxiety difference magnitude
+        // Strong: >4 point difference, Moderate: >3, Weak: >2
+        const effectStrength: ConfidenceFactors["effectStrength"] = 
+          difference > 4 ? "strong" : difference > 3 ? "moderate" : "weak";
+
+        const confidence = calculateConfidence({
+          sampleSize: highDoseAnxiety.length + lowDoseAnxiety.length,
+          effectStrength,
+        });
+
         patterns.push({
           id: "anxiety-dose",
           title: "Dose & Comfort Correlation",
           description:
             "Based on your data, higher doses appear to correlate with increased anxiety ratings. You may want to experiment with lower doses and compare how your comfort ratings change.",
-          confidence: highDoseAnxiety.length >= 2 ? "medium" : "low",
+          confidence,
           icon: "trending",
         });
       }
     }
   }
 
+  // ─────────────────────────────────────────────────────────────────────────────
   // Pattern 3: Focus intent effectiveness
+  // Measures success rate and average focus rating for focus-intent sessions
+  // ─────────────────────────────────────────────────────────────────────────────
   const focusSessions = sessions.filter((s) => s.intent === "focus");
   if (focusSessions.length >= 2) {
     const avgFocusRating =
@@ -185,19 +268,34 @@ function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
     const positiveOutcomes = focusSessions.filter(
       (s) => normalizeOutcome(s.outcome) === "positive"
     ).length;
+    const positiveRate = positiveOutcomes / focusSessions.length;
 
-    if (avgFocusRating >= 6 && positiveOutcomes / focusSessions.length >= 0.6) {
+    if (avgFocusRating >= 6 && positiveRate >= 0.6) {
+      // Effect strength based on both focus rating AND positive rate
+      // Strong: avg ≥8 AND ≥80% positive, Moderate: avg ≥7 AND ≥70%, Weak: threshold met
+      const effectStrength: ConfidenceFactors["effectStrength"] = 
+        (avgFocusRating >= 8 && positiveRate >= 0.8) ? "strong" :
+        (avgFocusRating >= 7 && positiveRate >= 0.7) ? "moderate" : "weak";
+
+      const confidence = calculateConfidence({
+        sampleSize: focusSessions.length,
+        effectStrength,
+      });
+
       patterns.push({
         id: "focus-success",
         title: "Focus Sessions Working Well",
-        description: `Based on your data, your focus sessions show an average focus rating of ${avgFocusRating.toFixed(1)}/10 with ${Math.round((positiveOutcomes / focusSessions.length) * 100)}% positive outcomes.`,
-        confidence: focusSessions.length >= 4 ? "high" : "medium",
+        description: `Based on your data, your focus sessions show an average focus rating of ${avgFocusRating.toFixed(1)}/10 with ${Math.round(positiveRate * 100)}% positive outcomes.`,
+        confidence,
         icon: "focus",
       });
     }
   }
 
+  // ─────────────────────────────────────────────────────────────────────────────
   // Pattern 4: Relaxation correlation
+  // Measures average relaxation rating for relaxation-intent sessions
+  // ─────────────────────────────────────────────────────────────────────────────
   const relaxationSessions = sessions.filter((s) => s.intent === "relaxation");
   if (relaxationSessions.length >= 2) {
     const avgRelaxation =
@@ -207,17 +305,30 @@ function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
       ) / relaxationSessions.length;
 
     if (avgRelaxation >= 7) {
+      // Effect strength based on relaxation rating magnitude
+      // Strong: avg ≥9, Moderate: avg ≥8, Weak: avg ≥7
+      const effectStrength: ConfidenceFactors["effectStrength"] = 
+        avgRelaxation >= 9 ? "strong" : avgRelaxation >= 8 ? "moderate" : "weak";
+
+      const confidence = calculateConfidence({
+        sampleSize: relaxationSessions.length,
+        effectStrength,
+      });
+
       patterns.push({
         id: "relaxation-success",
         title: "Strong Relaxation Results",
         description: `Based on your data, relaxation sessions average ${avgRelaxation.toFixed(1)}/10 on the relaxation scale. Your approach appears effective.`,
-        confidence: relaxationSessions.length >= 3 ? "medium" : "low",
+        confidence,
         icon: "sparkles",
       });
     }
   }
 
+  // ─────────────────────────────────────────────────────────────────────────────
   // Pattern 5: Method preference
+  // Identifies if a particular consumption method has high success rate
+  // ─────────────────────────────────────────────────────────────────────────────
   const methodCounts = sessions.reduce(
     (acc, s) => {
       const method = s.method ?? "unknown";
@@ -239,11 +350,21 @@ function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
       methodSessions.length;
 
     if (methodPositiveRate >= 0.7) {
+      // Effect strength based on positive rate magnitude
+      // Strong: ≥90% positive, Moderate: ≥80%, Weak: ≥70%
+      const effectStrength: ConfidenceFactors["effectStrength"] = 
+        methodPositiveRate >= 0.9 ? "strong" : methodPositiveRate >= 0.8 ? "moderate" : "weak";
+
+      const confidence = calculateConfidence({
+        sampleSize: topMethod[1],
+        effectStrength,
+      });
+
       patterns.push({
         id: "method-preference",
         title: `${topMethod[0].charAt(0).toUpperCase() + topMethod[0].slice(1)} Works for You`,
         description: `Based on your data, ${Math.round(methodPositiveRate * 100)}% of your ${topMethod[0]} sessions have positive outcomes across ${topMethod[1]} logged sessions.`,
-        confidence: topMethod[1] >= 5 ? "high" : "medium",
+        confidence,
         icon: "trending",
       });
     }
