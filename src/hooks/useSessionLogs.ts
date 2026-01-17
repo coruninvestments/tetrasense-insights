@@ -63,6 +63,7 @@ export function useSessionLogs() {
       const { data, error } = await supabase
         .from("session_logs")
         .select("*")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -83,6 +84,7 @@ export function useRecentSessions(limit = 5) {
       const { data, error } = await supabase
         .from("session_logs")
         .select("*")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false })
         .limit(limit);
 
@@ -110,6 +112,7 @@ export function useSessionStats() {
       const { data: weekSessions, error: weekError } = await supabase
         .from("session_logs")
         .select("id")
+        .eq("user_id", user.id)
         .gte("created_at", startOfWeek.toISOString());
 
       if (weekError) throw weekError;
@@ -117,14 +120,16 @@ export function useSessionStats() {
       // Get total sessions
       const { count: totalCount, error: totalError } = await supabase
         .from("session_logs")
-        .select("*", { count: "exact", head: true });
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id);
 
       if (totalError) throw totalError;
 
       // Get unique strains
       const { data: strains, error: strainsError } = await supabase
         .from("session_logs")
-        .select("strain_name_text");
+        .select("strain_name_text")
+        .eq("user_id", user.id);
 
       if (strainsError) throw strainsError;
 
