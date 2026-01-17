@@ -11,6 +11,7 @@ import { useInsights } from "@/hooks/useInsights";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
+import { normalizeOutcome } from "@/lib/sessionOutcome";
 
 const Index = () => {
   const { user } = useAuth();
@@ -157,7 +158,7 @@ const Index = () => {
                     key={session.id}
                     intent={session.intent}
                     strain={session.strain_name_text}
-                    outcome={session.outcome as "positive" | "neutral" | "negative" || "neutral"}
+                    outcome={normalizeOutcome(session.outcome)}
                     timeAgo={formatSessionTime(session.created_at)}
                     delay={0.35 + index * 0.05}
                   />
