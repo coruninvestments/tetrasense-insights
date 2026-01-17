@@ -5,6 +5,7 @@ import { useAuth } from "./useAuth";
 export type SessionIntent = 'sleep' | 'relaxation' | 'creativity' | 'focus' | 'pain_relief' | 'social' | 'recreation';
 export type SessionMethod = 'smoke' | 'vape' | 'edible' | 'tincture' | 'topical' | 'other';
 export type DoseLevel = 'low' | 'medium' | 'high';
+export type SessionOutcome = 'positive' | 'neutral' | 'negative';
 
 export interface EffectSliders {
   sleepiness: number;
@@ -36,7 +37,7 @@ export interface SessionLog {
   effect_euphoria: number | null;
   effects: string[] | null;
   notes: string | null;
-  outcome: string | null;
+  outcome: SessionOutcome | null;
 }
 
 export interface CreateSessionLogInput {
@@ -49,7 +50,7 @@ export interface CreateSessionLogInput {
   dose_amount_mg?: number | null;
   effects: EffectSliders;
   notes?: string;
-  outcome?: string;
+  outcome?: SessionOutcome;
 }
 
 export function useSessionLogs() {
@@ -165,7 +166,7 @@ export function useCreateSessionLog() {
       const hasLowAnxiety = anxiety <= 5;
       const hasHighAnxiety = anxiety >= 7;
       
-      let computedOutcome: string;
+      let computedOutcome: SessionOutcome;
       if (hasHighAnxiety) {
         computedOutcome = "negative";
       } else if (hasPositiveEffect && hasLowAnxiety) {
