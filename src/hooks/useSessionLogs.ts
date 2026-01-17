@@ -163,7 +163,16 @@ export function useCreateSessionLog() {
       const { sleepiness, relaxation, focus, pain_relief, anxiety } = input.effects;
       const hasPositiveEffect = relaxation >= 6 || sleepiness >= 6 || focus >= 6 || pain_relief >= 6;
       const hasLowAnxiety = anxiety <= 5;
-      const computedOutcome = hasPositiveEffect && hasLowAnxiety ? "positive" : "neutral";
+      const hasHighAnxiety = anxiety >= 7;
+      
+      let computedOutcome: string;
+      if (hasHighAnxiety) {
+        computedOutcome = "negative";
+      } else if (hasPositiveEffect && hasLowAnxiety) {
+        computedOutcome = "positive";
+      } else {
+        computedOutcome = "neutral";
+      }
       const finalOutcome = input.outcome ?? computedOutcome;
 
       // Capture local time
