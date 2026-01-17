@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import type { SessionOutcome } from "@/lib/sessionOutcome";
 
 interface RecentSessionProps {
   intent: string;
   strain: string;
-  outcome: "positive" | "neutral" | "negative";
+  outcome: SessionOutcome;
   timeAgo: string;
   delay?: number;
 }

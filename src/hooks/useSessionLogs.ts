@@ -1,11 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { SessionOutcome, computeSessionOutcome } from "@/lib/sessionOutcome";
 
 export type SessionIntent = 'sleep' | 'relaxation' | 'creativity' | 'focus' | 'pain_relief' | 'social' | 'recreation';
 export type SessionMethod = 'smoke' | 'vape' | 'edible' | 'tincture' | 'topical' | 'other';
 export type DoseLevel = 'low' | 'medium' | 'high';
-export type SessionOutcome = 'positive' | 'neutral' | 'negative';
+
+// Re-export SessionOutcome from centralized location for backwards compatibility
+export type { SessionOutcome } from "@/lib/sessionOutcome";
 
 export interface EffectSliders {
   sleepiness: number;
@@ -161,19 +164,7 @@ export function useCreateSessionLog() {
       }
 
       // Compute default outcome from effect sliders if not provided
-      const { sleepiness, relaxation, focus, pain_relief, anxiety } = input.effects;
-      const hasPositiveEffect = relaxation >= 6 || sleepiness >= 6 || focus >= 6 || pain_relief >= 6;
-      const hasLowAnxiety = anxiety <= 5;
-      const hasHighAnxiety = anxiety >= 7;
-      
-      let computedOutcome: SessionOutcome;
-      if (hasHighAnxiety) {
-        computedOutcome = "negative";
-      } else if (hasPositiveEffect && hasLowAnxiety) {
-        computedOutcome = "positive";
-      } else {
-        computedOutcome = "neutral";
-      }
+      const computedOutcome = computeSessionOutcome(input.effects);
       const finalOutcome = input.outcome ?? computedOutcome;
 
       // Capture local time

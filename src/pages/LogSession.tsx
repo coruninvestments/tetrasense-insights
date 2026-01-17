@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { EffectSlider } from "@/components/log/EffectSlider";
 import { StrainPicker } from "@/components/log/StrainPicker";
-import { useCreateSessionLog, SessionIntent, SessionMethod, DoseLevel, EffectSliders, SessionOutcome } from "@/hooks/useSessionLogs";
+import { useCreateSessionLog, SessionIntent, SessionMethod, DoseLevel, EffectSliders } from "@/hooks/useSessionLogs";
+import { SessionOutcome, computeSessionOutcomeForPreview } from "@/lib/sessionOutcome";
 import { toast } from "sonner";
 
 const intents: { id: SessionIntent; label: string; emoji: string }[] = [
@@ -83,13 +84,7 @@ export default function LogSession() {
   };
 
   const calculateOutcome = (): SessionOutcome => {
-    const positiveScore = effects.relaxation + effects.focus + effects.euphoria + effects.pain_relief;
-    const negativeScore = effects.anxiety * 2; // Weight anxiety more heavily
-    const neutralScore = effects.sleepiness;
-
-    if (positiveScore > negativeScore + neutralScore) return "positive";
-    if (negativeScore > positiveScore) return "negative";
-    return "neutral";
+    return computeSessionOutcomeForPreview(effects);
   };
 
   const goNext = async () => {

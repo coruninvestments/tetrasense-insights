@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useSessionLogs, SessionLog } from "./useSessionLogs";
+import { normalizeOutcome } from "@/lib/sessionOutcome";
 
 export interface InsightData {
   weeklyPositiveRate: number;
@@ -73,7 +74,7 @@ function calculateWeeklyPositiveRate(sessions: SessionLog[]): number {
   if (weekSessions.length === 0) return 0;
 
   const positiveCount = weekSessions.filter(
-    (s) => s.outcome === "positive"
+    (s) => normalizeOutcome(s.outcome) === "positive"
   ).length;
 
   return Math.round((positiveCount / weekSessions.length) * 100);
@@ -182,7 +183,7 @@ function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
       focusSessions.reduce((sum, s) => sum + (s.effect_focus || 0), 0) /
       focusSessions.length;
     const positiveOutcomes = focusSessions.filter(
-      (s) => s.outcome === "positive"
+      (s) => normalizeOutcome(s.outcome) === "positive"
     ).length;
 
     if (avgFocusRating >= 6 && positiveOutcomes / focusSessions.length >= 0.6) {
@@ -234,7 +235,7 @@ function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
   if (topMethod && topMethod[1] >= 3) {
     const methodSessions = sessions.filter((s) => s.method === topMethod[0]);
     const methodPositiveRate =
-      methodSessions.filter((s) => s.outcome === "positive").length /
+      methodSessions.filter((s) => normalizeOutcome(s.outcome) === "positive").length /
       methodSessions.length;
 
     if (methodPositiveRate >= 0.7) {
