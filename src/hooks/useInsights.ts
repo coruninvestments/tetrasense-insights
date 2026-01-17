@@ -167,7 +167,7 @@ function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
           id: "anxiety-dose",
           title: "Dose & Comfort Correlation",
           description:
-            "Based on your data, higher doses appear to correlate with increased anxiety ratings. Consider starting with lower doses.",
+            "Based on your data, higher doses appear to correlate with increased anxiety ratings. You may want to experiment with lower doses and compare how your comfort ratings change.",
           confidence: highDoseAnxiety.length >= 2 ? "medium" : "low",
           icon: "trending",
         });
@@ -219,15 +219,18 @@ function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
   // Pattern 5: Method preference
   const methodCounts = sessions.reduce(
     (acc, s) => {
-      acc[s.method] = (acc[s.method] || 0) + 1;
+      const method = s.method ?? "unknown";
+      acc[method] = (acc[method] || 0) + 1;
       return acc;
     },
     {} as Record<string, number>
   );
 
-  const topMethod = Object.entries(methodCounts).sort(
-    (a, b) => b[1] - a[1]
-  )[0];
+  // Exclude "unknown" from being the top method if possible
+  const sortedMethods = Object.entries(methodCounts)
+    .filter(([method]) => method !== "unknown")
+    .sort((a, b) => b[1] - a[1]);
+  const topMethod = sortedMethods[0];
   if (topMethod && topMethod[1] >= 3) {
     const methodSessions = sessions.filter((s) => s.method === topMethod[0]);
     const methodPositiveRate =
