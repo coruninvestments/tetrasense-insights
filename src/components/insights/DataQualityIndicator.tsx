@@ -32,8 +32,8 @@ const qualityConfig: Record<DataQuality, {
     label: "Early data",
     description: "Patterns may change as you log more",
     Icon: BarChart3,
-    colorClass: "text-warning",
-    bgClass: "bg-warning/10",
+    colorClass: "text-amber-600",
+    bgClass: "bg-amber-500/10",
   },
   good: {
     label: "Good",
@@ -46,8 +46,8 @@ const qualityConfig: Record<DataQuality, {
     label: "Strong",
     description: "High-confidence insights available",
     Icon: Sparkles,
-    colorClass: "text-success",
-    bgClass: "bg-success/10",
+    colorClass: "text-emerald-600",
+    bgClass: "bg-emerald-500/10",
   },
 };
 
