@@ -15,7 +15,7 @@ function getDataQuality(totalSessions: number): DataQuality {
 }
 
 // Tier thresholds for progress calculation
-const tierThresholds = {
+const tierThresholds: Record<DataQuality, { start: number; target: number }> = {
   insufficient: { start: 0, target: 3 },
   early: { start: 3, target: 7 },
   good: { start: 7, target: 15 },
@@ -28,7 +28,7 @@ function getProgressInfo(totalSessions: number, quality: DataQuality) {
   }
 
   const { start, target } = tierThresholds[quality];
-  const sessionsRemaining = target - totalSessions;
+  const sessionsRemaining = Math.max(0, target - totalSessions);
   const rangeSize = target - start;
   const progressInRange = totalSessions - start;
   const progressPercent = Math.min(100, Math.max(0, (progressInRange / rangeSize) * 100));
@@ -118,7 +118,7 @@ export function DataQualityIndicator({ totalSessions }: DataQualityIndicatorProp
             aria-label={`Progress to next tier: ${Math.round(progressPercent)}%`}
           >
             <motion.div
-              initial={{ width: 0 }}
+              initial={false}
               animate={{ width: `${progressPercent}%` }}
               transition={{ duration: 0.5, ease: "easeOut" }}
               className={`h-full rounded-full ${isMaxTier ? "bg-emerald-500" : "bg-primary"}`}
