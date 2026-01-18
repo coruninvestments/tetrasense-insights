@@ -64,7 +64,7 @@ export function DataQualityIndicator({ totalSessions }: DataQualityIndicatorProp
       role="status"
       aria-label={`Data quality: ${label}. ${description}`}
     >
-      <div className={`w-8 h-8 rounded-lg ${bgClass} flex items-center justify-center`}>
+      <div className="w-8 h-8 rounded-lg bg-background/60 backdrop-blur-sm flex items-center justify-center">
         <Icon className={`w-4 h-4 ${colorClass}`} aria-hidden="true" />
       </div>
       <div className="flex-1 min-w-0">
