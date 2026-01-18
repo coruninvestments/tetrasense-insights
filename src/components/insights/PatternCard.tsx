@@ -10,10 +10,22 @@ const iconMap = {
   sparkles: Sparkles,
 };
 
-const confidenceColors = {
-  low: "bg-muted text-muted-foreground",
-  medium: "bg-primary/10 text-primary",
-  high: "bg-success/10 text-success",
+const confidenceConfig = {
+  low: {
+    bgClass: "bg-muted",
+    textClass: "text-muted-foreground",
+    label: "Low",
+  },
+  medium: {
+    bgClass: "bg-primary/10",
+    textClass: "text-primary",
+    label: "Medium",
+  },
+  high: {
+    bgClass: "bg-success/10",
+    textClass: "text-success",
+    label: "High",
+  },
 };
 
 interface PatternCardProps {
@@ -23,6 +35,7 @@ interface PatternCardProps {
 
 export function PatternCard({ pattern, delay = 0 }: PatternCardProps) {
   const Icon = iconMap[pattern.icon];
+  const confidence = confidenceConfig[pattern.confidence];
 
   return (
     <motion.div
@@ -34,7 +47,7 @@ export function PatternCard({ pattern, delay = 0 }: PatternCardProps) {
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <Icon className="w-5 h-5 text-primary" />
+              <Icon className="w-5 h-5 text-primary" aria-hidden="true" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -42,9 +55,11 @@ export function PatternCard({ pattern, delay = 0 }: PatternCardProps) {
                   {pattern.title}
                 </h3>
                 <span
-                  className={`text-xs px-2 py-0.5 rounded-full capitalize ${confidenceColors[pattern.confidence]}`}
+                  className={`text-xs px-2 py-0.5 rounded-full font-medium ${confidence.bgClass} ${confidence.textClass}`}
+                  role="status"
+                  aria-label={`${confidence.label} confidence`}
                 >
-                  {pattern.confidence} confidence
+                  {confidence.label}
                 </span>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">

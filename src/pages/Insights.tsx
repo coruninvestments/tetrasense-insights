@@ -7,6 +7,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useSessionLogs, useSessionStats } from "@/hooks/useSessionLogs";
 import { useInsights } from "@/hooks/useInsights";
 import { PatternCard, NoPatternCard } from "@/components/insights/PatternCard";
+import { DataQualityIndicator } from "@/components/insights/DataQualityIndicator";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Insights() {
@@ -161,6 +162,14 @@ export default function Insights() {
             <h2 className="font-serif text-lg font-medium text-foreground mb-4">
               Discovered Patterns
             </h2>
+            
+            {/* Data Quality Indicator */}
+            {!insightsLoading && sessions && (
+              <div className="mb-4">
+                <DataQualityIndicator totalSessions={sessions.length} />
+              </div>
+            )}
+            
             <div className="space-y-3">
               {insightsLoading ? (
                 <>
