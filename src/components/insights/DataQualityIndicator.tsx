@@ -14,6 +14,28 @@ function getDataQuality(totalSessions: number): DataQuality {
   return "strong";
 }
 
+// Tier thresholds for progress calculation
+const tierThresholds = {
+  insufficient: { start: 0, target: 3 },
+  early: { start: 3, target: 7 },
+  good: { start: 7, target: 15 },
+  strong: { start: 15, target: 15 }, // Max tier
+};
+
+function getProgressInfo(totalSessions: number, quality: DataQuality) {
+  if (quality === "strong") {
+    return { sessionsRemaining: 0, progressPercent: 100, isMaxTier: true };
+  }
+
+  const { start, target } = tierThresholds[quality];
+  const sessionsRemaining = target - totalSessions;
+  const rangeSize = target - start;
+  const progressInRange = totalSessions - start;
+  const progressPercent = Math.min(100, Math.max(0, (progressInRange / rangeSize) * 100));
+
+  return { sessionsRemaining, progressPercent, isMaxTier: false };
+}
+
 const qualityConfig: Record<DataQuality, {
   label: string;
   description: string;
@@ -55,6 +77,7 @@ export function DataQualityIndicator({ totalSessions }: DataQualityIndicatorProp
   const quality = getDataQuality(totalSessions);
   const config = qualityConfig[quality];
   const { Icon, label, description, colorClass, bgClass } = config;
+  const { sessionsRemaining, progressPercent, isMaxTier } = getProgressInfo(totalSessions, quality);
 
   return (
     <motion.div
@@ -62,7 +85,7 @@ export function DataQualityIndicator({ totalSessions }: DataQualityIndicatorProp
       animate={{ opacity: 1, y: 0 }}
       className={`flex items-center gap-3 px-4 py-3 rounded-xl ${bgClass}`}
       role="status"
-      aria-label={`Data quality: ${label}. ${description}`}
+      aria-label={`Data quality: ${label}. ${description}. ${isMaxTier ? "Max tier reached" : `${sessionsRemaining} session${sessionsRemaining !== 1 ? "s" : ""} to next tier`}`}
     >
       <div className="w-8 h-8 rounded-lg bg-background/60 backdrop-blur-sm flex items-center justify-center">
         <Icon className={`w-4 h-4 ${colorClass}`} aria-hidden="true" />
@@ -77,6 +100,31 @@ export function DataQualityIndicator({ totalSessions }: DataQualityIndicatorProp
           </span>
         </div>
         <p className="text-xs text-muted-foreground">{description}</p>
+        
+        {/* Progress to next tier */}
+        <div className="mt-2 space-y-1">
+          <p className="text-xs text-muted-foreground">
+            {isMaxTier 
+              ? "Max tier reached" 
+              : `Next tier in ${sessionsRemaining} session${sessionsRemaining !== 1 ? "s" : ""}`
+            }
+          </p>
+          <div 
+            className="h-1 w-full rounded-full bg-muted overflow-hidden"
+            role="progressbar"
+            aria-valuenow={progressPercent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`Progress to next tier: ${Math.round(progressPercent)}%`}
+          >
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${progressPercent}%` }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className={`h-full rounded-full ${isMaxTier ? "bg-emerald-500" : "bg-primary"}`}
+            />
+          </div>
+        </div>
       </div>
     </motion.div>
   );
