@@ -2,6 +2,12 @@ import { motion } from "framer-motion";
 import { Moon, Brain, TrendingUp, Sparkles, Info } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { PatternInsight } from "@/hooks/useInsights";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const iconMap = {
   sleep: Moon,
@@ -15,16 +21,19 @@ const confidenceConfig = {
     bgClass: "bg-muted",
     textClass: "text-muted-foreground",
     label: "Low",
+    hint: "Small sample or weak signal — treat as a hypothesis.",
   },
   medium: {
     bgClass: "bg-primary/10",
     textClass: "text-primary",
     label: "Medium",
+    hint: "Moderate sample and/or signal — worth testing.",
   },
   high: {
-    bgClass: "bg-success/10",
-    textClass: "text-success",
+    bgClass: "bg-emerald-500/10",
+    textClass: "text-emerald-600",
     label: "High",
+    hint: "Strong signal with enough samples — more reliable.",
   },
 };
 
@@ -54,13 +63,22 @@ export function PatternCard({ pattern, delay = 0 }: PatternCardProps) {
                 <h3 className="text-sm font-medium text-foreground">
                   {pattern.title}
                 </h3>
-                <span
-                  className={`text-xs px-2 py-0.5 rounded-full font-medium ${confidence.bgClass} ${confidence.textClass}`}
-                  role="status"
-                  aria-label={`${confidence.label} confidence`}
-                >
-                  {confidence.label}
-                </span>
+                <TooltipProvider>
+                  <Tooltip delayDuration={300}>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        className={`text-xs px-2 py-0.5 rounded-full font-medium ${confidence.bgClass} ${confidence.textClass} cursor-help`}
+                        aria-label={`${confidence.label} confidence: ${confidence.hint}`}
+                      >
+                        {confidence.label}
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-[200px] text-center">
+                      <p className="text-xs">{confidence.hint}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {pattern.description}
