@@ -5,7 +5,6 @@ import { PatternInsight } from "@/hooks/useInsights";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
@@ -63,22 +62,20 @@ export function PatternCard({ pattern, delay = 0 }: PatternCardProps) {
                 <h3 className="text-sm font-medium text-foreground">
                   {pattern.title}
                 </h3>
-                <TooltipProvider>
-                  <Tooltip delayDuration={300}>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        className={`text-xs px-2 py-0.5 rounded-full font-medium ${confidence.bgClass} ${confidence.textClass} cursor-help`}
-                        aria-label={`${confidence.label} confidence: ${confidence.hint}`}
-                      >
-                        {confidence.label}
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="max-w-[200px] text-center">
-                      <p className="text-xs">{confidence.hint}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Tooltip delayDuration={300}>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      className={`text-xs px-2 py-0.5 rounded-full font-medium ${confidence.bgClass} ${confidence.textClass} cursor-help focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background`}
+                      aria-label={`${confidence.label} confidence: ${confidence.hint}`}
+                    >
+                      {confidence.label}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-[200px] text-center">
+                    <p className="text-xs">{confidence.hint}</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {pattern.description}

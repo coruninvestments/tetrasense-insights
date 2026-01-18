@@ -9,6 +9,7 @@ import { useInsights } from "@/hooks/useInsights";
 import { PatternCard, NoPatternCard } from "@/components/insights/PatternCard";
 import { DataQualityIndicator } from "@/components/insights/DataQualityIndicator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export default function Insights() {
   const { data: profile } = useProfile();
@@ -170,24 +171,26 @@ export default function Insights() {
               </div>
             )}
             
-            <div className="space-y-3">
-              {insightsLoading ? (
-                <>
-                  <Skeleton className="h-24 rounded-xl" />
-                  <Skeleton className="h-24 rounded-xl" />
-                </>
-              ) : insights?.patterns && insights.patterns.length > 0 ? (
-                insights.patterns.map((pattern, index) => (
-                  <PatternCard
-                    key={pattern.id}
-                    pattern={pattern}
-                    delay={index * 0.1}
-                  />
-                ))
-              ) : (
-                <NoPatternCard />
-              )}
-            </div>
+            <TooltipProvider>
+              <div className="space-y-3">
+                {insightsLoading ? (
+                  <>
+                    <Skeleton className="h-24 rounded-xl" />
+                    <Skeleton className="h-24 rounded-xl" />
+                  </>
+                ) : insights?.patterns && insights.patterns.length > 0 ? (
+                  insights.patterns.map((pattern, index) => (
+                    <PatternCard
+                      key={pattern.id}
+                      pattern={pattern}
+                      delay={index * 0.1}
+                    />
+                  ))
+                ) : (
+                  <NoPatternCard />
+                )}
+              </div>
+            </TooltipProvider>
             
             {insights?.patterns && insights.patterns.length > 0 && (
               <p className="text-xs text-muted-foreground text-center mt-4 px-4">
