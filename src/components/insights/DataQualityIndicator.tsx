@@ -87,7 +87,7 @@ export function DataQualityIndicator({ totalSessions }: DataQualityIndicatorProp
       role="status"
       aria-label={`Data quality: ${label}. ${description}. ${isMaxTier ? "Max tier reached" : `${sessionsRemaining} session${sessionsRemaining !== 1 ? "s" : ""} to next tier`}`}
     >
-      <div className="w-8 h-8 rounded-lg bg-background/60 backdrop-blur-sm flex items-center justify-center">
+      <div className="w-8 h-8 rounded-lg bg-background/60 backdrop-blur-sm border border-border/40 shadow-sm flex items-center justify-center">
         <Icon className={`w-4 h-4 ${colorClass}`} aria-hidden="true" />
       </div>
       <div className="flex-1 min-w-0">
