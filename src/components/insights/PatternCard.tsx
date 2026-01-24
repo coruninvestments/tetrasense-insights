@@ -45,15 +45,8 @@ export function PatternCard({ pattern }: { pattern: PatternInsight }) {
   const confidence = confidenceConfig[pattern.confidence];
 
   return (
-    <motion.div
-      variants={{
-        hidden: { opacity: 0, y: 12 },
-        visible: { opacity: 1, y: 0 },
-      }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
-    >
-      <Card variant="interactive" className="overflow-hidden">
-        <CardContent className="p-4">
+    <Card variant="interactive" className="overflow-hidden">
+      <CardContent className="p-4">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
               <Icon className="w-5 h-5 text-primary" aria-hidden="true" />
@@ -84,8 +77,7 @@ export function PatternCard({ pattern }: { pattern: PatternInsight }) {
             </div>
           </div>
         </CardContent>
-      </Card>
-    </motion.div>
+    </Card>
   );
 }
 
