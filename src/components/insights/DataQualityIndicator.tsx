@@ -89,13 +89,21 @@ export function DataQualityIndicator({ totalSessions }: DataQualityIndicatorProp
   const { Icon, label, description, colorClass, bgClass } = config;
   const { sessionsRemaining, progressPercent, isMaxTier } = getProgressInfo(totalSessions, quality);
   
-  // Track previous tier for celebration effect
+  // Track previous tier for celebration effect, persisted in localStorage
+  const STORAGE_KEY = "dataQuality:lastTier";
   const prevTierRef = useRef<DataQuality | null>(null);
   
   useEffect(() => {
+    // Initialize from localStorage on first render
     if (prevTierRef.current === null) {
-      // First render: initialize without celebrating
-      prevTierRef.current = quality;
+      const storedTier = localStorage.getItem(STORAGE_KEY) as DataQuality | null;
+      if (storedTier && tierOrder.includes(storedTier)) {
+        prevTierRef.current = storedTier;
+      } else {
+        // No stored tier, initialize to current without celebrating
+        prevTierRef.current = quality;
+        localStorage.setItem(STORAGE_KEY, quality);
+      }
       return;
     }
     
@@ -109,6 +117,8 @@ export function DataQualityIndicator({ totalSessions }: DataQualityIndicatorProp
         description: qualityConfig[quality].description,
         duration: 2500,
       });
+      // Persist new tier to localStorage
+      localStorage.setItem(STORAGE_KEY, quality);
     }
     
     prevTierRef.current = quality;
@@ -147,7 +157,7 @@ export function DataQualityIndicator({ totalSessions }: DataQualityIndicatorProp
           <div 
             className="h-1 w-full rounded-full bg-muted overflow-hidden"
             role="progressbar"
-            aria-valuenow={progressPercent}
+            aria-valuenow={Math.round(progressPercent)}
             aria-valuemin={0}
             aria-valuemax={100}
             aria-label={`Progress to next tier: ${Math.round(progressPercent)}%`}

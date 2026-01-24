@@ -192,7 +192,16 @@ export default function Insights() {
                   }}
                 >
                   {insights.patterns.map((pattern) => (
-                    <PatternCard key={pattern.id} pattern={pattern} />
+                    <motion.div
+                      key={pattern.id}
+                      variants={{
+                        hidden: { opacity: 0, y: 12 },
+                        visible: { opacity: 1, y: 0 },
+                      }}
+                      transition={{ duration: 0.35, ease: "easeOut" }}
+                    >
+                      <PatternCard pattern={pattern} />
+                    </motion.div>
                   ))}
                 </motion.div>
               ) : (
