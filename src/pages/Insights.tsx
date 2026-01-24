@@ -172,24 +172,32 @@ export default function Insights() {
             )}
             
             <TooltipProvider>
-              <div className="space-y-3">
-                {insightsLoading ? (
-                  <>
-                    <Skeleton className="h-24 rounded-xl" />
-                    <Skeleton className="h-24 rounded-xl" />
-                  </>
-                ) : insights?.patterns && insights.patterns.length > 0 ? (
-                  insights.patterns.map((pattern, index) => (
-                    <PatternCard
-                      key={pattern.id}
-                      pattern={pattern}
-                      delay={index * 0.1}
-                    />
-                  ))
-                ) : (
-                  <NoPatternCard />
-                )}
-              </div>
+              {insightsLoading ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-24 rounded-xl" />
+                  <Skeleton className="h-24 rounded-xl" />
+                </div>
+              ) : insights?.patterns && insights.patterns.length > 0 ? (
+                <motion.div
+                  className="space-y-3"
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: {},
+                    visible: {
+                      transition: {
+                        staggerChildren: 0.1,
+                      },
+                    },
+                  }}
+                >
+                  {insights.patterns.map((pattern) => (
+                    <PatternCard key={pattern.id} pattern={pattern} />
+                  ))}
+                </motion.div>
+              ) : (
+                <NoPatternCard />
+              )}
             </TooltipProvider>
             
             {insights?.patterns && insights.patterns.length > 0 && (

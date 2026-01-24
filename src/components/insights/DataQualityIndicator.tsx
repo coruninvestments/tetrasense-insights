@@ -1,5 +1,7 @@
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { BarChart3, AlertCircle, TrendingUp, Sparkles } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 type DataQuality = "insufficient" | "early" | "good" | "strong";
 
@@ -7,7 +9,15 @@ interface DataQualityIndicatorProps {
   totalSessions: number;
 }
 
-function getDataQuality(totalSessions: number): DataQuality {
+const tierOrder: DataQuality[] = ["insufficient", "early", "good", "strong"];
+const tierLabels: Record<DataQuality, string> = {
+  insufficient: "Not enough data",
+  early: "Early",
+  good: "Good",
+  strong: "Strong",
+};
+
+export function getDataQuality(totalSessions: number): DataQuality {
   if (totalSessions < 3) return "insufficient";
   if (totalSessions <= 6) return "early";
   if (totalSessions <= 14) return "good";
@@ -78,6 +88,31 @@ export function DataQualityIndicator({ totalSessions }: DataQualityIndicatorProp
   const config = qualityConfig[quality];
   const { Icon, label, description, colorClass, bgClass } = config;
   const { sessionsRemaining, progressPercent, isMaxTier } = getProgressInfo(totalSessions, quality);
+  
+  // Track previous tier for celebration effect
+  const prevTierRef = useRef<DataQuality | null>(null);
+  
+  useEffect(() => {
+    if (prevTierRef.current === null) {
+      // First render: initialize without celebrating
+      prevTierRef.current = quality;
+      return;
+    }
+    
+    const prevIndex = tierOrder.indexOf(prevTierRef.current);
+    const currentIndex = tierOrder.indexOf(quality);
+    
+    // Only celebrate if tier increased (not decreased)
+    if (currentIndex > prevIndex) {
+      toast({
+        title: `Tier Up: ${tierLabels[quality]} 🎉`,
+        description: qualityConfig[quality].description,
+        duration: 2500,
+      });
+    }
+    
+    prevTierRef.current = quality;
+  }, [quality]);
 
   return (
     <motion.div
