@@ -32,7 +32,6 @@ const SAMPLE_STRAINS = [
 const INTENTS: SessionIntent[] = ["sleep", "relaxation", "creativity", "focus", "pain_relief", "social", "recreation"];
 const METHODS: SessionMethod[] = ["smoke", "vape", "edible", "tincture"];
 const DOSE_LEVELS: DoseLevel[] = ["low", "medium", "high"];
-const OUTCOMES: SessionOutcome[] = ["positive", "neutral", "negative"];
 
 function randomPick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -42,26 +41,59 @@ function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+/**
+ * Generate a sample session with balanced outcome distribution:
+ * ~65% positive, ~25% neutral, ~10% negative
+ */
 function generateSampleSession(userId: string, daysAgo: number) {
   const strain = randomPick(SAMPLE_STRAINS);
   const intent = randomPick(INTENTS);
   const method = randomPick(METHODS);
   const doseLevel = randomPick(DOSE_LEVELS);
   
-  // Generate effects based on intent for more realistic data
-  const baseRelaxation = intent === "relaxation" || intent === "sleep" ? randomInt(6, 10) : randomInt(2, 7);
-  const baseSleepiness = intent === "sleep" ? randomInt(6, 10) : randomInt(1, 5);
-  const baseFocus = intent === "focus" || intent === "creativity" ? randomInt(6, 10) : randomInt(2, 6);
-  const baseAnxiety = randomInt(0, 5);
-  const basePainRelief = intent === "pain_relief" ? randomInt(6, 10) : randomInt(2, 6);
-  const baseEuphoria = randomInt(4, 9);
+  // Determine target outcome first using weighted random
+  const roll = Math.random();
+  let targetOutcome: SessionOutcome;
+  if (roll < 0.65) {
+    targetOutcome = "positive";
+  } else if (roll < 0.90) {
+    targetOutcome = "neutral";
+  } else {
+    targetOutcome = "negative";
+  }
   
-  // Determine outcome based on effects
-  let outcome: SessionOutcome = "neutral";
-  if ((baseRelaxation >= 6 || baseSleepiness >= 6 || baseFocus >= 6 || basePainRelief >= 6) && baseAnxiety <= 5) {
-    outcome = "positive";
-  } else if (baseAnxiety >= 7) {
-    outcome = "negative";
+  // Generate effects based on target outcome
+  let baseSleepiness: number;
+  let baseRelaxation: number;
+  let baseAnxiety: number;
+  let baseFocus: number;
+  let basePainRelief: number;
+  let baseEuphoria: number;
+
+  if (targetOutcome === "positive") {
+    // High positive effects, low anxiety
+    baseRelaxation = randomInt(6, 10);
+    baseSleepiness = intent === "sleep" ? randomInt(6, 10) : randomInt(3, 7);
+    baseFocus = intent === "focus" || intent === "creativity" ? randomInt(6, 10) : randomInt(4, 8);
+    basePainRelief = intent === "pain_relief" ? randomInt(6, 10) : randomInt(3, 7);
+    baseEuphoria = randomInt(5, 10);
+    baseAnxiety = randomInt(0, 4);
+  } else if (targetOutcome === "negative") {
+    // High anxiety triggers negative outcome
+    baseAnxiety = randomInt(7, 10);
+    baseRelaxation = randomInt(1, 5);
+    baseSleepiness = randomInt(1, 4);
+    baseFocus = randomInt(1, 4);
+    basePainRelief = randomInt(1, 5);
+    baseEuphoria = randomInt(1, 4);
+  } else {
+    // Neutral: moderate effects, moderate anxiety
+    baseRelaxation = randomInt(3, 5);
+    baseSleepiness = randomInt(2, 5);
+    baseFocus = randomInt(3, 5);
+    basePainRelief = randomInt(2, 5);
+    baseEuphoria = randomInt(3, 6);
+    baseAnxiety = randomInt(4, 6);
   }
   
   // Create date spread across days
@@ -75,23 +107,27 @@ function generateSampleSession(userId: string, daysAgo: number) {
     hour12: true 
   });
 
+  // Return only the exact columns used by the actual session creation code
+  // (aligned with useCreateSessionLog mutation in useSessionLogs.ts)
   return {
     user_id: userId,
     created_at: date.toISOString(),
     local_time: localTime,
     intent,
+    strain_id: null,
     strain_name_text: strain.name,
     strain_type: strain.type,
     method,
-    dose: doseLevel,
+    dose: doseLevel, // Legacy field for backwards compatibility
     dose_level: doseLevel,
+    dose_amount_mg: null,
     effect_sleepiness: baseSleepiness,
     effect_relaxation: baseRelaxation,
     effect_anxiety: baseAnxiety,
     effect_focus: baseFocus,
     effect_pain_relief: basePainRelief,
     effect_euphoria: baseEuphoria,
-    outcome,
+    outcome: targetOutcome,
     notes: null,
   };
 }
@@ -104,9 +140,12 @@ function DevToolsPanelContent() {
   const [isClearing, setIsClearing] = useState(false);
 
   const invalidateQueries = () => {
+    // Invalidate all session-related queries used by the app
     queryClient.invalidateQueries({ queryKey: ["session-logs"] });
     queryClient.invalidateQueries({ queryKey: ["recent-sessions"] });
     queryClient.invalidateQueries({ queryKey: ["session-stats"] });
+    // Fallback: invalidate all queries to ensure insights/patterns recompute
+    queryClient.invalidateQueries();
   };
 
   const handleSeedSessions = async () => {
@@ -173,11 +212,11 @@ function DevToolsPanelContent() {
   };
 
   return (
-    <Card className="border-dashed border-warning/50 bg-warning/5">
+    <Card className="border-dashed border-amber-500/30 bg-amber-500/10">
       <CardContent className="p-3">
         <div className="flex items-center gap-2 mb-2">
-          <Wrench className="w-4 h-4 text-warning" />
-          <span className="text-xs font-medium text-warning uppercase tracking-wide">Dev Tools</span>
+          <Wrench className="w-4 h-4 text-amber-600" />
+          <span className="text-xs font-medium text-amber-600 uppercase tracking-wide">Dev Tools</span>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button
