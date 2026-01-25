@@ -94,6 +94,9 @@ export function DataQualityIndicator({ totalSessions }: DataQualityIndicatorProp
   const prevTierRef = useRef<DataQuality | null>(null);
   
   useEffect(() => {
+    // SSR safety guard
+    if (typeof window === "undefined") return;
+    
     // Initialize from localStorage on first render
     if (prevTierRef.current === null) {
       const storedTier = localStorage.getItem(STORAGE_KEY) as DataQuality | null;
@@ -117,10 +120,10 @@ export function DataQualityIndicator({ totalSessions }: DataQualityIndicatorProp
         description: qualityConfig[quality].description,
         duration: 2500,
       });
-      // Persist new tier to localStorage
-      localStorage.setItem(STORAGE_KEY, quality);
     }
     
+    // Always persist current tier and update ref
+    localStorage.setItem(STORAGE_KEY, quality);
     prevTierRef.current = quality;
   }, [quality]);
 
