@@ -44,6 +44,8 @@ function randomInt(min: number, max: number): number {
 /**
  * Generate a sample session with balanced outcome distribution:
  * ~65% positive, ~25% neutral, ~10% negative
+ * 
+ * Fields are aligned with useCreateSessionLog mutation in useSessionLogs.ts
  */
 function generateSampleSession(userId: string, daysAgo: number) {
   const strain = randomPick(SAMPLE_STRAINS);
@@ -100,27 +102,18 @@ function generateSampleSession(userId: string, daysAgo: number) {
   const date = new Date();
   date.setDate(date.getDate() - daysAgo);
   date.setHours(randomInt(8, 23), randomInt(0, 59), 0, 0);
-  
-  const localTime = date.toLocaleTimeString('en-US', { 
-    hour: '2-digit', 
-    minute: '2-digit',
-    hour12: true 
-  });
 
-  // Return only the exact columns used by the actual session creation code
-  // (aligned with useCreateSessionLog mutation in useSessionLogs.ts)
+  // Return only the exact columns confirmed by the real create mutation
+  // Removed: dose (legacy), dose_amount_mg, local_time (optional fields)
   return {
     user_id: userId,
     created_at: date.toISOString(),
-    local_time: localTime,
     intent,
     strain_id: null,
     strain_name_text: strain.name,
     strain_type: strain.type,
     method,
-    dose: doseLevel, // Legacy field for backwards compatibility
     dose_level: doseLevel,
-    dose_amount_mg: null,
     effect_sleepiness: baseSleepiness,
     effect_relaxation: baseRelaxation,
     effect_anxiety: baseAnxiety,
@@ -167,12 +160,30 @@ function DevToolsPanelContent() {
         .from("session_logs")
         .insert(sessions);
       
-      if (error) throw error;
+      if (error) {
+        // Rich error reporting for schema mismatches
+        console.error("Supabase insert error (full object):", error);
+        
+        const errorParts: string[] = [error.message];
+        if ('details' in error && error.details) {
+          errorParts.push(`Details: ${error.details}`);
+        }
+        if ('hint' in error && error.hint) {
+          errorParts.push(`Hint: ${error.hint}`);
+        }
+        
+        toast({ 
+          title: "Seed failed", 
+          description: errorParts.join(" | "), 
+          variant: "destructive" 
+        });
+        return;
+      }
       
       invalidateQueries();
       toast({ title: "Seeded 20 sessions", description: "Sample data added successfully." });
     } catch (err) {
-      console.error("Seed error:", err);
+      console.error("Seed error (caught exception):", err);
       toast({ title: "Seed failed", description: String(err), variant: "destructive" });
     } finally {
       setIsSeeding(false);
@@ -192,12 +203,29 @@ function DevToolsPanelContent() {
         .delete()
         .eq("user_id", user.id);
       
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase delete error (full object):", error);
+        
+        const errorParts: string[] = [error.message];
+        if ('details' in error && error.details) {
+          errorParts.push(`Details: ${error.details}`);
+        }
+        if ('hint' in error && error.hint) {
+          errorParts.push(`Hint: ${error.hint}`);
+        }
+        
+        toast({ 
+          title: "Clear failed", 
+          description: errorParts.join(" | "), 
+          variant: "destructive" 
+        });
+        return;
+      }
       
       invalidateQueries();
       toast({ title: "Cleared all sessions", description: "All your session data removed." });
     } catch (err) {
-      console.error("Clear error:", err);
+      console.error("Clear error (caught exception):", err);
       toast({ title: "Clear failed", description: String(err), variant: "destructive" });
     } finally {
       setIsClearing(false);
