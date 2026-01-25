@@ -45,7 +45,8 @@ function randomInt(min: number, max: number): number {
  * Generate a sample session with balanced outcome distribution:
  * ~65% positive, ~25% neutral, ~10% negative
  * 
- * Fields are aligned with useCreateSessionLog mutation in useSessionLogs.ts
+ * This is a minimal dev seeding payload. Optional/legacy fields
+ * (dose, dose_amount_mg, local_time) are intentionally omitted.
  */
 function generateSampleSession(userId: string, daysAgo: number) {
   const strain = randomPick(SAMPLE_STRAINS);
@@ -141,7 +142,7 @@ function DevToolsPanelContent() {
     queryClient.invalidateQueries();
   };
 
-  const handleSeedSessions = async () => {
+  const handleSeedSessions = async (count: number) => {
     if (!user) {
       toast({ title: "Not authenticated", description: "Please log in first.", variant: "destructive" });
       return;
@@ -149,9 +150,9 @@ function DevToolsPanelContent() {
     
     setIsSeeding(true);
     try {
-      // Generate 20 sessions spread across 14 days
+      // Generate sessions spread across 14 days
       const sessions = [];
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < count; i++) {
         const daysAgo = randomInt(0, 13);
         sessions.push(generateSampleSession(user.id, daysAgo));
       }
@@ -181,7 +182,7 @@ function DevToolsPanelContent() {
       }
       
       invalidateQueries();
-      toast({ title: "Seeded 20 sessions", description: "Sample data added successfully." });
+      toast({ title: `Seeded ${count} sessions`, description: "Sample data added successfully." });
     } catch (err) {
       console.error("Seed error (caught exception):", err);
       toast({ title: "Seed failed", description: String(err), variant: "destructive" });
@@ -195,6 +196,9 @@ function DevToolsPanelContent() {
       toast({ title: "Not authenticated", description: "Please log in first.", variant: "destructive" });
       return;
     }
+    
+    const confirmed = window.confirm("Are you sure you want to clear ALL session data? This cannot be undone.");
+    if (!confirmed) return;
     
     setIsClearing(true);
     try {
@@ -250,7 +254,17 @@ function DevToolsPanelContent() {
           <Button
             size="sm"
             variant="outline"
-            onClick={handleSeedSessions}
+            onClick={() => handleSeedSessions(5)}
+            disabled={isSeeding || isClearing}
+            className="text-xs h-7"
+          >
+            {isSeeding ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
+            Seed 5 sessions
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => handleSeedSessions(20)}
             disabled={isSeeding || isClearing}
             className="text-xs h-7"
           >
