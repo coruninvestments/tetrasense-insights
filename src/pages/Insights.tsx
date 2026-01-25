@@ -10,6 +10,7 @@ import { PatternCard, NoPatternCard } from "@/components/insights/PatternCard";
 import { DataQualityIndicator } from "@/components/insights/DataQualityIndicator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { DevToolsPanel } from "@/components/insights/DevToolsPanel";
 
 export default function Insights() {
   const { data: profile } = useProfile();
@@ -52,6 +53,9 @@ export default function Insights() {
         </header>
 
         <div className="px-5 pb-8 space-y-6">
+          {/* Dev Tools Panel - only shows in development */}
+          <DevToolsPanel />
+          
           {/* Premium Banner */}
           {!isPremium && (
             <motion.div
