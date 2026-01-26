@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Wrench, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -130,8 +131,9 @@ function DevToolsPanelContent() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const [isSeeding, setIsSeeding] = useState(false);
+  const [seedingCount, setSeedingCount] = useState<number | null>(null); // tracks which count is seeding
   const [isClearing, setIsClearing] = useState(false);
+  const [customCount, setCustomCount] = useState(20);
 
   const invalidateQueries = () => {
     // Invalidate all session-related queries used by the app
@@ -148,7 +150,7 @@ function DevToolsPanelContent() {
       return;
     }
     
-    setIsSeeding(true);
+    setSeedingCount(count);
     try {
       // Generate sessions spread across 14 days
       const sessions = [];
@@ -181,13 +183,21 @@ function DevToolsPanelContent() {
         return;
       }
       
+      // Calculate outcome breakdown for toast
+      const outcomes = sessions.reduce((acc, s) => {
+        acc[s.outcome as SessionOutcome] = (acc[s.outcome as SessionOutcome] || 0) + 1;
+        return acc;
+      }, {} as Record<SessionOutcome, number>);
+      
+      const statsDesc = `${outcomes.positive || 0} positive, ${outcomes.neutral || 0} neutral, ${outcomes.negative || 0} negative`;
+      
       invalidateQueries();
-      toast({ title: `Seeded ${count} sessions`, description: "Sample data added successfully." });
+      toast({ title: `Seeded ${count} sessions`, description: statsDesc });
     } catch (err) {
       console.error("Seed error (caught exception):", err);
       toast({ title: "Seed failed", description: String(err), variant: "destructive" });
     } finally {
-      setIsSeeding(false);
+      setSeedingCount(null);
     }
   };
 
@@ -243,6 +253,8 @@ function DevToolsPanelContent() {
     }
   };
 
+  const isSeeding = seedingCount !== null;
+  
   return (
     <Card className="border-dashed border-amber-500/30 bg-amber-500/10">
       <CardContent className="p-3">
@@ -250,7 +262,7 @@ function DevToolsPanelContent() {
           <Wrench className="w-4 h-4 text-amber-600" />
           <span className="text-xs font-medium text-amber-600 uppercase tracking-wide">Dev Tools</span>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 items-center">
           <Button
             size="sm"
             variant="outline"
@@ -258,8 +270,8 @@ function DevToolsPanelContent() {
             disabled={isSeeding || isClearing}
             className="text-xs h-7"
           >
-            {isSeeding ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
-            Seed 5 sessions
+            {seedingCount === 5 ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
+            Seed 5
           </Button>
           <Button
             size="sm"
@@ -268,9 +280,32 @@ function DevToolsPanelContent() {
             disabled={isSeeding || isClearing}
             className="text-xs h-7"
           >
-            {isSeeding ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
-            Seed 20 sessions
+            {seedingCount === 20 ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
+            Seed 20
           </Button>
+          <div className="flex items-center gap-1">
+            <Input
+              type="number"
+              min={1}
+              max={200}
+              value={customCount}
+              onChange={(e) => setCustomCount(Math.min(200, Math.max(1, parseInt(e.target.value) || 1)))}
+              className="w-16 h-7 text-xs"
+              disabled={isSeeding || isClearing}
+            />
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => handleSeedSessions(customCount)}
+              disabled={isSeeding || isClearing}
+              className="text-xs h-7"
+            >
+              {seedingCount === customCount && seedingCount !== 5 && seedingCount !== 20 ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : null}
+              Seed
+            </Button>
+          </div>
           <Button
             size="sm"
             variant="outline"
@@ -279,7 +314,7 @@ function DevToolsPanelContent() {
             className="text-xs h-7"
           >
             {isClearing ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
-            Clear all sessions
+            Clear all
           </Button>
           <Button
             size="sm"
@@ -288,7 +323,7 @@ function DevToolsPanelContent() {
             disabled={isSeeding || isClearing}
             className="text-xs h-7"
           >
-            Reset Tier Celebration
+            Reset Tier
           </Button>
         </div>
       </CardContent>
