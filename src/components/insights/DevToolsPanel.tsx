@@ -49,6 +49,9 @@ function randomInt(min: number, max: number): number {
  * This is a minimal dev seeding payload. Optional/legacy fields
  * (dose, dose_amount_mg, local_time) are intentionally omitted.
  */
+type SeedingSource = 'preset-5' | 'preset-20' | 'custom';
+type SeedingState = { count: number; source: SeedingSource } | null;
+
 function generateSampleSession(userId: string, daysAgo: number) {
   const strain = randomPick(SAMPLE_STRAINS);
   const intent = randomPick(INTENTS);
@@ -131,9 +134,10 @@ function DevToolsPanelContent() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const [seedingCount, setSeedingCount] = useState<number | null>(null); // tracks which count is seeding
+  const [seedingState, setSeedingState] = useState<SeedingState>(null);
   const [isClearing, setIsClearing] = useState(false);
   const [customCount, setCustomCount] = useState(20);
+  const [daysBack, setDaysBack] = useState(14);
 
   const invalidateQueries = () => {
     // Invalidate all session-related queries used by the app
@@ -144,19 +148,19 @@ function DevToolsPanelContent() {
     queryClient.invalidateQueries();
   };
 
-  const handleSeedSessions = async (count: number) => {
+  const handleSeedSessions = async (count: number, source: SeedingSource) => {
     if (!user) {
       toast({ title: "Not authenticated", description: "Please log in first.", variant: "destructive" });
       return;
     }
     
-    setSeedingCount(count);
+    setSeedingState({ count, source });
     try {
-      // Generate sessions spread across 14 days
+      // Generate sessions spread across the configured days range
       const sessions = [];
       for (let i = 0; i < count; i++) {
-        const daysAgo = randomInt(0, 13);
-        sessions.push(generateSampleSession(user.id, daysAgo));
+        const daysAgoValue = randomInt(0, daysBack - 1);
+        sessions.push(generateSampleSession(user.id, daysAgoValue));
       }
       
       const { error } = await supabase
@@ -197,7 +201,7 @@ function DevToolsPanelContent() {
       console.error("Seed error (caught exception):", err);
       toast({ title: "Seed failed", description: String(err), variant: "destructive" });
     } finally {
-      setSeedingCount(null);
+      setSeedingState(null);
     }
   };
 
@@ -206,6 +210,9 @@ function DevToolsPanelContent() {
       toast({ title: "Not authenticated", description: "Please log in first.", variant: "destructive" });
       return;
     }
+    
+    // SSR safety guard for window.confirm
+    if (typeof window === "undefined") return;
     
     const confirmed = window.confirm("Are you sure you want to clear ALL session data? This cannot be undone.");
     if (!confirmed) return;
@@ -253,7 +260,10 @@ function DevToolsPanelContent() {
     }
   };
 
-  const isSeeding = seedingCount !== null;
+  const isSeeding = seedingState !== null;
+  const isPreset5 = seedingState?.source === 'preset-5';
+  const isPreset20 = seedingState?.source === 'preset-20';
+  const isCustom = seedingState?.source === 'custom';
   
   return (
     <Card className="border-dashed border-amber-500/30 bg-amber-500/10">
@@ -266,21 +276,21 @@ function DevToolsPanelContent() {
           <Button
             size="sm"
             variant="outline"
-            onClick={() => handleSeedSessions(5)}
+            onClick={() => handleSeedSessions(5, 'preset-5')}
             disabled={isSeeding || isClearing}
             className="text-xs h-7"
           >
-            {seedingCount === 5 ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
+            {isPreset5 ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
             Seed 5
           </Button>
           <Button
             size="sm"
             variant="outline"
-            onClick={() => handleSeedSessions(20)}
+            onClick={() => handleSeedSessions(20, 'preset-20')}
             disabled={isSeeding || isClearing}
             className="text-xs h-7"
           >
-            {seedingCount === 20 ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
+            {isPreset20 ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
             Seed 20
           </Button>
           <div className="flex items-center gap-1">
@@ -296,15 +306,25 @@ function DevToolsPanelContent() {
             <Button
               size="sm"
               variant="outline"
-              onClick={() => handleSeedSessions(customCount)}
+              onClick={() => handleSeedSessions(customCount, 'custom')}
               disabled={isSeeding || isClearing}
               className="text-xs h-7"
             >
-              {seedingCount === customCount && seedingCount !== 5 && seedingCount !== 20 ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-              ) : null}
+              {isCustom ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
               Seed
             </Button>
+          </div>
+          <div className="flex items-center gap-1">
+            <Input
+              type="number"
+              min={1}
+              max={60}
+              value={daysBack}
+              onChange={(e) => setDaysBack(Math.min(60, Math.max(1, parseInt(e.target.value) || 1)))}
+              className="w-14 h-7 text-xs"
+              disabled={isSeeding || isClearing}
+            />
+            <span className="text-xs text-muted-foreground">days</span>
           </div>
           <Button
             size="sm"
