@@ -167,9 +167,9 @@ function calculateConfidence(factors: ConfidenceFactors): ConfidenceLevel {
 function getConfidencePrefix(confidence: ConfidenceLevel): string {
   switch (confidence) {
     case "high":
-      return "Your sessions consistently show";
+      return "Your data strongly suggests";
     case "medium":
-      return "Your data shows a pattern:";
+      return "Your data suggests";
     case "low":
     default:
       return "Early signals suggest";
@@ -354,16 +354,16 @@ function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
   // ─────────────────────────────────────────────────────────────────────────────
   const methodCounts = sessions.reduce(
     (acc, s) => {
-      const method = s.method ?? "unknown";
+      const method = s.method ?? "other";
       acc[method] = (acc[method] || 0) + 1;
       return acc;
     },
     {} as Record<string, number>
   );
 
-  // Exclude "unknown" from being the top method if possible
+  // Exclude "other" from being the top method if possible
   const sortedMethods = Object.entries(methodCounts)
-    .filter(([method]) => method !== "unknown")
+    .filter(([method]) => method !== "other")
     .sort((a, b) => b[1] - a[1]);
   const topMethod = sortedMethods[0];
   if (topMethod && topMethod[1] >= 3) {

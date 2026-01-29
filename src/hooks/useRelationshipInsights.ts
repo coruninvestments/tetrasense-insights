@@ -271,15 +271,15 @@ function formatIntent(intent: string): string {
 /**
  * Get tier-aware language prefix
  */
-function getTierPrefix(tier: DataQualityTier): { opening: string; qualifier: string } {
+function getTierPrefix(tier: DataQualityTier): string {
   switch (tier) {
     case "strong":
-      return { opening: "Your sessions consistently show", qualifier: "reliably" };
+      return "Your data strongly suggests";
     case "good":
-      return { opening: "Your data shows a pattern:", qualifier: "often" };
+      return "Your data suggests";
     case "early":
     default:
-      return { opening: "Early signals suggest", qualifier: "may" };
+      return "Early signals suggest";
   }
 }
 
@@ -288,21 +288,15 @@ function getTierPrefix(tier: DataQualityTier): { opening: string; qualifier: str
  */
 function buildInsights(sessions: SessionLog[], tier: DataQualityTier): RelationshipInsight[] {
   const insights: RelationshipInsight[] = [];
-  const { opening, qualifier } = getTierPrefix(tier);
+  const prefix = getTierPrefix(tier);
 
   // Primary Intent (available at early tier)
   const primaryIntent = calculatePrimaryIntent(sessions);
   if (primaryIntent && primaryIntent.percentage >= 25) {
-    const tierLanguage = tier === "early"
-      ? `Early signals suggest ${formatIntent(primaryIntent.intent)} is your most common intent (${primaryIntent.percentage}% of sessions).`
-      : tier === "good"
-      ? `Your data shows a pattern: ${formatIntent(primaryIntent.intent)} represents ${primaryIntent.percentage}% of your sessions.`
-      : `Your sessions consistently show ${formatIntent(primaryIntent.intent)} as your primary intent (${primaryIntent.percentage}% of ${sessions.length} sessions).`;
-
     insights.push({
       id: "primary-intent",
       title: "Primary Usage Intent",
-      description: tierLanguage,
+      description: `${prefix} ${formatIntent(primaryIntent.intent)} is your most common intent (${primaryIntent.percentage}% of sessions).`,
       type: "primary-intent",
       tier,
     });
@@ -311,35 +305,10 @@ function buildInsights(sessions: SessionLog[], tier: DataQualityTier): Relations
   // Outcome Balance (available at early tier)
   const balance = calculateOutcomeBalance(sessions);
   if (sessions.length >= 5) {
-    let balanceDescription: string;
-    if (tier === "early") {
-      balanceDescription = `Early signals suggest ${balance.positive}% positive, ${balance.neutral}% neutral, and ${balance.negative}% negative outcomes so far.`;
-    } else if (tier === "good") {
-      balanceDescription = `Your data shows a pattern: ${balance.positive}% positive, ${balance.neutral}% neutral, and ${balance.negative}% negative outcomes.`;
-    } else {
-      balanceDescription = `Your sessions consistently show ${balance.positive}% positive, ${balance.neutral}% neutral, and ${balance.negative}% negative outcomes.`;
-    }
-
     insights.push({
       id: "outcome-balance",
       title: "Outcome Balance",
-      description: balanceDescription,
-      type: "outcome-balance",
-      tier,
-    });
-  }
-  if (sessions.length >= 5) {
-    let balanceDescription: string;
-    if (tier === "early") {
-      balanceDescription = `So far, ${balance.positive}% of your sessions have been positive, ${balance.neutral}% neutral, and ${balance.negative}% negative.`;
-    } else {
-      balanceDescription = `Your sessions show ${balance.positive}% positive outcomes, ${balance.neutral}% neutral, and ${balance.negative}% negative. This reflects your personal response patterns.`;
-    }
-
-    insights.push({
-      id: "outcome-balance",
-      title: "Outcome Balance",
-      description: balanceDescription,
+      description: `${prefix} ${balance.positive}% positive, ${balance.neutral}% neutral, and ${balance.negative}% negative outcomes.`,
       type: "outcome-balance",
       tier,
     });
@@ -349,14 +318,10 @@ function buildInsights(sessions: SessionLog[], tier: DataQualityTier): Relations
   if (tier === "good" || tier === "strong") {
     const correlation = detectDoseAnxietyCorrelation(sessions);
     if (correlation?.detected) {
-      const description = tier === "strong"
-        ? `Your sessions consistently show higher doses correlating with elevated anxiety (avg ${correlation.avgHighAnxiety.toFixed(1)} vs ${correlation.avgLowAnxiety.toFixed(1)} for low doses).`
-        : `Your data shows a pattern: higher doses ${qualifier} correlate with elevated anxiety ratings (avg ${correlation.avgHighAnxiety.toFixed(1)} vs ${correlation.avgLowAnxiety.toFixed(1)} for low doses).`;
-
       insights.push({
         id: "dose-anxiety",
         title: "Dose & Comfort Pattern",
-        description,
+        description: `${prefix} higher doses correlate with elevated anxiety (avg ${correlation.avgHighAnxiety.toFixed(1)} vs ${correlation.avgLowAnxiety.toFixed(1)} for low doses).`,
         type: "correlation",
         tier,
       });
@@ -368,24 +333,17 @@ function buildInsights(sessions: SessionLog[], tier: DataQualityTier): Relations
     const stability = calculateStabilityTrend(sessions);
     if (stability.trend !== "insufficient") {
       let stabilityDescription: string;
-      const isStrong = tier === "strong";
       
       switch (stability.trend) {
         case "improving":
-          stabilityDescription = isStrong
-            ? `Your sessions consistently show improvement: ${stability.recentPositiveRate}% positive recently vs ${stability.olderPositiveRate}% earlier.`
-            : `Your data shows a pattern: recent sessions trend toward ${stability.recentPositiveRate}% positive (vs ${stability.olderPositiveRate}% earlier).`;
+          stabilityDescription = `${prefix} improvement: ${stability.recentPositiveRate}% positive recently vs ${stability.olderPositiveRate}% earlier.`;
           break;
         case "volatile":
-          stabilityDescription = isStrong
-            ? `Your sessions consistently show variability between outcomes. This may reflect different contexts, strains, or doses.`
-            : `Your data shows a pattern: outcomes vary between sessions, which may reflect changing contexts.`;
+          stabilityDescription = `${prefix} variability between outcomes, which may reflect different contexts, strains, or doses.`;
           break;
         case "stable":
         default:
-          stabilityDescription = isStrong
-            ? `Your sessions consistently show stable outcomes over time.`
-            : `Your data shows a pattern: outcomes have remained relatively consistent.`;
+          stabilityDescription = `${prefix} stable outcomes over time.`;
           break;
       }
 
@@ -404,24 +362,17 @@ function buildInsights(sessions: SessionLog[], tier: DataQualityTier): Relations
     const tolerance = calculateToleranceTrend(sessions);
     if (tolerance) {
       let toleranceDescription: string;
-      const isStrong = tier === "strong";
       
       switch (tolerance.trend) {
         case "increasing":
-          toleranceDescription = isStrong
-            ? `Your sessions consistently show tolerance may be increasing—recent sessions use higher average doses.`
-            : `Your data shows a pattern: tolerance may be increasing, with recent sessions trending toward higher doses.`;
+          toleranceDescription = `${prefix} tolerance may be increasing—recent sessions use higher average doses.`;
           break;
         case "decreasing":
-          toleranceDescription = isStrong
-            ? `Your sessions consistently show decreasing effective doses over time.`
-            : `Your data shows a pattern: your effective dose appears to be decreasing.`;
+          toleranceDescription = `${prefix} decreasing effective doses over time.`;
           break;
         case "stable":
         default:
-          toleranceDescription = isStrong
-            ? `Your sessions consistently show stable dose levels over time.`
-            : `Your data shows a pattern: dose levels have remained relatively stable.`;
+          toleranceDescription = `${prefix} stable dose levels over time.`;
           break;
       }
 
