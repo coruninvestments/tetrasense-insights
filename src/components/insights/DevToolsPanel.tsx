@@ -260,6 +260,12 @@ function DevToolsPanelContent() {
     }
   };
 
+  const handleResetDefaults = () => {
+    setCustomCount(20);
+    setDaysBack(14);
+    toast({ title: "Defaults reset", description: "Count 20, Range 14 days" });
+  };
+
   const isSeeding = seedingState !== null;
   const isPreset5 = seedingState?.source === 'preset-5';
   const isPreset20 = seedingState?.source === 'preset-20';
@@ -364,6 +370,15 @@ function DevToolsPanelContent() {
             className="text-xs h-7"
           >
             Reset Tier
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleResetDefaults}
+            disabled={isSeeding || isClearing}
+            className="text-xs h-7"
+          >
+            Reset defaults
           </Button>
         </div>
         <OutcomePreview />
