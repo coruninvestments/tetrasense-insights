@@ -9,6 +9,7 @@ import { useInsights } from "@/hooks/useInsights";
 import { PatternCard, NoPatternCard } from "@/components/insights/PatternCard";
 import { DataQualityIndicator } from "@/components/insights/DataQualityIndicator";
 import { RelationshipInsightsSection } from "@/components/insights/RelationshipInsightsSection";
+import { WeeklyUsageSection } from "@/components/insights/WeeklyUsageSection";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { DevToolsPanel } from "@/components/insights/DevToolsPanel";
@@ -162,6 +163,9 @@ export default function Insights() {
               </div>
             )}
           </section>
+
+          {/* Weekly Usage Summary */}
+          <WeeklyUsageSection />
 
           {/* Your Cannabis Relationship */}
           <RelationshipInsightsSection />
