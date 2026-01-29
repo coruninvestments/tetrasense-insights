@@ -109,16 +109,18 @@ function detectDoseAnxietyCorrelation(sessions: SessionLog[]): {
 
 /**
  * Map dose level to numeric value for comparison
+ * Returns null for missing/invalid values to exclude from averages
  */
-function doseToNumber(dose: string | null | undefined): number {
+function doseToNumber(dose: string | null | undefined): number | null {
   if (dose === "high") return 3;
   if (dose === "medium") return 2;
-  return 1; // low or undefined
+  if (dose === "low") return 1;
+  return null;
 }
 
 /**
  * Calculate tolerance trend based on dose progression and outcome patterns
- * Only available with ≥10 sessions
+ * Only available with ≥10 sessions and sufficient dose data
  */
 function calculateToleranceTrend(sessions: SessionLog[]): {
   trend: ToleranceTrend;
@@ -138,18 +140,25 @@ function calculateToleranceTrend(sessions: SessionLog[]): {
   const older = sorted.slice(0, midpoint);
   const recent = sorted.slice(midpoint);
 
-  // Calculate average dose levels
-  const olderAvgDose = older.reduce((sum, s) => sum + doseToNumber(s.dose_level), 0) / older.length;
-  const recentAvgDose = recent.reduce((sum, s) => sum + doseToNumber(s.dose_level), 0) / recent.length;
+  // Filter to sessions with known dose levels for dose-based calculations
+  const olderWithDose = older.filter(s => doseToNumber(s.dose_level) !== null);
+  const recentWithDose = recent.filter(s => doseToNumber(s.dose_level) !== null);
 
-  // Calculate session frequency (sessions per 7 days)
+  // Require at least 4 sessions with dose data in each half (8 total minimum)
+  if (olderWithDose.length < 4 || recentWithDose.length < 4) return null;
+
+  // Calculate average dose levels (only from known doses)
+  const olderAvgDose = olderWithDose.reduce((sum, s) => sum + (doseToNumber(s.dose_level) as number), 0) / olderWithDose.length;
+  const recentAvgDose = recentWithDose.reduce((sum, s) => sum + (doseToNumber(s.dose_level) as number), 0) / recentWithDose.length;
+
+  // Calculate session frequency (sessions per 7 days) - uses ALL sessions
   const olderDays = Math.max(1, (new Date(older[older.length - 1].created_at).getTime() - new Date(older[0].created_at).getTime()) / (1000 * 60 * 60 * 24));
   const recentDays = Math.max(1, (new Date(recent[recent.length - 1].created_at).getTime() - new Date(recent[0].created_at).getTime()) / (1000 * 60 * 60 * 24));
   
   const olderFrequency = (older.length / olderDays) * 7;
   const recentFrequency = (recent.length / recentDays) * 7;
 
-  // Check outcome quality at higher doses
+  // Check outcome quality at higher doses (only explicit "high" dose sessions)
   const recentHighDose = recent.filter(s => s.dose_level === "high");
   const olderHighDose = older.filter(s => s.dose_level === "high");
   
@@ -160,7 +169,7 @@ function calculateToleranceTrend(sessions: SessionLog[]): {
     ? olderHighDose.filter(s => normalizeOutcome(s.outcome) === "positive").length / olderHighDose.length 
     : 0;
 
-  // Check anxiety at higher doses
+  // Check anxiety at higher doses (only explicit "high" dose sessions)
   const recentHighAnxiety = recentHighDose.length > 0
     ? recentHighDose.reduce((sum, s) => sum + (s.effect_anxiety || 0), 0) / recentHighDose.length
     : 0;
