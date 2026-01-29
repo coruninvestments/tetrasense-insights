@@ -36,15 +36,33 @@ interface DoseDistributionDisplayProps {
 }
 
 function DoseDistributionDisplay({ distribution, total }: DoseDistributionDisplayProps) {
+  const doseItems = [
+    { key: "low" as const, label: "Low", color: "bg-primary/40" },
+    { key: "medium" as const, label: "Medium", color: "bg-primary/70" },
+    { key: "high" as const, label: "High", color: "bg-primary" },
+    { key: "unknown" as const, label: "Unknown", color: "bg-muted" },
+  ];
+
+  // Only show unknown if there are unknown doses
+  const visibleDoseItems = doseItems.filter(
+    (item) => item.key !== "unknown" || distribution.unknown > 0
+  );
+
   return (
     <div className="space-y-2">
       <h4 className="text-xs font-medium text-foreground uppercase tracking-wide">
         Dose Levels
       </h4>
       <div className="space-y-1.5">
-        <DistributionBar label="Low" count={distribution.low} total={total} color="bg-emerald-500" />
-        <DistributionBar label="Medium" count={distribution.medium} total={total} color="bg-amber-500" />
-        <DistributionBar label="High" count={distribution.high} total={total} color="bg-rose-500" />
+        {visibleDoseItems.map((item) => (
+          <DistributionBar
+            key={item.key}
+            label={item.label}
+            count={distribution[item.key]}
+            total={total}
+            color={item.color}
+          />
+        ))}
       </div>
     </div>
   );
@@ -57,10 +75,12 @@ interface MethodDistributionDisplayProps {
 
 function MethodDistributionDisplay({ distribution, total }: MethodDistributionDisplayProps) {
   const methods = [
-    { key: "smoke", label: "Smoke", color: "bg-orange-500" },
-    { key: "vape", label: "Vape", color: "bg-sky-500" },
-    { key: "edible", label: "Edible", color: "bg-violet-500" },
-    { key: "tincture", label: "Tincture", color: "bg-teal-500" },
+    { key: "smoke", label: "Smoke", color: "bg-accent" },
+    { key: "vape", label: "Vape", color: "bg-secondary" },
+    { key: "edible", label: "Edible", color: "bg-primary/60" },
+    { key: "tincture", label: "Tincture", color: "bg-primary/40" },
+    { key: "topical", label: "Topical", color: "bg-primary/30" },
+    { key: "other", label: "Other", color: "bg-muted" },
   ] as const;
 
   // Only show methods that have been used
@@ -156,7 +176,7 @@ export function WeeklyUsageSection() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-                  This Week
+                  Last 7 days
                 </p>
                 <p className="text-2xl font-serif font-medium text-foreground">
                   {data.thisWeekCount} session{data.thisWeekCount !== 1 ? "s" : ""}
@@ -164,7 +184,7 @@ export function WeeklyUsageSection() {
               </div>
               <div className="text-right">
                 <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
-                  Last Week
+                  Previous 7 days
                 </p>
                 <div className="flex items-center justify-end gap-1.5">
                   <p className="text-lg text-muted-foreground">
@@ -208,7 +228,7 @@ export function WeeklyUsageSection() {
       </motion.div>
 
       <p className="text-xs text-muted-foreground text-center mt-3">
-        Based on the last 7 days of logged sessions.
+        Based on your last 7 days of logged sessions.
       </p>
     </section>
   );

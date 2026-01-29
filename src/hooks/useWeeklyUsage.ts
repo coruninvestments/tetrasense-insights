@@ -5,6 +5,7 @@ export interface DoseDistribution {
   low: number;
   medium: number;
   high: number;
+  unknown: number;
 }
 
 export interface MethodDistribution {
@@ -69,16 +70,18 @@ export function useWeeklyUsage(): {
       weekOverWeekChange = thisWeekCount - lastWeekCount;
     }
 
-    // Calculate dose distribution for this week
-    const doseDistribution: DoseDistribution = { low: 0, medium: 0, high: 0 };
+    // Calculate dose distribution for this week (missing dose goes to unknown)
+    const doseDistribution: DoseDistribution = { low: 0, medium: 0, high: 0, unknown: 0 };
     thisWeekSessions.forEach((s) => {
-      const dose = s.dose_level || "medium";
-      if (dose in doseDistribution) {
-        doseDistribution[dose as keyof DoseDistribution]++;
+      const dose = s.dose_level;
+      if (dose === "low" || dose === "medium" || dose === "high") {
+        doseDistribution[dose]++;
+      } else {
+        doseDistribution.unknown++;
       }
     });
 
-    // Calculate method distribution for this week
+    // Calculate method distribution for this week (missing/unrecognized goes to other)
     const methodDistribution: MethodDistribution = {
       smoke: 0,
       vape: 0,
