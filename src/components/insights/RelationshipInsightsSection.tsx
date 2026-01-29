@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { Heart, PieChart, Activity, TrendingUp, Info } from "lucide-react";
+import { Heart, PieChart, Activity, TrendingUp, Info, Gauge, HelpCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useRelationshipInsights, RelationshipInsight, DataQualityTier } from "@/hooks/useRelationshipInsights";
 
 const iconMap = {
@@ -9,6 +10,7 @@ const iconMap = {
   "outcome-balance": PieChart,
   "correlation": Activity,
   "stability": TrendingUp,
+  "tolerance": Gauge,
 };
 
 const tierBadgeConfig: Record<DataQualityTier, { label: string; className: string }> = {
@@ -43,6 +45,24 @@ function RelationshipCard({ insight }: RelationshipCardProps) {
               >
                 {badge.label}
               </span>
+              {insight.tooltipText && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        className="p-0.5 rounded-full hover:bg-muted/50 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50"
+                        aria-label="Learn how this is calculated"
+                      >
+                        <HelpCircle className="w-3.5 h-3.5 text-muted-foreground" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs text-xs">
+                      {insight.tooltipText}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               {insight.description}

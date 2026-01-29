@@ -4,12 +4,15 @@ import { normalizeOutcome, SessionOutcome } from "@/lib/sessionOutcome";
 
 export type DataQualityTier = "insufficient" | "early" | "good" | "strong";
 
+export type ToleranceTrend = "decreasing" | "stable" | "increasing";
+
 export interface RelationshipInsight {
   id: string;
   title: string;
   description: string;
-  type: "primary-intent" | "outcome-balance" | "correlation" | "stability";
+  type: "primary-intent" | "outcome-balance" | "correlation" | "stability" | "tolerance";
   tier: DataQualityTier;
+  tooltipText?: string;
 }
 
 export interface RelationshipInsightsData {
@@ -101,6 +104,96 @@ function detectDoseAnxietyCorrelation(sessions: SessionLog[]): {
     avgHighAnxiety: avgHigh,
     avgLowAnxiety: avgLow,
     difference,
+  };
+}
+
+/**
+ * Map dose level to numeric value for comparison
+ */
+function doseToNumber(dose: string | null | undefined): number {
+  if (dose === "high") return 3;
+  if (dose === "medium") return 2;
+  return 1; // low or undefined
+}
+
+/**
+ * Calculate tolerance trend based on dose progression and outcome patterns
+ * Only available with ≥10 sessions
+ */
+function calculateToleranceTrend(sessions: SessionLog[]): {
+  trend: ToleranceTrend;
+  recentAvgDose: number;
+  olderAvgDose: number;
+  recentFrequency: number;
+  olderFrequency: number;
+} | null {
+  if (sessions.length < 10) return null;
+
+  // Sort by date ascending (oldest first)
+  const sorted = [...sessions].sort(
+    (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+  );
+
+  const midpoint = Math.floor(sorted.length / 2);
+  const older = sorted.slice(0, midpoint);
+  const recent = sorted.slice(midpoint);
+
+  // Calculate average dose levels
+  const olderAvgDose = older.reduce((sum, s) => sum + doseToNumber(s.dose_level), 0) / older.length;
+  const recentAvgDose = recent.reduce((sum, s) => sum + doseToNumber(s.dose_level), 0) / recent.length;
+
+  // Calculate session frequency (sessions per 7 days)
+  const olderDays = Math.max(1, (new Date(older[older.length - 1].created_at).getTime() - new Date(older[0].created_at).getTime()) / (1000 * 60 * 60 * 24));
+  const recentDays = Math.max(1, (new Date(recent[recent.length - 1].created_at).getTime() - new Date(recent[0].created_at).getTime()) / (1000 * 60 * 60 * 24));
+  
+  const olderFrequency = (older.length / olderDays) * 7;
+  const recentFrequency = (recent.length / recentDays) * 7;
+
+  // Check outcome quality at higher doses
+  const recentHighDose = recent.filter(s => s.dose_level === "high");
+  const olderHighDose = older.filter(s => s.dose_level === "high");
+  
+  const recentHighPositiveRate = recentHighDose.length > 0 
+    ? recentHighDose.filter(s => normalizeOutcome(s.outcome) === "positive").length / recentHighDose.length 
+    : 0;
+  const olderHighPositiveRate = olderHighDose.length > 0 
+    ? olderHighDose.filter(s => normalizeOutcome(s.outcome) === "positive").length / olderHighDose.length 
+    : 0;
+
+  // Check anxiety at higher doses
+  const recentHighAnxiety = recentHighDose.length > 0
+    ? recentHighDose.reduce((sum, s) => sum + (s.effect_anxiety || 0), 0) / recentHighDose.length
+    : 0;
+  const olderHighAnxiety = olderHighDose.length > 0
+    ? olderHighDose.reduce((sum, s) => sum + (s.effect_anxiety || 0), 0) / olderHighDose.length
+    : 0;
+
+  // Determine trend
+  const doseIncreasing = recentAvgDose > olderAvgDose + 0.3;
+  const doseDecreasing = recentAvgDose < olderAvgDose - 0.3;
+  const frequencyIncreasing = recentFrequency > olderFrequency * 1.2;
+  const outcomesWorseningAtHighDose = recentHighPositiveRate < olderHighPositiveRate - 0.15;
+  const anxietyIncreasingAtHighDose = recentHighAnxiety > olderHighAnxiety + 1;
+
+  let trend: ToleranceTrend = "stable";
+
+  // Increasing tolerance signals
+  if (doseIncreasing && (frequencyIncreasing || outcomesWorseningAtHighDose || anxietyIncreasingAtHighDose)) {
+    trend = "increasing";
+  } else if (doseIncreasing && recentHighDose.length >= 2) {
+    trend = "increasing";
+  }
+  // Decreasing tolerance signals  
+  else if (doseDecreasing && !frequencyIncreasing) {
+    trend = "decreasing";
+  }
+
+  return {
+    trend,
+    recentAvgDose,
+    olderAvgDose,
+    recentFrequency,
+    olderFrequency,
   };
 }
 
@@ -254,6 +347,35 @@ function buildInsights(sessions: SessionLog[], tier: DataQualityTier): Relations
         description: stabilityDescription,
         type: "stability",
         tier,
+      });
+    }
+  }
+
+  // Tolerance Trend (requires ≥10 sessions, available at good/strong tier)
+  if ((tier === "good" || tier === "strong") && sessions.length >= 10) {
+    const tolerance = calculateToleranceTrend(sessions);
+    if (tolerance) {
+      let toleranceDescription: string;
+      switch (tolerance.trend) {
+        case "increasing":
+          toleranceDescription = `Your data suggests tolerance may be increasing. Recent sessions show higher average doses compared to earlier sessions.`;
+          break;
+        case "decreasing":
+          toleranceDescription = `Your effective dose appears to be decreasing. Recent sessions use lower doses on average compared to earlier periods.`;
+          break;
+        case "stable":
+        default:
+          toleranceDescription = `Your effective dose has remained stable over time, with consistent dose levels across your logged sessions.`;
+          break;
+      }
+
+      insights.push({
+        id: "tolerance-trend",
+        title: "Tolerance Trend",
+        description: toleranceDescription,
+        type: "tolerance",
+        tier,
+        tooltipText: "Inferred from dose level changes, session frequency, and outcome patterns at higher doses. This is an observation, not medical guidance.",
       });
     }
   }
