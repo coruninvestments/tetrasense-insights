@@ -264,6 +264,26 @@ function DevToolsPanelContent() {
   const isPreset5 = seedingState?.source === 'preset-5';
   const isPreset20 = seedingState?.source === 'preset-20';
   const isCustom = seedingState?.source === 'custom';
+
+  // Calculate expected outcome counts based on target distribution
+  const expectedPositive = Math.round(customCount * 0.65);
+  const expectedNeutral = Math.round(customCount * 0.25);
+  const expectedNegative = customCount - expectedPositive - expectedNeutral;
+
+  // Outcome Preview Component - shows target distribution visually
+  const OutcomePreview = () => (
+    <div className="mt-2 space-y-1">
+      <div className="flex h-2 w-full rounded-sm overflow-hidden">
+        {/* Dev-only hardcoded colors acceptable per requirements */}
+        <div className="h-full" style={{ width: '65%', backgroundColor: '#22c55e' }} />
+        <div className="h-full" style={{ width: '25%', backgroundColor: '#a3a3a3' }} />
+        <div className="h-full" style={{ width: '10%', backgroundColor: '#ef4444' }} />
+      </div>
+      <p className="text-[10px] text-muted-foreground">
+        Target: {expectedPositive} positive / {expectedNeutral} neutral / {expectedNegative} negative
+      </p>
+    </div>
+  );
   
   return (
     <Card className="border-dashed border-amber-500/30 bg-amber-500/10">
@@ -346,6 +366,7 @@ function DevToolsPanelContent() {
             Reset Tier
           </Button>
         </div>
+        <OutcomePreview />
       </CardContent>
     </Card>
   );
