@@ -38,10 +38,10 @@ function getDataTier(count: number): DataQualityTier {
 function calculatePrimaryIntent(sessions: SessionLog[]): { intent: string; count: number; percentage: number } | null {
   if (sessions.length === 0) return null;
 
-  const intentCounts = sessions.reduce((acc, s) => {
+  const intentCounts = sessions.reduce<Record<string, number>>((acc, s) => {
     acc[s.intent] = (acc[s.intent] || 0) + 1;
     return acc;
-  }, {} as Record<string, number>);
+  }, {});
 
   const sorted = Object.entries(intentCounts).sort((a, b) => b[1] - a[1]);
   if (sorted.length === 0) return null;
@@ -64,7 +64,7 @@ function calculateOutcomeBalance(sessions: SessionLog[]): {
 } {
   if (sessions.length === 0) return { positive: 0, neutral: 0, negative: 0 };
 
-  const counts = { positive: 0, neutral: 0, negative: 0 };
+  const counts: Record<SessionOutcome, number> = { positive: 0, neutral: 0, negative: 0 };
   sessions.forEach((s) => {
     const outcome = normalizeOutcome(s.outcome);
     counts[outcome]++;
