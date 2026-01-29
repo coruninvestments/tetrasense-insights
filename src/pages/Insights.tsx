@@ -7,6 +7,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useSessionLogs, useSessionStats } from "@/hooks/useSessionLogs";
 import { useInsights } from "@/hooks/useInsights";
 import { PatternCard, NoPatternCard } from "@/components/insights/PatternCard";
+import { MilestoneCallout } from "@/components/insights/MilestoneCallout";
 import { DataQualityIndicator } from "@/components/insights/DataQualityIndicator";
 import { RelationshipInsightsSection } from "@/components/insights/RelationshipInsightsSection";
 import { WeeklyUsageSection } from "@/components/insights/WeeklyUsageSection";
@@ -55,6 +56,9 @@ export default function Insights() {
         </header>
 
         <div className="px-5 pb-8 space-y-6">
+          {/* Milestone Callout - shown once at 10 sessions */}
+          {sessions && <MilestoneCallout sessionCount={sessions.length} />}
+          
           {/* Dev Tools Panel - only shows in development */}
           <DevToolsPanel />
           
@@ -168,7 +172,9 @@ export default function Insights() {
           <WeeklyUsageSection />
 
           {/* Your Cannabis Relationship */}
-          <RelationshipInsightsSection />
+          <div id="relationship-section">
+            <RelationshipInsightsSection />
+          </div>
 
           {/* Discovered Patterns */}
           <section>
