@@ -8,6 +8,7 @@ import { useSessionLogs, useSessionStats } from "@/hooks/useSessionLogs";
 import { useInsights } from "@/hooks/useInsights";
 import { PatternCard, NoPatternCard } from "@/components/insights/PatternCard";
 import { DataQualityIndicator } from "@/components/insights/DataQualityIndicator";
+import { RelationshipInsightsSection } from "@/components/insights/RelationshipInsightsSection";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { DevToolsPanel } from "@/components/insights/DevToolsPanel";
@@ -161,6 +162,9 @@ export default function Insights() {
               </div>
             )}
           </section>
+
+          {/* Your Cannabis Relationship */}
+          <RelationshipInsightsSection />
 
           {/* Discovered Patterns */}
           <section>
