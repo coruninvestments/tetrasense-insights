@@ -49,12 +49,12 @@ export function MilestoneCallout({ sessionCount }: MilestoneCalloutProps) {
             Your Cannabis Pattern Is Emerging
           </AlertTitle>
           <AlertDescription className="text-sm text-muted-foreground mt-1">
-            With 10 sessions logged, we can now surface early patterns in your usage.{" "}
+            With 10 sessions logged, early signals are beginning to surface.{" "}
             <button
               onClick={scrollToRelationship}
               className="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary/50 rounded"
             >
-              See your relationship insights
+              Explore your relationship insights
             </button>
             .
           </AlertDescription>

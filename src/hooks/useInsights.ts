@@ -161,6 +161,21 @@ function calculateConfidence(factors: ConfidenceFactors): ConfidenceLevel {
   return "low";
 }
 
+/**
+ * Get confidence-aware prefix for pattern descriptions
+ */
+function getConfidencePrefix(confidence: ConfidenceLevel): string {
+  switch (confidence) {
+    case "high":
+      return "Your sessions consistently show";
+    case "medium":
+      return "Your data shows a pattern:";
+    case "low":
+    default:
+      return "Early signals suggest";
+  }
+}
+
 function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
   const patterns: PatternInsight[] = [];
 
@@ -196,11 +211,13 @@ function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
           effectStrength,
         });
 
+        const prefix = getConfidencePrefix(confidence);
+
         patterns.push({
           id: "sleep-low-dose",
           title: "Lower Doses May Help Sleep",
           description:
-            "Based on your data, lower doses for sleep intent tend to result in higher sleepiness ratings without excess effects.",
+            `${prefix} lower doses for sleep intent tend to result in higher sleepiness ratings without excess effects.`,
           confidence,
           icon: "sleep",
         });
@@ -244,11 +261,13 @@ function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
           effectStrength,
         });
 
+        const prefix = getConfidencePrefix(confidence);
+
         patterns.push({
           id: "anxiety-dose",
           title: "Dose & Comfort Correlation",
           description:
-            "Based on your data, higher doses appear to correlate with increased anxiety ratings. You may want to experiment with lower doses and compare how your comfort ratings change.",
+            `${prefix} higher doses appear to correlate with increased anxiety ratings. Consider experimenting with lower doses to compare.`,
           confidence,
           icon: "trending",
         });
@@ -282,10 +301,12 @@ function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
         effectStrength,
       });
 
+      const prefix = getConfidencePrefix(confidence);
+
       patterns.push({
         id: "focus-success",
         title: "Focus Sessions Working Well",
-        description: `Based on your data, your focus sessions show an average focus rating of ${avgFocusRating.toFixed(1)}/10 with ${Math.round(positiveRate * 100)}% positive outcomes.`,
+        description: `${prefix} focus sessions average ${avgFocusRating.toFixed(1)}/10 with ${Math.round(positiveRate * 100)}% positive outcomes.`,
         confidence,
         icon: "focus",
       });
@@ -315,10 +336,12 @@ function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
         effectStrength,
       });
 
+      const prefix = getConfidencePrefix(confidence);
+
       patterns.push({
         id: "relaxation-success",
         title: "Strong Relaxation Results",
-        description: `Based on your data, relaxation sessions average ${avgRelaxation.toFixed(1)}/10 on the relaxation scale. Your approach appears effective.`,
+        description: `${prefix} relaxation sessions average ${avgRelaxation.toFixed(1)}/10 on the relaxation scale.`,
         confidence,
         icon: "sparkles",
       });
@@ -360,10 +383,12 @@ function detectPatterns(sessions: SessionLog[]): PatternInsight[] {
         effectStrength,
       });
 
+      const prefix = getConfidencePrefix(confidence);
+
       patterns.push({
         id: "method-preference",
         title: `${topMethod[0].charAt(0).toUpperCase() + topMethod[0].slice(1)} Works for You`,
-        description: `Based on your data, ${Math.round(methodPositiveRate * 100)}% of your ${topMethod[0]} sessions have positive outcomes across ${topMethod[1]} logged sessions.`,
+        description: `${prefix} ${Math.round(methodPositiveRate * 100)}% of ${topMethod[0]} sessions have positive outcomes (${topMethod[1]} sessions).`,
         confidence,
         icon: "trending",
       });
