@@ -223,12 +223,14 @@ function calculateStabilityTrend(sessions: SessionLog[]): {
   const recentRate = recentPositive / recent.length;
   const olderRate = olderPositive / older.length;
 
-  // Calculate variance in outcomes for volatility
+  // Calculate volatility score for recent sessions
   const recentOutcomes = recent.map((s) => normalizeOutcome(s.outcome));
-  const recentVariance = calculateOutcomeVariance(recentOutcomes);
+  const volatilityScore = calculateVolatilityScore(recentOutcomes);
 
+  // Determine trend: volatile only if score exceeds threshold (0.65)
+  // This requires BOTH frequent flips AND mixed distribution
   let trend: "stable" | "improving" | "volatile";
-  if (recentVariance > 0.7) {
+  if (volatilityScore > 0.65) {
     trend = "volatile";
   } else if (recentRate > olderRate + 0.15) {
     trend = "improving";
@@ -244,18 +246,43 @@ function calculateStabilityTrend(sessions: SessionLog[]): {
 }
 
 /**
- * Simple variance calculation for outcomes
+ * Calculate volatility score combining transition rate and distribution entropy.
+ * Returns a score from 0 to 1 where higher = more volatile.
+ * 
+ * - transitionRate: How often outcomes change between consecutive sessions (0-1)
+ * - distributionEntropy: How evenly distributed outcomes are across categories (0-1)
+ * 
+ * Weighted: 0.6 * transitionRate + 0.4 * normalizedEntropy
  */
-function calculateOutcomeVariance(outcomes: SessionOutcome[]): number {
-  if (outcomes.length < 3) return 0;
+function calculateVolatilityScore(outcomes: SessionOutcome[]): number {
+  // Require minimum sample size for meaningful volatility
+  if (outcomes.length < 6) return 0;
 
-  // Count transitions between different outcome types
+  // 1. Calculate transition rate (how often outcome changes)
   let transitions = 0;
   for (let i = 1; i < outcomes.length; i++) {
     if (outcomes[i] !== outcomes[i - 1]) transitions++;
   }
+  const transitionRate = transitions / (outcomes.length - 1);
 
-  return transitions / (outcomes.length - 1);
+  // 2. Calculate distribution entropy (how mixed the outcomes are)
+  const counts: Record<SessionOutcome, number> = { positive: 0, neutral: 0, negative: 0 };
+  outcomes.forEach((o) => counts[o]++);
+
+  const total = outcomes.length;
+  const probabilities = Object.values(counts).map((c) => c / total).filter((p) => p > 0);
+  
+  // Shannon entropy: -sum(p * log2(p))
+  const entropy = probabilities.reduce((sum, p) => sum - p * Math.log2(p), 0);
+  
+  // Normalize entropy to 0-1 (max entropy for 3 categories = log2(3) ≈ 1.585)
+  const maxEntropy = Math.log2(3);
+  const normalizedEntropy = entropy / maxEntropy;
+
+  // 3. Weighted volatility score
+  const volatilityScore = 0.6 * transitionRate + 0.4 * normalizedEntropy;
+
+  return volatilityScore;
 }
 
 /**
