@@ -53,15 +53,22 @@ export type Database = {
       session_logs: {
         Row: {
           created_at: string
+          custom_effects: Json | null
           dose: string
           dose_amount_mg: number | null
           dose_level: Database["public"]["Enums"]["dose_level"] | null
           effect_anxiety: number | null
+          effect_body_heaviness: number | null
+          effect_body_mind: number | null
+          effect_dry_eyes: number | null
+          effect_dry_mouth: number | null
+          effect_duration_bucket: string | null
           effect_euphoria: number | null
           effect_focus: number | null
           effect_pain_relief: number | null
           effect_relaxation: number | null
           effect_sleepiness: number | null
+          effect_throat_irritation: number | null
           effects: string[] | null
           id: string
           intent: string
@@ -69,6 +76,7 @@ export type Database = {
           method: string
           notes: string | null
           outcome: string | null
+          outcome_preference: string | null
           strain_id: string | null
           strain_name_text: string
           strain_type: string | null
@@ -76,15 +84,22 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          custom_effects?: Json | null
           dose: string
           dose_amount_mg?: number | null
           dose_level?: Database["public"]["Enums"]["dose_level"] | null
           effect_anxiety?: number | null
+          effect_body_heaviness?: number | null
+          effect_body_mind?: number | null
+          effect_dry_eyes?: number | null
+          effect_dry_mouth?: number | null
+          effect_duration_bucket?: string | null
           effect_euphoria?: number | null
           effect_focus?: number | null
           effect_pain_relief?: number | null
           effect_relaxation?: number | null
           effect_sleepiness?: number | null
+          effect_throat_irritation?: number | null
           effects?: string[] | null
           id?: string
           intent: string
@@ -92,6 +107,7 @@ export type Database = {
           method: string
           notes?: string | null
           outcome?: string | null
+          outcome_preference?: string | null
           strain_id?: string | null
           strain_name_text: string
           strain_type?: string | null
@@ -99,15 +115,22 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          custom_effects?: Json | null
           dose?: string
           dose_amount_mg?: number | null
           dose_level?: Database["public"]["Enums"]["dose_level"] | null
           effect_anxiety?: number | null
+          effect_body_heaviness?: number | null
+          effect_body_mind?: number | null
+          effect_dry_eyes?: number | null
+          effect_dry_mouth?: number | null
+          effect_duration_bucket?: string | null
           effect_euphoria?: number | null
           effect_focus?: number | null
           effect_pain_relief?: number | null
           effect_relaxation?: number | null
           effect_sleepiness?: number | null
+          effect_throat_irritation?: number | null
           effects?: string[] | null
           id?: string
           intent?: string
@@ -115,6 +138,7 @@ export type Database = {
           method?: string
           notes?: string | null
           outcome?: string | null
+          outcome_preference?: string | null
           strain_id?: string | null
           strain_name_text?: string
           strain_type?: string | null
