@@ -109,7 +109,6 @@ function generateSampleSession(userId: string, daysAgo: number) {
   date.setHours(randomInt(8, 23), randomInt(0, 59), 0, 0);
 
   // Return only the exact columns confirmed by the real create mutation
-  // Removed: dose (legacy), dose_amount_mg, local_time (optional fields)
   return {
     user_id: userId,
     created_at: date.toISOString(),
@@ -118,6 +117,7 @@ function generateSampleSession(userId: string, daysAgo: number) {
     strain_name_text: strain.name,
     strain_type: strain.type,
     method,
+    dose: doseLevel,
     dose_level: doseLevel,
     effect_sleepiness: baseSleepiness,
     effect_relaxation: baseRelaxation,
