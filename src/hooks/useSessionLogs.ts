@@ -19,6 +19,18 @@ export interface EffectSliders {
   euphoria: number;
 }
 
+export interface PhysicalEffectsData {
+  dry_mouth: number;
+  dry_eyes: number;
+  throat_irritation: number;
+  body_heaviness: number;
+}
+
+export interface CustomEffectEntry {
+  name: string;
+  value: number;
+}
+
 export interface SessionLog {
   id: string;
   user_id: string;
@@ -41,6 +53,14 @@ export interface SessionLog {
   effects: string[] | null;
   notes: string | null;
   outcome: SessionOutcome | null;
+  effect_dry_mouth: number | null;
+  effect_dry_eyes: number | null;
+  effect_throat_irritation: number | null;
+  effect_body_heaviness: number | null;
+  effect_duration_bucket: string | null;
+  effect_body_mind: number | null;
+  outcome_preference: string | null;
+  custom_effects: CustomEffectEntry[] | null;
 }
 
 export interface CreateSessionLogInput {
@@ -52,6 +72,11 @@ export interface CreateSessionLogInput {
   dose_level: DoseLevel;
   dose_amount_mg?: number | null;
   effects: EffectSliders;
+  physicalEffects?: PhysicalEffectsData;
+  durationBucket?: string;
+  bodyMind?: number;
+  outcomePreference?: string;
+  customEffects?: CustomEffectEntry[];
   notes?: string;
   outcome?: SessionOutcome;
 }
@@ -71,7 +96,7 @@ export function useSessionLogs() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as SessionLog[];
+      return data as unknown as SessionLog[];
     },
     enabled: !!user,
   });
@@ -93,7 +118,7 @@ export function useRecentSessions(limit = 5) {
         .limit(limit);
 
       if (error) throw error;
-      return data as SessionLog[];
+      return data as unknown as SessionLog[];
     },
     enabled: !!user,
   });
@@ -201,9 +226,19 @@ export function useCreateSessionLog() {
           effect_focus: input.effects.focus,
           effect_pain_relief: input.effects.pain_relief,
           effect_euphoria: input.effects.euphoria,
+          effect_dry_mouth: input.physicalEffects?.dry_mouth ?? 0,
+          effect_dry_eyes: input.physicalEffects?.dry_eyes ?? 0,
+          effect_throat_irritation: input.physicalEffects?.throat_irritation ?? 0,
+          effect_body_heaviness: input.physicalEffects?.body_heaviness ?? 0,
+          effect_duration_bucket: input.durationBucket || null,
+          effect_body_mind: input.bodyMind ?? null,
+          outcome_preference: input.outcomePreference || null,
+          custom_effects: input.customEffects && input.customEffects.length > 0
+            ? (input.customEffects as unknown as Record<string, unknown>[])
+            : null,
           notes: input.notes || null,
           outcome: finalOutcome,
-        })
+        } as any)
         .select()
         .single();
 

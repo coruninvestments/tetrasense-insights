@@ -8,8 +8,15 @@ import { Input } from "@/components/ui/input";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { EffectSlider } from "@/components/log/EffectSlider";
 import { StrainPicker } from "@/components/log/StrainPicker";
+import { PhysicalEffectsSection, type PhysicalEffects } from "@/components/log/PhysicalEffectsSection";
+import { CustomEffectsSection } from "@/components/log/CustomEffectsSection";
+import { DurationSection, type DurationBucket } from "@/components/log/DurationSection";
+import { BodyMindSlider } from "@/components/log/BodyMindSlider";
+import { OverallExperienceSection, type OutcomePreference } from "@/components/log/OverallExperienceSection";
+import { SessionCompletionMoment } from "@/components/log/SessionCompletionMoment";
 import { useCreateSessionLog, SessionIntent, SessionMethod, DoseLevel, EffectSliders } from "@/hooks/useSessionLogs";
-import { SessionOutcome, computeSessionOutcomeForPreview } from "@/lib/sessionOutcome";
+import { useCustomEffects } from "@/hooks/useCustomEffects";
+import { computeSessionOutcomeForPreview } from "@/lib/sessionOutcome";
 import { toast } from "sonner";
 
 const intents: { id: SessionIntent; label: string; emoji: string }[] = [
@@ -31,7 +38,7 @@ const methods: { id: SessionMethod; label: string; emoji: string }[] = [
   { id: "other", label: "Other", emoji: "✨" },
 ];
 
-const effectsConfig = [
+const mentalEffectsConfig = [
   { key: "sleepiness" as const, label: "Sleepiness", emoji: "😴" },
   { key: "relaxation" as const, label: "Relaxation", emoji: "😌" },
   { key: "anxiety" as const, label: "Anxiety", emoji: "😰" },
@@ -45,7 +52,8 @@ type Step = "intent" | "strain" | "method" | "dose" | "effects" | "done";
 export default function LogSession() {
   const navigate = useNavigate();
   const createSession = useCreateSessionLog();
-  
+  const { customEffects: customEffectDefs, addCustomEffect } = useCustomEffects();
+
   const [step, setStep] = useState<Step>("intent");
   const [selectedIntent, setSelectedIntent] = useState<SessionIntent | "">("");
   const [strainText, setStrainText] = useState("");
@@ -54,13 +62,15 @@ export default function LogSession() {
   const [doseLevel, setDoseLevel] = useState<DoseLevel>("medium");
   const [doseAmountMg, setDoseAmountMg] = useState<string>("");
   const [effects, setEffects] = useState<EffectSliders>({
-    sleepiness: 0,
-    relaxation: 0,
-    anxiety: 0,
-    focus: 0,
-    pain_relief: 0,
-    euphoria: 0,
+    sleepiness: 0, relaxation: 0, anxiety: 0, focus: 0, pain_relief: 0, euphoria: 0,
   });
+  const [physicalEffects, setPhysicalEffects] = useState<PhysicalEffects>({
+    dry_mouth: 0, dry_eyes: 0, throat_irritation: 0, body_heaviness: 0,
+  });
+  const [customEffectValues, setCustomEffectValues] = useState<{ name: string; value: number }[]>([]);
+  const [durationBucket, setDurationBucket] = useState<DurationBucket | "">("");
+  const [bodyMind, setBodyMind] = useState(5);
+  const [outcomePreference, setOutcomePreference] = useState<OutcomePreference | "">("");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -74,7 +84,7 @@ export default function LogSession() {
     { id: "high", label: "High", description: "Above usual intake" },
   ];
 
-  const handleStrainSelect = (name: string, id: string | null, isPending?: boolean) => {
+  const handleStrainSelect = (name: string, id: string | null) => {
     setStrainText(name);
     setSelectedStrainId(id);
   };
@@ -83,8 +93,8 @@ export default function LogSession() {
     setEffects(prev => ({ ...prev, [key]: value }));
   };
 
-  const calculateOutcome = (): SessionOutcome => {
-    return computeSessionOutcomeForPreview(effects);
+  const updatePhysicalEffect = (key: keyof PhysicalEffects, value: number) => {
+    setPhysicalEffects(prev => ({ ...prev, [key]: value }));
   };
 
   const goNext = async () => {
@@ -99,10 +109,14 @@ export default function LogSession() {
           dose_level: doseLevel,
           dose_amount_mg: doseAmountMg ? parseFloat(doseAmountMg) : null,
           effects,
+          physicalEffects,
+          durationBucket: durationBucket || undefined,
+          bodyMind,
+          outcomePreference: outcomePreference || undefined,
+          customEffects: customEffectValues.filter(e => e.value > 0),
           notes: notes || undefined,
-          outcome: calculateOutcome(),
+          outcome: computeSessionOutcomeForPreview(effects),
         });
-
         setStep("done");
         toast.success("Session logged successfully!");
       } catch (error: any) {
@@ -126,7 +140,6 @@ export default function LogSession() {
     }
   };
 
-
   return (
     <AppLayout showNav={false}>
       <div className="min-h-screen bg-background">
@@ -146,7 +159,6 @@ export default function LogSession() {
               </p>
             </div>
           </div>
-          {/* Progress bar */}
           <div className="h-1 bg-secondary">
             <motion.div
               className="h-full gradient-primary"
@@ -175,17 +187,12 @@ export default function LogSession() {
                 <p className="text-muted-foreground mb-6">
                   Select your primary goal for this session
                 </p>
-
                 <div className="grid grid-cols-2 gap-3">
                   {intents.map((intent) => (
                     <Card
                       key={intent.id}
                       variant="interactive"
-                      className={`p-4 ${
-                        selectedIntent === intent.id
-                          ? "ring-2 ring-primary bg-primary/5"
-                          : ""
-                      }`}
+                      className={`p-4 ${selectedIntent === intent.id ? "ring-2 ring-primary bg-primary/5" : ""}`}
                       onClick={() => setSelectedIntent(intent.id)}
                     >
                       <span className="text-2xl mb-2 block">{intent.emoji}</span>
@@ -193,17 +200,9 @@ export default function LogSession() {
                     </Card>
                   ))}
                 </div>
-
                 <div className="mt-8">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="w-full"
-                    disabled={!selectedIntent}
-                    onClick={goNext}
-                  >
-                    Continue
-                    <ChevronRight className="w-4 h-4" />
+                  <Button variant="primary" size="lg" className="w-full" disabled={!selectedIntent} onClick={goNext}>
+                    Continue <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
@@ -212,29 +211,12 @@ export default function LogSession() {
             {/* Strain Step */}
             {step === "strain" && (
               <div>
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-2">
-                  Which strain?
-                </h2>
-                <p className="text-muted-foreground mb-6">
-                  Search our library or add a custom strain
-                </p>
-
-                <StrainPicker
-                  value={strainText}
-                  selectedStrainId={selectedStrainId}
-                  onSelect={handleStrainSelect}
-                />
-
+                <h2 className="font-serif text-2xl font-medium text-foreground mb-2">Which strain?</h2>
+                <p className="text-muted-foreground mb-6">Search our library or add a custom strain</p>
+                <StrainPicker value={strainText} selectedStrainId={selectedStrainId} onSelect={handleStrainSelect} />
                 <div className="mt-8">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="w-full"
-                    disabled={!strainText}
-                    onClick={goNext}
-                  >
-                    Continue
-                    <ChevronRight className="w-4 h-4" />
+                  <Button variant="primary" size="lg" className="w-full" disabled={!strainText} onClick={goNext}>
+                    Continue <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
@@ -243,23 +225,14 @@ export default function LogSession() {
             {/* Method Step */}
             {step === "method" && (
               <div>
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-2">
-                  How did you consume?
-                </h2>
-                <p className="text-muted-foreground mb-6">
-                  Select your consumption method
-                </p>
-
+                <h2 className="font-serif text-2xl font-medium text-foreground mb-2">How did you consume?</h2>
+                <p className="text-muted-foreground mb-6">Select your consumption method</p>
                 <div className="grid grid-cols-2 gap-3">
                   {methods.map((method) => (
                     <Card
                       key={method.id}
                       variant="interactive"
-                      className={`p-4 ${
-                        selectedMethod === method.id
-                          ? "ring-2 ring-primary bg-primary/5"
-                          : ""
-                      }`}
+                      className={`p-4 ${selectedMethod === method.id ? "ring-2 ring-primary bg-primary/5" : ""}`}
                       onClick={() => setSelectedMethod(method.id)}
                     >
                       <span className="text-2xl mb-2 block">{method.emoji}</span>
@@ -267,17 +240,9 @@ export default function LogSession() {
                     </Card>
                   ))}
                 </div>
-
                 <div className="mt-8">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="w-full"
-                    disabled={!selectedMethod}
-                    onClick={goNext}
-                  >
-                    Continue
-                    <ChevronRight className="w-4 h-4" />
+                  <Button variant="primary" size="lg" className="w-full" disabled={!selectedMethod} onClick={goNext}>
+                    Continue <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
@@ -286,101 +251,106 @@ export default function LogSession() {
             {/* Dose Step */}
             {step === "dose" && (
               <div>
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-2">
-                  How much?
-                </h2>
-                <p className="text-muted-foreground mb-6">
-                  Estimate your dose level
-                </p>
-
+                <h2 className="font-serif text-2xl font-medium text-foreground mb-2">How much?</h2>
+                <p className="text-muted-foreground mb-6">Estimate your dose level</p>
                 <div className="space-y-3">
                   {doseLevels.map((level) => (
                     <Card
                       key={level.id}
                       variant="interactive"
-                      className={`p-4 flex items-center justify-between ${
-                        doseLevel === level.id
-                          ? "ring-2 ring-primary bg-primary/5"
-                          : ""
-                      }`}
+                      className={`p-4 flex items-center justify-between ${doseLevel === level.id ? "ring-2 ring-primary bg-primary/5" : ""}`}
                       onClick={() => setDoseLevel(level.id)}
                     >
                       <div>
                         <span className="font-medium block">{level.label}</span>
                         <span className="text-xs text-muted-foreground">{level.description}</span>
                       </div>
-                      {doseLevel === level.id && (
-                        <Check className="w-5 h-5 text-primary" />
-                      )}
+                      {doseLevel === level.id && <Check className="w-5 h-5 text-primary" />}
                     </Card>
                   ))}
                 </div>
-
                 <div className="mt-6">
-                  <label className="text-sm text-muted-foreground mb-2 block">
-                    Dose amount (optional)
-                  </label>
+                  <label className="text-sm text-muted-foreground mb-2 block">Dose amount (optional)</label>
                   <div className="flex items-center gap-2">
-                    <Input
-                      type="number"
-                      value={doseAmountMg}
-                      onChange={(e) => setDoseAmountMg(e.target.value)}
-                      placeholder="e.g., 10"
-                      className="flex-1"
-                    />
+                    <Input type="number" value={doseAmountMg} onChange={(e) => setDoseAmountMg(e.target.value)} placeholder="e.g., 10" className="flex-1" />
                     <span className="text-sm text-muted-foreground">mg</span>
                   </div>
                 </div>
-
                 <div className="mt-8">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="w-full"
-                    onClick={goNext}
-                  >
-                    Continue
-                    <ChevronRight className="w-4 h-4" />
+                  <Button variant="primary" size="lg" className="w-full" onClick={goNext}>
+                    Continue <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
             )}
 
-            {/* Effects Step */}
+            {/* Effects Step - Enhanced */}
             {step === "effects" && (
               <div>
                 <h2 className="font-serif text-2xl font-medium text-foreground mb-2">
                   Rate your experience
                 </h2>
                 <p className="text-muted-foreground mb-6">
-                  Slide to rate each effect from 0-10
+                  Slide to rate each effect from 0–10
                 </p>
 
-                <div className="space-y-6">
-                  {effectsConfig.map((effect) => (
-                    <EffectSlider
-                      key={effect.key}
-                      label={effect.label}
-                      emoji={effect.emoji}
-                      value={effects[effect.key]}
-                      onChange={(value) => updateEffect(effect.key, value)}
-                    />
-                  ))}
-                </div>
+                <div className="space-y-8">
+                  {/* Section 1: Mental & Functional Effects */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
+                      Mental & Functional Effects
+                    </h3>
+                    <div className="space-y-5">
+                      {mentalEffectsConfig.map((effect) => (
+                        <EffectSlider
+                          key={effect.key}
+                          label={effect.label}
+                          emoji={effect.emoji}
+                          value={effects[effect.key]}
+                          onChange={(value) => updateEffect(effect.key, value)}
+                        />
+                      ))}
+                    </div>
+                  </div>
 
-                <div className="mt-6">
-                  <label className="text-sm text-muted-foreground mb-2 block">
-                    Notes (optional)
-                  </label>
-                  <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Any additional thoughts about this session..."
-                    className="w-full h-24 px-4 py-3 rounded-xl bg-secondary border-0 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                  {/* Section 2: Physical Effects */}
+                  <PhysicalEffectsSection
+                    effects={physicalEffects}
+                    onChange={updatePhysicalEffect}
                   />
+
+                  {/* Section 3: Custom Effects */}
+                  <CustomEffectsSection
+                    definitions={customEffectDefs}
+                    values={customEffectValues}
+                    onValuesChange={setCustomEffectValues}
+                    onAddEffect={addCustomEffect}
+                  />
+
+                  {/* Section 4: Duration */}
+                  <DurationSection value={durationBucket} onChange={setDurationBucket} />
+
+                  {/* Section 5: Body vs Mind */}
+                  <BodyMindSlider value={bodyMind} onChange={setBodyMind} />
+
+                  {/* Section 6: Overall Experience */}
+                  <OverallExperienceSection value={outcomePreference} onChange={setOutcomePreference} />
+
+                  {/* Section 7: Notes */}
+                  <div>
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                      Notes (Optional)
+                    </h3>
+                    <textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="Any additional thoughts about this session..."
+                      className="w-full h-24 px-4 py-3 rounded-xl bg-secondary border-0 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                    />
+                  </div>
                 </div>
 
-                <div className="mt-8">
+                <div className="mt-8 pb-6">
                   <Button
                     variant="primary"
                     size="lg"
@@ -395,44 +365,15 @@ export default function LogSession() {
               </div>
             )}
 
-            {/* Done Step */}
+            {/* Done Step - Session Completion Moment */}
             {step === "done" && (
-              <div className="text-center py-12">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", duration: 0.5 }}
-                  className="w-20 h-20 rounded-full gradient-primary flex items-center justify-center mx-auto mb-6"
-                >
-                  <Check className="w-10 h-10 text-primary-foreground" />
-                </motion.div>
-
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-2">
-                  Session Logged!
-                </h2>
-                <p className="text-muted-foreground mb-8">
-                  Your data helps build personalized insights
-                </p>
-
-                <div className="space-y-3">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="w-full"
-                    onClick={() => navigate("/")}
-                  >
-                    Back to Home
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full"
-                    onClick={() => navigate("/insights")}
-                  >
-                    View Insights
-                  </Button>
-                </div>
-              </div>
+              <SessionCompletionMoment
+                outcomePreference={outcomePreference}
+                physicalEffects={physicalEffects}
+                mentalEffects={effects}
+                durationBucket={durationBucket}
+                intent={selectedIntent}
+              />
             )}
           </motion.div>
         </AnimatePresence>
