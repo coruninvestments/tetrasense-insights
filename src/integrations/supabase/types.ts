@@ -64,6 +64,97 @@ export type Database = {
           },
         ]
       }
+      product_batches: {
+        Row: {
+          batch_code: string | null
+          coa_file_path: string | null
+          coa_status: string
+          coa_url: string | null
+          created_at: string
+          created_by_user_id: string | null
+          id: string
+          is_public_library: boolean
+          lab_name: string | null
+          lab_panel_common: Json | null
+          lab_panel_custom: Json | null
+          product_id: string
+          tested_at: string | null
+        }
+        Insert: {
+          batch_code?: string | null
+          coa_file_path?: string | null
+          coa_status?: string
+          coa_url?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          id?: string
+          is_public_library?: boolean
+          lab_name?: string | null
+          lab_panel_common?: Json | null
+          lab_panel_custom?: Json | null
+          product_id: string
+          tested_at?: string | null
+        }
+        Update: {
+          batch_code?: string | null
+          coa_file_path?: string | null
+          coa_status?: string
+          coa_url?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          id?: string
+          is_public_library?: boolean
+          lab_name?: string | null
+          lab_panel_common?: Json | null
+          lab_panel_custom?: Json | null
+          product_id?: string
+          tested_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_batches_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          brand_name: string | null
+          created_at: string
+          form: string | null
+          id: string
+          product_name: string
+          strain_id: string | null
+        }
+        Insert: {
+          brand_name?: string | null
+          created_at?: string
+          form?: string | null
+          id?: string
+          product_name: string
+          strain_id?: string | null
+        }
+        Update: {
+          brand_name?: string | null
+          created_at?: string
+          form?: string | null
+          id?: string
+          product_name?: string
+          strain_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_strain_id_fkey"
+            columns: ["strain_id"]
+            isOneToOne: false
+            referencedRelation: "strains_canonical"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           age_range: string | null
@@ -105,6 +196,9 @@ export type Database = {
       }
       session_logs: {
         Row: {
+          batch_id: string | null
+          canonical_strain_id: string | null
+          coa_attached: boolean
           created_at: string
           custom_effects: Json | null
           dose: string
@@ -130,12 +224,16 @@ export type Database = {
           notes: string | null
           outcome: string | null
           outcome_preference: string | null
+          product_id: string | null
           strain_id: string | null
           strain_name_text: string
           strain_type: string | null
           user_id: string
         }
         Insert: {
+          batch_id?: string | null
+          canonical_strain_id?: string | null
+          coa_attached?: boolean
           created_at?: string
           custom_effects?: Json | null
           dose: string
@@ -161,12 +259,16 @@ export type Database = {
           notes?: string | null
           outcome?: string | null
           outcome_preference?: string | null
+          product_id?: string | null
           strain_id?: string | null
           strain_name_text: string
           strain_type?: string | null
           user_id: string
         }
         Update: {
+          batch_id?: string | null
+          canonical_strain_id?: string | null
+          coa_attached?: boolean
           created_at?: string
           custom_effects?: Json | null
           dose?: string
@@ -192,12 +294,34 @@ export type Database = {
           notes?: string | null
           outcome?: string | null
           outcome_preference?: string | null
+          product_id?: string | null
           strain_id?: string | null
           strain_name_text?: string
           strain_type?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "session_logs_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "product_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_logs_canonical_strain_id_fkey"
+            columns: ["canonical_strain_id"]
+            isOneToOne: false
+            referencedRelation: "strains_canonical"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "session_logs_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "session_logs_strain_id_fkey"
             columns: ["strain_id"]
@@ -232,6 +356,41 @@ export type Database = {
             columns: ["strain_id"]
             isOneToOne: false
             referencedRelation: "strains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      strain_aliases_canonical: {
+        Row: {
+          alias_name: string
+          confidence: number
+          created_at: string
+          id: string
+          source: string
+          strain_id: string
+        }
+        Insert: {
+          alias_name: string
+          confidence?: number
+          created_at?: string
+          id?: string
+          source?: string
+          strain_id: string
+        }
+        Update: {
+          alias_name?: string
+          confidence?: number
+          created_at?: string
+          id?: string
+          source?: string
+          strain_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strain_aliases_canonical_strain_id_fkey"
+            columns: ["strain_id"]
+            isOneToOne: false
+            referencedRelation: "strains_canonical"
             referencedColumns: ["id"]
           },
         ]
@@ -287,6 +446,33 @@ export type Database = {
           thc_min?: number | null
           thc_range?: string | null
           type?: string
+        }
+        Relationships: []
+      }
+      strains_canonical: {
+        Row: {
+          canonical_name: string
+          created_at: string
+          description: string | null
+          id: string
+          is_verified: boolean
+          strain_type: string | null
+        }
+        Insert: {
+          canonical_name: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_verified?: boolean
+          strain_type?: string | null
+        }
+        Update: {
+          canonical_name?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_verified?: boolean
+          strain_type?: string | null
         }
         Relationships: []
       }
