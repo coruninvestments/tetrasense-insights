@@ -33,6 +33,7 @@ export interface CreateDraftBatchInput {
   tested_at?: string;
   lab_name?: string;
   coa_url?: string;
+  coa_file_path?: string;
   lab_panel_common?: Record<string, number>;
   lab_panel_custom?: LabPanelCustomEntry[];
 }
@@ -121,6 +122,7 @@ export function useCreateDraftBatch() {
           tested_at: input.tested_at || null,
           lab_name: input.lab_name?.trim() || null,
           coa_url: input.coa_url?.trim() || null,
+          coa_file_path: input.coa_file_path || null,
           coa_status: "unverified",
           lab_panel_common: input.lab_panel_common || null,
           lab_panel_custom: input.lab_panel_custom?.length

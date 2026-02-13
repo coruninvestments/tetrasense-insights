@@ -1,11 +1,13 @@
-import { useState } from "react";
-import { FlaskConical, ChevronDown, ChevronUp, Plus, Check, Loader2, Link as LinkIcon, Shield, Lock, Users, Sparkles } from "lucide-react";
+import { useState, useRef } from "react";
+import { FlaskConical, ChevronDown, ChevronUp, Plus, Check, Loader2, Link as LinkIcon, Shield, Lock, Users, Sparkles, Upload, X, FileCheck } from "lucide-react";
 import { normalizeLabPanel, SIMULATED_EXTRACTION } from "@/lib/coaPipeline";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { LabPanelSection } from "./LabPanelSection";
 import { usePublicBatchesByStrain, useCreateDraftBatch, type LabPanelCustomEntry, type ProductBatch } from "@/hooks/useProductBatches";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BatchChooserProps {
   canonicalStrainId: string;
@@ -16,10 +18,14 @@ interface BatchChooserProps {
 
 type Mode = "collapsed" | "choose" | "create";
 
+const ACCEPTED_FILE_TYPES = ".pdf,.jpg,.jpeg,.png";
+
 export function BatchChooser({ canonicalStrainId, selectedBatchId, selectedProductId, onSelect }: BatchChooserProps) {
   const [mode, setMode] = useState<Mode>("collapsed");
   const { data: publicBatches, isLoading } = usePublicBatchesByStrain(canonicalStrainId);
   const createDraft = useCreateDraftBatch();
+  const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Draft form state
   const [productName, setProductName] = useState("");
@@ -31,6 +37,50 @@ export function BatchChooser({ canonicalStrainId, selectedBatchId, selectedProdu
   const [labPanelCommon, setLabPanelCommon] = useState<Record<string, number>>({});
   const [labPanelCustom, setLabPanelCustom] = useState<LabPanelCustomEntry[]>([]);
   const [showLabPanel, setShowLabPanel] = useState(false);
+
+  // File upload state
+  const [coaFile, setCoaFile] = useState<File | null>(null);
+  const [coaFilePath, setCoaFilePath] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<"idle" | "uploading" | "done" | "error">("idle");
+
+  const hasCoaSource = !!(coaUrl.trim() || coaFilePath);
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    setCoaFile(file);
+    setUploadProgress("uploading");
+
+    const timestamp = Date.now();
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const storagePath = `${user.id}/${timestamp}-${safeName}`;
+
+    const { error } = await supabase.storage
+      .from("coa-files")
+      .upload(storagePath, file, { upsert: false });
+
+    if (error) {
+      console.error("COA upload failed:", error);
+      setUploadProgress("error");
+      setCoaFile(null);
+    } else {
+      setCoaFilePath(storagePath);
+      setUploadProgress("done");
+    }
+
+    // Reset input so the same file can be re-selected
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleRemoveFile = async () => {
+    if (coaFilePath) {
+      await supabase.storage.from("coa-files").remove([coaFilePath]);
+    }
+    setCoaFile(null);
+    setCoaFilePath(null);
+    setUploadProgress("idle");
+  };
 
   const handleSelectPublicBatch = (batch: any) => {
     onSelect(batch.product_id, batch.id, !!(batch.coa_url || batch.coa_file_path));
@@ -47,10 +97,11 @@ export function BatchChooser({ canonicalStrainId, selectedBatchId, selectedProdu
         tested_at: testedAt || undefined,
         lab_name: labName || undefined,
         coa_url: coaUrl || undefined,
+        coa_file_path: coaFilePath || undefined,
         lab_panel_common: Object.keys(labPanelCommon).length ? labPanelCommon : undefined,
         lab_panel_custom: labPanelCustom.length ? labPanelCustom : undefined,
       });
-      onSelect(product.id, batch.id, !!coaUrl);
+      onSelect(product.id, batch.id, !!(coaUrl || coaFilePath));
       setMode("collapsed");
     } catch (err: any) {
       // Error handled by mutation
@@ -103,7 +154,6 @@ export function BatchChooser({ canonicalStrainId, selectedBatchId, selectedProdu
           </button>
         </div>
 
-        {/* Public library batches */}
         {isLoading && (
           <div className="flex items-center justify-center py-3">
             <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
@@ -144,7 +194,6 @@ export function BatchChooser({ canonicalStrainId, selectedBatchId, selectedProdu
           </div>
         )}
 
-        {/* Create private draft */}
         <Button
           type="button"
           variant="outline"
@@ -198,6 +247,8 @@ export function BatchChooser({ canonicalStrainId, selectedBatchId, selectedProdu
           <label className="text-xs text-muted-foreground mb-1 block">Lab Name</label>
           <Input value={labName} onChange={(e) => setLabName(e.target.value)} placeholder="Optional" className="h-9" />
         </div>
+
+        {/* COA URL */}
         <div>
           <label className="text-xs text-muted-foreground mb-1 block">COA URL</label>
           <div className="flex items-center gap-2">
@@ -205,10 +256,55 @@ export function BatchChooser({ canonicalStrainId, selectedBatchId, selectedProdu
             <Input value={coaUrl} onChange={(e) => setCoaUrl(e.target.value)} placeholder="https://..." className="h-9" />
           </div>
         </div>
+
+        {/* COA File Upload */}
+        <div>
+          <label className="text-xs text-muted-foreground mb-1 block">Upload COA (PDF/JPG/PNG)</label>
+          {uploadProgress === "done" && coaFile ? (
+            <div className="flex items-center justify-between p-2.5 rounded-lg bg-primary/5 border border-primary/20">
+              <div className="flex items-center gap-2 text-sm min-w-0">
+                <FileCheck className="w-4 h-4 text-primary shrink-0" />
+                <span className="text-foreground truncate">{coaFile.name}</span>
+                <span className="text-xs text-primary shrink-0">✅</span>
+              </div>
+              <button type="button" onClick={handleRemoveFile} className="text-muted-foreground hover:text-destructive shrink-0 ml-2">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : uploadProgress === "uploading" ? (
+            <div className="flex items-center gap-2 p-2.5 rounded-lg bg-muted border border-border">
+              <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">Uploading…</span>
+            </div>
+          ) : (
+            <>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={ACCEPTED_FILE_TYPES}
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                Choose file
+              </Button>
+              {uploadProgress === "error" && (
+                <p className="text-xs text-destructive mt-1">Upload failed. Please try again.</p>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       {/* Auto-extract Premium button */}
-      {coaUrl.trim() && (
+      {hasCoaSource && (
         <div className="relative">
           {import.meta.env.DEV ? (
             <Button
