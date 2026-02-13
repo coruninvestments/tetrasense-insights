@@ -79,6 +79,10 @@ export interface CreateSessionLogInput {
   customEffects?: CustomEffectEntry[];
   notes?: string;
   outcome?: SessionOutcome;
+  canonical_strain_id?: string | null;
+  product_id?: string | null;
+  batch_id?: string | null;
+  coa_attached?: boolean;
 }
 
 export function useSessionLogs() {
@@ -238,6 +242,10 @@ export function useCreateSessionLog() {
             : null,
           notes: input.notes || null,
           outcome: finalOutcome,
+          canonical_strain_id: input.canonical_strain_id || null,
+          product_id: input.product_id || null,
+          batch_id: input.batch_id || null,
+          coa_attached: input.coa_attached ?? false,
         } as any)
         .select()
         .single();
