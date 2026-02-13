@@ -12,10 +12,11 @@ import {
 } from "@/components/ui/dialog";
 import { Shield } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "@/hooks/use-toast";
 
 interface PrivacyCommunitySectionProps {
   enabled: boolean;
-  onToggle: (value: boolean) => void;
+  onToggle: (value: boolean) => void | Promise<void>;
   isPending: boolean;
 }
 
@@ -23,6 +24,7 @@ const sharingBullets = [
   { shared: false, text: "Individual sessions, notes, or timestamps" },
   { shared: false, text: "Location, custom strain text, or personal details" },
   { shared: false, text: "Anything that can identify you" },
+  { shared: false, text: "Device identifiers or analytics IDs" },
   { shared: true, text: "Aggregated, de-identified effect averages for library strains only (no custom text)" },
   { shared: true, text: "Anonymous outcome statistics (positive/neutral/avoid)" },
 ];
@@ -57,9 +59,13 @@ export function PrivacyCommunitySection({ enabled, onToggle, isPending }: Privac
     }
   };
 
-  const handleConfirm = () => {
-    onToggle(true);
-    setShowConfirm(false);
+  const handleConfirm = async () => {
+    try {
+      await onToggle(true);
+      setShowConfirm(false);
+    } catch {
+      toast({ title: "Error", description: "Failed to enable sharing. Please try again.", variant: "destructive" });
+    }
   };
 
   return (
@@ -80,6 +86,8 @@ export function PrivacyCommunitySection({ enabled, onToggle, isPending }: Privac
                 You can turn this off anytime. Your data will only be included while this is enabled.
               </p>
               <button
+                type="button"
+                aria-label="Learn more about community data sharing"
                 onClick={() => setShowLearnMore(true)}
                 className="text-xs text-primary hover:underline mt-1"
               >
