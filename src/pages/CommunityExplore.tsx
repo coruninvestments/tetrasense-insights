@@ -7,6 +7,7 @@ import { Shield, Users, TrendingUp, Lock, CheckCircle2, Settings, Beaker, FlaskC
 import { useCommunityStrainStats } from "@/hooks/useCommunityStrainStats";
 import { usePublicBatchBrowse } from "@/hooks/usePublicBatchBrowse";
 import { useProfile } from "@/hooks/useProfile";
+import { useEntitlements } from "@/hooks/useEntitlements";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
@@ -75,7 +76,19 @@ function FilterChips({
   );
 }
 
-function LockedSection({ title, children }: { title: string; children: React.ReactNode }) {
+function LockedSection({ title, children, isPremium }: { title: string; children: React.ReactNode; isPremium: boolean }) {
+  if (isPremium) {
+    return (
+      <div className="rounded-xl border border-border/50 bg-muted/30 p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-medium text-foreground">{title}</h3>
+          <Badge variant="secondary" className="text-[10px] ml-auto">Premium</Badge>
+        </div>
+        {children}
+      </div>
+    );
+  }
+
   return (
     <div className="relative rounded-xl border border-border/50 bg-muted/30 p-4 space-y-3">
       <div className="flex items-center gap-2">
@@ -271,6 +284,7 @@ export default function CommunityExplore() {
 
   const { data: stats, isLoading: statsLoading } = useCommunityStrainStats(selectedIntent || undefined);
   const { data: batches, isLoading: batchesLoading } = usePublicBatchBrowse();
+  const { isPremium } = useEntitlements();
 
   // Client-side type filter (community_strain_stats doesn't have a type filter column for querying)
   const filteredStats = (stats ?? []).filter((s) => {
@@ -321,7 +335,7 @@ export default function CommunityExplore() {
             </div>
 
             {/* Premium: Batch Precision Filters */}
-            <LockedSection title="Batch Precision Filters">
+            <LockedSection title="Batch Precision Filters" isPremium={isPremium}>
               <div className="space-y-3">
                 <div className="space-y-1">
                   <label className="text-xs text-foreground">THCa Range</label>
@@ -377,7 +391,7 @@ export default function CommunityExplore() {
             )}
 
             {/* Premium: Batch-level Insights */}
-            <LockedSection title="Batch-level Insights">
+            <LockedSection title="Batch-level Insights" isPremium={isPremium}>
               <div className="space-y-2">
                 <div className="flex gap-1.5">
                   {["Relaxed", "Euphoric", "Sleepy"].map((e) => (
