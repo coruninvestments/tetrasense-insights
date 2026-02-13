@@ -136,6 +136,7 @@ function DevToolsPanelContent() {
   const { toast } = useToast();
   const [seedingState, setSeedingState] = useState<SeedingState>(null);
   const [isClearing, setIsClearing] = useState(false);
+  const [isRefreshingStats, setIsRefreshingStats] = useState(false);
   const [customCount, setCustomCount] = useState(20);
   const [daysBack, setDaysBack] = useState(14);
 
@@ -379,6 +380,31 @@ function DevToolsPanelContent() {
             className="text-xs h-7"
           >
             Reset defaults
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={async () => {
+              setIsRefreshingStats(true);
+              try {
+                const { data, error } = await supabase.rpc("refresh_community_strain_stats" as any);
+                if (error) {
+                  toast({ title: "Refresh failed", description: error.message, variant: "destructive" });
+                } else {
+                  queryClient.invalidateQueries({ queryKey: ["community-strain-stats"] });
+                  toast({ title: "Community stats refreshed", description: `${data} rows rebuilt.` });
+                }
+              } catch (err) {
+                toast({ title: "Refresh failed", description: String(err), variant: "destructive" });
+              } finally {
+                setIsRefreshingStats(false);
+              }
+            }}
+            disabled={isSeeding || isClearing || isRefreshingStats}
+            className="text-xs h-7"
+          >
+            {isRefreshingStats ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
+            Refresh Stats
           </Button>
         </div>
         <OutcomePreview />
