@@ -546,7 +546,7 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      refresh_community_strain_stats: { Args: never; Returns: number }
     }
     Enums: {
       dose_level: "low" | "medium" | "high"
