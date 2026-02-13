@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { FlaskConical, ChevronDown, ChevronUp, Plus, Check, Loader2, Link as LinkIcon, Shield, Lock, Users } from "lucide-react";
+import { FlaskConical, ChevronDown, ChevronUp, Plus, Check, Loader2, Link as LinkIcon, Shield, Lock, Users, Sparkles } from "lucide-react";
+import { normalizeLabPanel, SIMULATED_EXTRACTION } from "@/lib/coaPipeline";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -205,6 +206,40 @@ export function BatchChooser({ canonicalStrainId, selectedBatchId, selectedProdu
           </div>
         </div>
       </div>
+
+      {/* Auto-extract Premium button */}
+      {coaUrl.trim() && (
+        <div className="relative">
+          {import.meta.env.DEV ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="w-full border-primary/30 text-primary"
+              onClick={() => {
+                const { lab_panel_common, lab_panel_custom } = normalizeLabPanel(SIMULATED_EXTRACTION);
+                setLabPanelCommon(lab_panel_common);
+                setLabPanelCustom(lab_panel_custom);
+                setShowLabPanel(true);
+              }}
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              DEV: Simulate Auto-Extract
+            </Button>
+          ) : (
+            <div className="p-3 rounded-xl bg-muted/60 border border-border opacity-70">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-muted-foreground">Auto-extract (Premium)</span>
+                <Lock className="w-3.5 h-3.5 text-muted-foreground ml-auto" />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Automatically reads your COA and fills in the lab panel. Available with Premium.
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Lab Panel toggle */}
       <button

@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      coa_ingestions: {
+        Row: {
+          batch_id: string
+          created_at: string
+          extracted_json: Json | null
+          id: string
+          parser_version: string
+          raw_text: string | null
+          source: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          batch_id: string
+          created_at?: string
+          extracted_json?: Json | null
+          id?: string
+          parser_version?: string
+          raw_text?: string | null
+          source: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          batch_id?: string
+          created_at?: string
+          extracted_json?: Json | null
+          id?: string
+          parser_version?: string
+          raw_text?: string | null
+          source?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coa_ingestions_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "product_batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_strain_stats: {
         Row: {
           id: string
