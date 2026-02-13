@@ -10,6 +10,7 @@ export interface Profile {
   weight_range: string | null;
   sensitivity_flags: string[];
   is_premium: boolean;
+  community_sharing_enabled: boolean;
   created_at: string;
   updated_at: string;
 }

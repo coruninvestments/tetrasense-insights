@@ -17,6 +17,7 @@ export type Database = {
       profiles: {
         Row: {
           age_range: string | null
+          community_sharing_enabled: boolean
           created_at: string
           display_name: string | null
           id: string
@@ -28,6 +29,7 @@ export type Database = {
         }
         Insert: {
           age_range?: string | null
+          community_sharing_enabled?: boolean
           created_at?: string
           display_name?: string | null
           id?: string
@@ -39,6 +41,7 @@ export type Database = {
         }
         Update: {
           age_range?: string | null
+          community_sharing_enabled?: boolean
           created_at?: string
           display_name?: string | null
           id?: string

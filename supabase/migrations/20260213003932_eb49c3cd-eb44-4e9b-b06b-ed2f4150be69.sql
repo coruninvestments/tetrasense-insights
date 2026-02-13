@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN community_sharing_enabled boolean NOT NULL DEFAULT false;

@@ -14,6 +14,7 @@ import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
 import { useSessionStats } from "@/hooks/useSessionLogs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { PrivacyCommunitySection } from "@/components/profile/PrivacyCommunitySection";
 
 type Section = "main" | "edit" | "notifications" | "privacy" | "settings";
 
@@ -150,6 +151,18 @@ export default function Profile() {
 
             {activeSection === "privacy" && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+                <PrivacyCommunitySection
+                  enabled={profile?.community_sharing_enabled ?? false}
+                  onToggle={async (value) => {
+                    try {
+                      await updateProfile.mutateAsync({ community_sharing_enabled: value });
+                      toast.success(value ? "Community sharing enabled" : "Community sharing disabled");
+                    } catch {
+                      toast.error("Failed to update preference");
+                    }
+                  }}
+                  isPending={updateProfile.isPending}
+                />
                 <Card variant="default" className="p-4 flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-foreground">Anonymous Data Sharing</p>
