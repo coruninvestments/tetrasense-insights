@@ -14,6 +14,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      community_strain_stats: {
+        Row: {
+          id: string
+          intent: string
+          last_updated: string
+          outcome_avoid_pct: number | null
+          outcome_neutral_pct: number | null
+          outcome_positive_pct: number | null
+          sample_size: number
+          strain_id: string
+          strain_name: string
+          strain_type: string
+          top_effects: string[]
+        }
+        Insert: {
+          id?: string
+          intent: string
+          last_updated?: string
+          outcome_avoid_pct?: number | null
+          outcome_neutral_pct?: number | null
+          outcome_positive_pct?: number | null
+          sample_size?: number
+          strain_id: string
+          strain_name: string
+          strain_type: string
+          top_effects?: string[]
+        }
+        Update: {
+          id?: string
+          intent?: string
+          last_updated?: string
+          outcome_avoid_pct?: number | null
+          outcome_neutral_pct?: number | null
+          outcome_positive_pct?: number | null
+          sample_size?: number
+          strain_id?: string
+          strain_name?: string
+          strain_type?: string
+          top_effects?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_strain_stats_strain_id_fkey"
+            columns: ["strain_id"]
+            isOneToOne: false
+            referencedRelation: "strains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           age_range: string | null

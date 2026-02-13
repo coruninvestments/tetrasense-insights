@@ -13,6 +13,7 @@ import StrainDetail from "./pages/StrainDetail";
 import Learn from "./pages/Learn";
 import Insights from "./pages/Insights";
 import Profile from "./pages/Profile";
+import CommunityExplore from "./pages/CommunityExplore";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -86,6 +87,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/explore"
+              element={
+                <ProtectedRoute>
+                  <CommunityExplore />
                 </ProtectedRoute>
               }
             />
