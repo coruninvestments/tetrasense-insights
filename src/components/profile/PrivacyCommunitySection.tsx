@@ -23,7 +23,7 @@ const sharingBullets = [
   { shared: false, text: "Individual sessions, notes, or timestamps" },
   { shared: false, text: "Location, custom strain text, or personal details" },
   { shared: false, text: "Anything that can identify you" },
-  { shared: true, text: "Aggregated, de-identified effect averages per strain" },
+  { shared: true, text: "Aggregated, de-identified effect averages for library strains only (no custom text)" },
   { shared: true, text: "Anonymous outcome statistics (positive/neutral/avoid)" },
 ];
 
@@ -69,12 +69,15 @@ export function PrivacyCommunitySection({ enabled, onToggle, isPending }: Privac
           <Shield className="w-4 h-4 text-muted-foreground" />
           Privacy & Community
         </h3>
-        <Card variant="default" className="p-4">
+        <Card className="p-4">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 space-y-1">
               <p className="text-sm font-medium text-foreground">Contribute anonymous community stats</p>
               <p className="text-xs text-muted-foreground">
                 Off by default. If enabled, we only share aggregated, de-identified stats to improve community insights.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                You can turn this off anytime. Your data will only be included while this is enabled.
               </p>
               <button
                 onClick={() => setShowLearnMore(true)}
