@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { EffectSlider } from "@/components/log/EffectSlider";
 import { StrainPicker } from "@/components/log/StrainPicker";
+import { BatchChooser } from "@/components/log/BatchChooser";
 import { PhysicalEffectsSection, type PhysicalEffects } from "@/components/log/PhysicalEffectsSection";
 import { CustomEffectsSection } from "@/components/log/CustomEffectsSection";
 import { DurationSection, type DurationBucket } from "@/components/log/DurationSection";
@@ -58,6 +59,10 @@ export default function LogSession() {
   const [selectedIntent, setSelectedIntent] = useState<SessionIntent | "">("");
   const [strainText, setStrainText] = useState("");
   const [selectedStrainId, setSelectedStrainId] = useState<string | null>(null);
+  const [canonicalStrainId, setCanonicalStrainId] = useState<string | null>(null);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
+  const [coaAttached, setCoaAttached] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState<SessionMethod | "">("");
   const [doseLevel, setDoseLevel] = useState<DoseLevel>("medium");
   const [doseAmountMg, setDoseAmountMg] = useState<string>("");
@@ -84,9 +89,22 @@ export default function LogSession() {
     { id: "high", label: "High", description: "Above usual intake" },
   ];
 
-  const handleStrainSelect = (name: string, id: string | null) => {
+  const handleStrainSelect = (name: string, id: string | null, canonicalId?: string | null) => {
     setStrainText(name);
     setSelectedStrainId(id);
+    setCanonicalStrainId(canonicalId || null);
+    // Clear batch when strain changes
+    if (canonicalId !== canonicalStrainId) {
+      setSelectedProductId(null);
+      setSelectedBatchId(null);
+      setCoaAttached(false);
+    }
+  };
+
+  const handleBatchSelect = (productId: string | null, batchId: string | null, hasCoa: boolean) => {
+    setSelectedProductId(productId);
+    setSelectedBatchId(batchId);
+    setCoaAttached(hasCoa);
   };
 
   const updateEffect = (key: keyof EffectSliders, value: number) => {
@@ -116,6 +134,10 @@ export default function LogSession() {
           customEffects: customEffectValues.filter(e => e.value > 0),
           notes: notes || undefined,
           outcome: computeSessionOutcomeForPreview(effects),
+          canonical_strain_id: canonicalStrainId,
+          product_id: selectedProductId,
+          batch_id: selectedBatchId,
+          coa_attached: coaAttached,
         });
         setStep("done");
         toast.success("Session logged successfully!");
@@ -208,12 +230,30 @@ export default function LogSession() {
               </div>
             )}
 
-            {/* Strain Step */}
+            {/* Strain / Product Step */}
             {step === "strain" && (
               <div>
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-2">Which strain?</h2>
-                <p className="text-muted-foreground mb-6">Search our library or add a custom strain</p>
-                <StrainPicker value={strainText} selectedStrainId={selectedStrainId} onSelect={handleStrainSelect} />
+                <h2 className="font-serif text-2xl font-medium text-foreground mb-2">Strain / Product</h2>
+                <p className="text-muted-foreground mb-6">Search our library or enter a personal strain name</p>
+                <StrainPicker
+                  value={strainText}
+                  selectedStrainId={selectedStrainId}
+                  canonicalStrainId={canonicalStrainId}
+                  onSelect={handleStrainSelect}
+                />
+
+                {/* Batch chooser — only shown for canonical strains */}
+                {canonicalStrainId && (
+                  <div className="mt-6">
+                    <BatchChooser
+                      canonicalStrainId={canonicalStrainId}
+                      selectedBatchId={selectedBatchId}
+                      selectedProductId={selectedProductId}
+                      onSelect={handleBatchSelect}
+                    />
+                  </div>
+                )}
+
                 <div className="mt-8">
                   <Button variant="primary" size="lg" className="w-full" disabled={!strainText} onClick={goNext}>
                     Continue <ChevronRight className="w-4 h-4" />
@@ -284,63 +324,27 @@ export default function LogSession() {
               </div>
             )}
 
-            {/* Effects Step - Enhanced */}
+            {/* Effects Step */}
             {step === "effects" && (
               <div>
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-2">
-                  Rate your experience
-                </h2>
-                <p className="text-muted-foreground mb-6">
-                  Slide to rate each effect from 0–10
-                </p>
-
+                <h2 className="font-serif text-2xl font-medium text-foreground mb-2">Rate your experience</h2>
+                <p className="text-muted-foreground mb-6">Slide to rate each effect from 0–10</p>
                 <div className="space-y-8">
-                  {/* Section 1: Mental & Functional Effects */}
                   <div>
-                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">
-                      Mental & Functional Effects
-                    </h3>
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Mental & Functional Effects</h3>
                     <div className="space-y-5">
                       {mentalEffectsConfig.map((effect) => (
-                        <EffectSlider
-                          key={effect.key}
-                          label={effect.label}
-                          emoji={effect.emoji}
-                          value={effects[effect.key]}
-                          onChange={(value) => updateEffect(effect.key, value)}
-                        />
+                        <EffectSlider key={effect.key} label={effect.label} emoji={effect.emoji} value={effects[effect.key]} onChange={(value) => updateEffect(effect.key, value)} />
                       ))}
                     </div>
                   </div>
-
-                  {/* Section 2: Physical Effects */}
-                  <PhysicalEffectsSection
-                    effects={physicalEffects}
-                    onChange={updatePhysicalEffect}
-                  />
-
-                  {/* Section 3: Custom Effects */}
-                  <CustomEffectsSection
-                    definitions={customEffectDefs}
-                    values={customEffectValues}
-                    onValuesChange={setCustomEffectValues}
-                    onAddEffect={addCustomEffect}
-                  />
-
-                  {/* Section 4: Duration */}
+                  <PhysicalEffectsSection effects={physicalEffects} onChange={updatePhysicalEffect} />
+                  <CustomEffectsSection definitions={customEffectDefs} values={customEffectValues} onValuesChange={setCustomEffectValues} onAddEffect={addCustomEffect} />
                   <DurationSection value={durationBucket} onChange={setDurationBucket} />
-
-                  {/* Section 5: Body vs Mind */}
                   <BodyMindSlider value={bodyMind} onChange={setBodyMind} />
-
-                  {/* Section 6: Overall Experience */}
                   <OverallExperienceSection value={outcomePreference} onChange={setOutcomePreference} />
-
-                  {/* Section 7: Notes */}
                   <div>
-                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                      Notes (Optional)
-                    </h3>
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Notes (Optional)</h3>
                     <textarea
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
@@ -349,23 +353,15 @@ export default function LogSession() {
                     />
                   </div>
                 </div>
-
                 <div className="mt-8 pb-6">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="w-full"
-                    disabled={saving}
-                    onClick={goNext}
-                  >
-                    {saving ? "Saving..." : "Save Session"}
-                    <Check className="w-4 h-4" />
+                  <Button variant="primary" size="lg" className="w-full" disabled={saving} onClick={goNext}>
+                    {saving ? "Saving..." : "Save Session"} <Check className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
             )}
 
-            {/* Done Step - Session Completion Moment */}
+            {/* Done Step */}
             {step === "done" && (
               <SessionCompletionMoment
                 outcomePreference={outcomePreference}
