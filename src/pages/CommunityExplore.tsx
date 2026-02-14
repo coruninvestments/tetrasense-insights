@@ -24,6 +24,7 @@ const INTENTS = [
   { value: "pain_relief", label: "Pain Relief" },
   { value: "social", label: "Social" },
   { value: "recreation", label: "Recreation" },
+  { value: "learning", label: "Learning" },
 ];
 
 const STRAIN_TYPES = [

@@ -558,6 +558,7 @@ export type Database = {
         | "pain_relief"
         | "social"
         | "recreation"
+        | "learning"
       session_method:
         | "smoke"
         | "vape"
@@ -701,6 +702,7 @@ export const Constants = {
         "pain_relief",
         "social",
         "recreation",
+        "learning",
       ],
       session_method: [
         "smoke",
