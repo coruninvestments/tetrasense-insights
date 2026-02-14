@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { HelpTip } from "@/components/guide/HelpTip";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -329,6 +330,15 @@ export default function CommunityExplore() {
           </TabsList>
 
           <TabsContent value="strains" className="space-y-4 mt-4">
+            <div className="flex items-center gap-1.5 mb-1">
+              <h3 className="text-sm font-medium text-foreground">Top Strains</h3>
+              <HelpTip
+                id="explore_top_strains"
+                title="Top Strains"
+                description="These rankings are built from anonymized, aggregated session data contributed by community members who opted in. No individual sessions or personal details are ever shown."
+              />
+            </div>
+
             {/* Filters */}
             <div className="space-y-2">
               <FilterChips options={INTENTS} selected={selectedIntent} onSelect={setSelectedIntent} />
@@ -409,6 +419,14 @@ export default function CommunityExplore() {
           </TabsContent>
 
           <TabsContent value="batches" className="space-y-4 mt-4">
+            <div className="flex items-center gap-1.5 mb-1">
+              <h3 className="text-sm font-medium text-foreground">Public Batches</h3>
+              <HelpTip
+                id="explore_public_batches"
+                title="Public Batches"
+                description="Public batches contain lab-verified data from Certificates of Analysis (COAs). This data is curated and publicly available — it is not derived from individual user sessions."
+              />
+            </div>
             {batchesLoading ? (
               <div className="space-y-3">
                 {[1, 2, 3].map((i) => (

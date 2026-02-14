@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
+import { HelpTip } from "@/components/guide/HelpTip";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -74,6 +75,11 @@ export function PrivacyCommunitySection({ enabled, onToggle, isPending }: Privac
         <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
           <Shield className="w-4 h-4 text-muted-foreground" />
           Privacy & Community
+          <HelpTip
+            id="privacy_community_sharing"
+            title="Community Sharing"
+            description="When enabled, your session data is anonymized and aggregated into community insights visible on the Explore page. No personal details, timestamps, or individual sessions are ever shared."
+          />
         </h3>
         <Card className="p-4">
           <div className="flex items-start justify-between gap-4">

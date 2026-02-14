@@ -208,6 +208,42 @@ export default function Profile() {
                     </SelectContent>
                   </Select>
                 </Card>
+
+                {/* Help / Onboarding */}
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider pt-4">Help & Onboarding</h3>
+                <Card variant="default" className="p-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Guide Mode</p>
+                    <p className="text-xs text-muted-foreground">Show helpful explanations throughout the app</p>
+                  </div>
+                  <Switch
+                    checked={profile?.guide_mode_enabled ?? true}
+                    onCheckedChange={async (value) => {
+                      try {
+                        await updateProfile.mutateAsync({ guide_mode_enabled: value });
+                        toast.success(value ? "Guide Mode enabled" : "Guide Mode disabled");
+                      } catch {
+                        toast.error("Failed to update preference");
+                      }
+                    }}
+                    disabled={updateProfile.isPending}
+                  />
+                </Card>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  disabled={updateProfile.isPending || (profile?.dismissed_tip_ids?.length ?? 0) === 0}
+                  onClick={async () => {
+                    try {
+                      await updateProfile.mutateAsync({ dismissed_tip_ids: [] });
+                      toast.success("All tips have been reset");
+                    } catch {
+                      toast.error("Failed to reset tips");
+                    }
+                  }}
+                >
+                  Reset Tips
+                </Button>
               </motion.div>
             )}
           </div>
