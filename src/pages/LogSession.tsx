@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Check, ChevronRight } from "lucide-react";
+import { HelpTip } from "@/components/guide/HelpTip";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -204,9 +205,16 @@ export default function LogSession() {
             {/* Intent Step */}
             {step === "intent" && (
               <div>
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-2">
-                  What's your intention?
-                </h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="font-serif text-2xl font-medium text-foreground mb-2">
+                    What's your intention?
+                  </h2>
+                  <HelpTip
+                    id="log_intent"
+                    title="Why set an intention?"
+                    description="Your intention helps personalize your insights and contributes to anonymous community data on the Explore page. It's the foundation for understanding what works best for you."
+                  />
+                </div>
                 <p className="text-muted-foreground mb-6">
                   Select your primary goal for this session
                 </p>
@@ -234,7 +242,14 @@ export default function LogSession() {
             {/* Strain / Product Step */}
             {step === "strain" && (
               <div>
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-2">Strain / Product</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="font-serif text-2xl font-medium text-foreground mb-2">Strain / Product</h2>
+                  <HelpTip
+                    id="log_strain"
+                    title="Strains, Products & Batches"
+                    description="Selecting a strain from our verified library links your session to community data. Choosing a specific batch with a COA (Certificate of Analysis) adds lab-verified precision to your tracking."
+                  />
+                </div>
                 <p className="text-muted-foreground mb-6">Search our library or enter a personal strain name</p>
                 <StrainPicker
                   value={strainText}
@@ -292,7 +307,14 @@ export default function LogSession() {
             {/* Dose Step */}
             {step === "dose" && (
               <div>
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-2">How much?</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="font-serif text-2xl font-medium text-foreground mb-2">How much?</h2>
+                  <HelpTip
+                    id="log_dose"
+                    title="Dose Level vs. Exact mg"
+                    description="The dose level (Low/Medium/High) is a quick estimate relative to your tolerance. The optional mg field lets you track exact amounts for more precise insights over time."
+                  />
+                </div>
                 <p className="text-muted-foreground mb-6">Estimate your dose level</p>
                 <div className="space-y-3">
                   {doseLevels.map((level) => (
@@ -328,7 +350,14 @@ export default function LogSession() {
             {/* Effects Step */}
             {step === "effects" && (
               <div>
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-2">Rate your experience</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="font-serif text-2xl font-medium text-foreground mb-2">Rate your experience</h2>
+                  <HelpTip
+                    id="log_effects"
+                    title="How effects shape your insights"
+                    description="Your effect ratings are used to calculate your overall session outcome and build personal patterns over time. The more consistently you rate, the more accurate your insights become."
+                  />
+                </div>
                 <p className="text-muted-foreground mb-6">Slide to rate each effect from 0–10</p>
                 <div className="space-y-8">
                   <div>

@@ -11,6 +11,8 @@ export interface Profile {
   sensitivity_flags: string[];
   is_premium: boolean;
   community_sharing_enabled: boolean;
+  guide_mode_enabled: boolean;
+  dismissed_tip_ids: string[];
   created_at: string;
   updated_at: string;
 }

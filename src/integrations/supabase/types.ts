@@ -204,7 +204,9 @@ export type Database = {
           age_range: string | null
           community_sharing_enabled: boolean
           created_at: string
+          dismissed_tip_ids: string[]
           display_name: string | null
+          guide_mode_enabled: boolean
           id: string
           is_premium: boolean | null
           sensitivity_flags: string[] | null
@@ -216,7 +218,9 @@ export type Database = {
           age_range?: string | null
           community_sharing_enabled?: boolean
           created_at?: string
+          dismissed_tip_ids?: string[]
           display_name?: string | null
+          guide_mode_enabled?: boolean
           id?: string
           is_premium?: boolean | null
           sensitivity_flags?: string[] | null
@@ -228,7 +232,9 @@ export type Database = {
           age_range?: string | null
           community_sharing_enabled?: boolean
           created_at?: string
+          dismissed_tip_ids?: string[]
           display_name?: string | null
+          guide_mode_enabled?: boolean
           id?: string
           is_premium?: boolean | null
           sensitivity_flags?: string[] | null
