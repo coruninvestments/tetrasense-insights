@@ -30,7 +30,7 @@ const SAMPLE_STRAINS = [
   { name: "Granddaddy Purple", type: "indica" },
 ];
 
-const INTENTS: SessionIntent[] = ["sleep", "relaxation", "creativity", "focus", "pain_relief", "social", "recreation"];
+const INTENTS: SessionIntent[] = ["sleep", "relaxation", "creativity", "focus", "pain_relief", "social", "recreation", "learning"];
 const METHODS: SessionMethod[] = ["smoke", "vape", "edible", "tincture"];
 const DOSE_LEVELS: DoseLevel[] = ["low", "medium", "high"];
 

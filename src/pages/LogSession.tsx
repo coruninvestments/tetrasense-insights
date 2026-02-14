@@ -24,8 +24,9 @@ const intents: { id: SessionIntent; label: string; emoji: string }[] = [
   { id: "sleep", label: "Sleep", emoji: "🌙" },
   { id: "relaxation", label: "Relaxation", emoji: "🧘" },
   { id: "focus", label: "Focus", emoji: "🎯" },
-  { id: "pain_relief", label: "Pain Relief", emoji: "💆" },
   { id: "creativity", label: "Creativity", emoji: "🎨" },
+  { id: "learning", label: "Learning", emoji: "🧠" },
+  { id: "pain_relief", label: "Pain Relief", emoji: "💆" },
   { id: "social", label: "Social", emoji: "👥" },
   { id: "recreation", label: "Recreation", emoji: "🎉" },
 ];
