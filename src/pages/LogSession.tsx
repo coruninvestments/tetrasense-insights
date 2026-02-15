@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Check, ChevronRight, ChevronDown } from "lucide-react";
 import { HelpTip } from "@/components/guide/HelpTip";
 import { useProfile } from "@/hooks/useProfile";
+import { useActiveBatch } from "@/hooks/useActiveBatch";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { EffectSlider } from "@/components/log/EffectSlider";
 import { StrainPicker } from "@/components/log/StrainPicker";
 import { BatchChooser } from "@/components/log/BatchChooser";
+import { ActiveBatchCard } from "@/components/log/ActiveBatchCard";
 import { PhysicalEffectsSection, type PhysicalEffects } from "@/components/log/PhysicalEffectsSection";
 import { CustomEffectsSection } from "@/components/log/CustomEffectsSection";
 import { DurationSection, type DurationBucket } from "@/components/log/DurationSection";
@@ -60,7 +62,9 @@ export default function LogSession() {
   const createSession = useCreateSessionLog();
   const { customEffects: customEffectDefs, addCustomEffect } = useCustomEffects();
   const { data: profile } = useProfile();
+  const { activeBatch, setActiveBatch, clearActiveBatch } = useActiveBatch();
   const isQuickLog = profile?.quick_log_enabled ?? true;
+  const [activeBatchUsed, setActiveBatchUsed] = useState(false);
   const [step, setStep] = useState<Step>("intent");
   const [selectedIntent, setSelectedIntent] = useState<SessionIntent | "">("");
   const [strainText, setStrainText] = useState("");
@@ -149,6 +153,10 @@ export default function LogSession() {
           batch_id: selectedBatchId,
           coa_attached: coaAttached,
         });
+        // Auto-set active batch if a product was selected
+        if (canonicalStrainId && selectedProductId) {
+          setActiveBatch(canonicalStrainId, selectedProductId, selectedBatchId);
+        }
         setStep("done");
         toast.success("Session logged successfully!");
       } catch (error: any) {
@@ -165,7 +173,10 @@ export default function LogSession() {
   };
 
   const goBack = () => {
-    if (currentStepIndex > 0) {
+    if (step === "method" && activeBatchUsed) {
+      // Go back to intent (skip strain)
+      setStep("intent");
+    } else if (currentStepIndex > 0) {
       setStep(steps[currentStepIndex - 1]);
     } else {
       navigate(-1);
@@ -213,6 +224,33 @@ export default function LogSession() {
             {/* Intent Step */}
             {step === "intent" && (
               <div>
+                {/* Active Batch Card */}
+                {activeBatch && !activeBatchUsed && (
+                  <ActiveBatchCard
+                    batch={activeBatch}
+                    onContinue={() => {
+                      setStrainText(activeBatch.strainName);
+                      setCanonicalStrainId(activeBatch.canonicalStrainId);
+                      setSelectedProductId(activeBatch.productId);
+                      setSelectedBatchId(activeBatch.batchId);
+                      setCoaAttached(false);
+                      setActiveBatchUsed(true);
+                    }}
+                    onChange={() => {
+                      setActiveBatchUsed(false);
+                    }}
+                    onClear={() => {
+                      clearActiveBatch();
+                    }}
+                  />
+                )}
+
+                {activeBatchUsed && (
+                  <div className="mb-4 px-3 py-2 rounded-lg bg-primary/5 border border-primary/20 text-xs text-muted-foreground">
+                    Using <span className="font-medium text-foreground">{activeBatch?.strainName}</span> — select your intent to continue
+                  </div>
+                )}
+
                 <div className="flex items-center gap-2">
                   <h2 className="font-serif text-2xl font-medium text-foreground mb-2">
                     What's your intention?
@@ -240,7 +278,20 @@ export default function LogSession() {
                   ))}
                 </div>
                 <div className="mt-8">
-                  <Button variant="primary" size="lg" className="w-full" disabled={!selectedIntent} onClick={goNext}>
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    className="w-full"
+                    disabled={!selectedIntent}
+                    onClick={() => {
+                      if (activeBatchUsed) {
+                        // Skip strain step, go to method
+                        setStep("method");
+                      } else {
+                        goNext();
+                      }
+                    }}
+                  >
                     Continue <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>

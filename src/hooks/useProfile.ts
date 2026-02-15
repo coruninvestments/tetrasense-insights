@@ -20,6 +20,9 @@ export interface Profile {
   onboarding_completed: boolean;
   calibration_anchors: CalibrationAnchors | null;
   quick_log_enabled: boolean;
+  active_batch_id: string | null;
+  active_product_id: string | null;
+  active_strain_id: string | null;
   created_at: string;
   updated_at: string;
 }
