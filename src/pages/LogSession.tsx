@@ -14,7 +14,7 @@ import { PhysicalEffectsSection, type PhysicalEffects } from "@/components/log/P
 import { CustomEffectsSection } from "@/components/log/CustomEffectsSection";
 import { DurationSection, type DurationBucket } from "@/components/log/DurationSection";
 import { BodyMindSlider } from "@/components/log/BodyMindSlider";
-import { OverallExperienceSection, type OutcomePreference } from "@/components/log/OverallExperienceSection";
+import { OverallExperienceSection } from "@/components/log/OverallExperienceSection";
 import { SessionCompletionMoment } from "@/components/log/SessionCompletionMoment";
 import { useCreateSessionLog, SessionIntent, SessionMethod, DoseLevel, EffectSliders } from "@/hooks/useSessionLogs";
 import { useCustomEffects } from "@/hooks/useCustomEffects";
@@ -77,7 +77,7 @@ export default function LogSession() {
   const [customEffectValues, setCustomEffectValues] = useState<{ name: string; value: number }[]>([]);
   const [durationBucket, setDurationBucket] = useState<DurationBucket | "">("");
   const [bodyMind, setBodyMind] = useState(5);
-  const [outcomePreference, setOutcomePreference] = useState<OutcomePreference | "">("");
+  const [outcomePreference, setOutcomePreference] = useState<"use_again" | "neutral" | "avoid" | "">("");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -394,11 +394,9 @@ export default function LogSession() {
             {/* Done Step */}
             {step === "done" && (
               <SessionCompletionMoment
-                outcomePreference={outcomePreference}
-                physicalEffects={physicalEffects}
-                mentalEffects={effects}
-                durationBucket={durationBucket}
-                intent={selectedIntent}
+                sessionId={createSession.data?.id}
+                strainName={strainText}
+                intent={selectedIntent as string}
               />
             )}
           </motion.div>
