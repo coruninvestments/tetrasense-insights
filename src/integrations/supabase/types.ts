@@ -201,6 +201,9 @@ export type Database = {
       }
       profiles: {
         Row: {
+          active_batch_id: string | null
+          active_product_id: string | null
+          active_strain_id: string | null
           age_range: string | null
           calibration_anchors: Json | null
           community_sharing_enabled: boolean
@@ -218,6 +221,9 @@ export type Database = {
           weight_range: string | null
         }
         Insert: {
+          active_batch_id?: string | null
+          active_product_id?: string | null
+          active_strain_id?: string | null
           age_range?: string | null
           calibration_anchors?: Json | null
           community_sharing_enabled?: boolean
@@ -235,6 +241,9 @@ export type Database = {
           weight_range?: string | null
         }
         Update: {
+          active_batch_id?: string | null
+          active_product_id?: string | null
+          active_strain_id?: string | null
           age_range?: string | null
           calibration_anchors?: Json | null
           community_sharing_enabled?: boolean
@@ -251,7 +260,29 @@ export type Database = {
           user_id?: string
           weight_range?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_active_batch_id_fkey"
+            columns: ["active_batch_id"]
+            isOneToOne: false
+            referencedRelation: "product_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_active_product_id_fkey"
+            columns: ["active_product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_active_strain_id_fkey"
+            columns: ["active_strain_id"]
+            isOneToOne: false
+            referencedRelation: "strains_canonical"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       session_logs: {
         Row: {
