@@ -13,8 +13,12 @@ export interface InsightData {
 
 export interface PatternInsight {
   id: string;
+  type?: "dose" | "time" | "side_effect" | "intent_success";
   title: string;
+  headline?: string;
   description: string;
+  explanation?: string;
+  suggestion?: string;
   confidence: "low" | "medium" | "high";
   icon: "sleep" | "focus" | "trending" | "sparkles";
 }

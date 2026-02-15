@@ -30,8 +30,8 @@ function getTimeBucket(hour: number): string {
 }
 
 function confidence(sampleSize: number): PatternInsight["confidence"] {
-  if (sampleSize >= 10) return "high";
-  if (sampleSize >= 7) return "medium";
+  if (sampleSize >= 15) return "high";
+  if (sampleSize >= 8) return "medium";
   return "low";
 }
 
@@ -67,10 +67,15 @@ function detectSideEffectSensitivity(sessions: SessionLog[]): PatternInsight[] {
 
     if (rate >= 0.6) {
       const c = confidence(relevant.length);
+      const label = effect.label;
       patterns.push({
         id: `sensitivity-${effect.key}`,
-        title: `${effect.label.charAt(0).toUpperCase() + effect.label.slice(1)} Sensitivity`,
-        description: `${prefix(c)} you often report ${effect.label} during sessions (${Math.round(rate * 100)}% of ${relevant.length} sessions).`,
+        type: "side_effect",
+        title: `${label.charAt(0).toUpperCase() + label.slice(1)} Sensitivity`,
+        headline: `You frequently experience ${label}`,
+        description: `${prefix(c)} you often report ${label} during sessions (${Math.round(rate * 100)}% of ${relevant.length} sessions).`,
+        explanation: `${Math.round(rate * 100)}% of your ${relevant.length} logged sessions included notable ${label}. This pattern may be worth tracking over time.`,
+        suggestion: `Consider noting what changes — like dose, method, or strain — when ${label} is less present.`,
         confidence: c,
         icon: "trending",
       });
@@ -100,8 +105,12 @@ function detectDoseSensitivity(sessions: SessionLog[]): PatternInsight[] {
   return [
     {
       id: "dose-sensitivity",
+      type: "dose",
       title: "Dose Comfort Pattern",
+      headline: "Higher doses may reduce your comfort",
       description: `${prefix(c)} higher doses may reduce comfort for you (${Math.round(rate * 100)}% of high-dose sessions felt too strong).`,
+      explanation: `In ${highDoseUncomfortable.length} of ${highDoseTotal} high-dose sessions, you reported low comfort. This is a notable pattern in your data.`,
+      suggestion: "You might explore lower or medium doses and compare your comfort ratings.",
       confidence: c,
       icon: "trending",
     },
@@ -133,8 +142,11 @@ function detectIntentSuccess(sessions: SessionLog[]): PatternInsight[] {
       const c = confidence(group.length);
       patterns.push({
         id: `intent-success-${intent}-${strain}`,
+        type: "intent_success",
         title: `Great ${intent} Match`,
+        headline: `${strain} often matches your ${intent} intent`,
         description: `${prefix(c)} ${strain} often matches your ${intent} intent (${Math.round(rate * 100)}% perfect match across ${group.length} sessions).`,
+        explanation: `Across ${group.length} sessions using ${strain} for ${intent}, ${Math.round(rate * 100)}% resulted in a perfect intent match.`,
         confidence: c,
         icon: "sparkles",
       });
@@ -172,8 +184,12 @@ function detectTimeOfDayPattern(sessions: SessionLog[]): PatternInsight[] {
       const c = confidence(group.length);
       patterns.push({
         id: `time-${bucket}`,
+        type: "time",
         title: `${bucket.charAt(0).toUpperCase() + bucket.slice(1)} Sessions Shine`,
+        headline: `Your ${bucket} sessions tend to go well`,
         description: `${prefix(c)} ${bucket} sessions tend to produce better outcomes (${Math.round(rate * 100)}% positive across ${group.length} sessions).`,
+        explanation: `${Math.round(rate * 100)}% of your ${group.length} ${bucket} sessions had a positive outcome, compared to other times of day.`,
+        suggestion: `If consistency matters to you, ${bucket} sessions seem to work in your favor.`,
         confidence: c,
         icon: "sleep",
       });

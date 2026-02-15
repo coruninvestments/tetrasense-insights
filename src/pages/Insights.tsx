@@ -15,6 +15,7 @@ import { WeeklyUsageSection } from "@/components/insights/WeeklyUsageSection";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { DevToolsPanel } from "@/components/insights/DevToolsPanel";
+import { HelpTip } from "@/components/guide/HelpTip";
 
 export default function Insights() {
   const { data: profile } = useProfile();
@@ -181,9 +182,16 @@ export default function Insights() {
 
           {/* Discovered Patterns */}
           <section>
-            <h2 className="font-serif text-lg font-medium text-foreground mb-4">
-              Discovered Patterns
-            </h2>
+            <div className="flex items-center gap-2 mb-4">
+              <h2 className="font-serif text-lg font-medium text-foreground">
+                Discovered Patterns
+              </h2>
+              <HelpTip
+                id="discovered-patterns-info"
+                title="About Discovered Patterns"
+                description="Insights are based only on your past sessions. They reflect patterns in your personal data and are not medical advice."
+              />
+            </div>
             
             {/* Data Quality Indicator */}
             {!insightsLoading && sessions && (
@@ -239,9 +247,16 @@ export default function Insights() {
 
           {/* Personal Patterns */}
           <section>
-            <h2 className="font-serif text-lg font-medium text-foreground mb-4">
-              Personal Patterns
-            </h2>
+            <div className="flex items-center gap-2 mb-4">
+              <h2 className="font-serif text-lg font-medium text-foreground">
+                Personal Patterns
+              </h2>
+              <HelpTip
+                id="personal-patterns-info"
+                title="About Personal Patterns"
+                description="Insights are based only on your past sessions. They reflect patterns in your personal data and are not medical advice."
+              />
+            </div>
             <TooltipProvider>
               {personalPatternsLoading ? (
                 <div className="space-y-3">
