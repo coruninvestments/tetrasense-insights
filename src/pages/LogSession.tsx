@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Check, ChevronRight } from "lucide-react";
+import { ArrowLeft, Check, ChevronRight, ChevronDown } from "lucide-react";
 import { HelpTip } from "@/components/guide/HelpTip";
+import { useProfile } from "@/hooks/useProfile";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -56,7 +57,8 @@ export default function LogSession() {
   const navigate = useNavigate();
   const createSession = useCreateSessionLog();
   const { customEffects: customEffectDefs, addCustomEffect } = useCustomEffects();
-
+  const { data: profile } = useProfile();
+  const isQuickLog = profile?.quick_log_enabled ?? true;
   const [step, setStep] = useState<Step>("intent");
   const [selectedIntent, setSelectedIntent] = useState<SessionIntent | "">("");
   const [strainText, setStrainText] = useState("");
@@ -80,7 +82,7 @@ export default function LogSession() {
   const [outcomePreference, setOutcomePreference] = useState<"use_again" | "neutral" | "avoid" | "">("");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
-
+  const [showDetails, setShowDetails] = useState(false);
   const steps: Step[] = ["intent", "strain", "method", "dose", "effects", "done"];
   const currentStepIndex = steps.indexOf(step);
   const progress = ((currentStepIndex + 1) / steps.length) * 100;
@@ -368,10 +370,27 @@ export default function LogSession() {
                       ))}
                     </div>
                   </div>
-                  <PhysicalEffectsSection effects={physicalEffects} onChange={updatePhysicalEffect} />
-                  <CustomEffectsSection definitions={customEffectDefs} values={customEffectValues} onValuesChange={setCustomEffectValues} onAddEffect={addCustomEffect} />
-                  <DurationSection value={durationBucket} onChange={setDurationBucket} />
-                  <BodyMindSlider value={bodyMind} onChange={setBodyMind} />
+                  {/* Advanced sections - collapsible in quick log mode */}
+                  {(!isQuickLog || showDetails) && (
+                    <>
+                      <PhysicalEffectsSection effects={physicalEffects} onChange={updatePhysicalEffect} />
+                      <CustomEffectsSection definitions={customEffectDefs} values={customEffectValues} onValuesChange={setCustomEffectValues} onAddEffect={addCustomEffect} />
+                      <DurationSection value={durationBucket} onChange={setDurationBucket} />
+                      <BodyMindSlider value={bodyMind} onChange={setBodyMind} />
+                    </>
+                  )}
+
+                  {isQuickLog && !showDetails && (
+                    <Button
+                      variant="ghost"
+                      className="w-full text-muted-foreground"
+                      onClick={() => setShowDetails(true)}
+                    >
+                      <ChevronDown className="w-4 h-4 mr-2" />
+                      Add details (physical effects, duration, body/mind)
+                    </Button>
+                  )}
+
                   <OverallExperienceSection value={outcomePreference} onChange={setOutcomePreference} />
                   <div>
                     <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Notes (Optional)</h3>
