@@ -202,6 +202,7 @@ export type Database = {
       profiles: {
         Row: {
           age_range: string | null
+          calibration_anchors: Json | null
           community_sharing_enabled: boolean
           created_at: string
           dismissed_tip_ids: string[]
@@ -209,6 +210,8 @@ export type Database = {
           guide_mode_enabled: boolean
           id: string
           is_premium: boolean | null
+          onboarding_completed: boolean
+          quick_log_enabled: boolean
           sensitivity_flags: string[] | null
           updated_at: string
           user_id: string
@@ -216,6 +219,7 @@ export type Database = {
         }
         Insert: {
           age_range?: string | null
+          calibration_anchors?: Json | null
           community_sharing_enabled?: boolean
           created_at?: string
           dismissed_tip_ids?: string[]
@@ -223,6 +227,8 @@ export type Database = {
           guide_mode_enabled?: boolean
           id?: string
           is_premium?: boolean | null
+          onboarding_completed?: boolean
+          quick_log_enabled?: boolean
           sensitivity_flags?: string[] | null
           updated_at?: string
           user_id: string
@@ -230,6 +236,7 @@ export type Database = {
         }
         Update: {
           age_range?: string | null
+          calibration_anchors?: Json | null
           community_sharing_enabled?: boolean
           created_at?: string
           dismissed_tip_ids?: string[]
@@ -237,6 +244,8 @@ export type Database = {
           guide_mode_enabled?: boolean
           id?: string
           is_premium?: boolean | null
+          onboarding_completed?: boolean
+          quick_log_enabled?: boolean
           sensitivity_flags?: string[] | null
           updated_at?: string
           user_id?: string

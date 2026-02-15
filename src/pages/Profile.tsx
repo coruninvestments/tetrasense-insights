@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { User, Settings, Shield, Bell, ChevronRight, LogOut, Crown, ArrowLeft } from "lucide-react";
+import { User, Settings, Shield, Bell, ChevronRight, LogOut, Crown, ArrowLeft, Sliders } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,8 +15,10 @@ import { useSessionStats } from "@/hooks/useSessionLogs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { PrivacyCommunitySection } from "@/components/profile/PrivacyCommunitySection";
+import { CalibrationScreen } from "@/components/onboarding/CalibrationScreen";
+import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 
-type Section = "main" | "edit" | "notifications" | "privacy" | "settings";
+type Section = "main" | "edit" | "notifications" | "privacy" | "settings" | "calibration" | "onboarding";
 
 const menuItems: { icon: React.ElementType; label: string; section: Section }[] = [
   { icon: User, label: "Edit Profile", section: "edit" },
@@ -70,6 +72,20 @@ export default function Profile() {
       toast.error("Failed to sign out");
     }
   };
+
+  if (activeSection === "onboarding") {
+    return (
+      <OnboardingFlow onComplete={() => setActiveSection("main")} />
+    );
+  }
+
+  if (activeSection === "calibration") {
+    return (
+      <AppLayout>
+        <CalibrationScreen onBack={() => setActiveSection("settings")} />
+      </AppLayout>
+    );
+  }
 
   if (activeSection !== "main") {
     return (
@@ -209,7 +225,7 @@ export default function Profile() {
                   </Select>
                 </Card>
 
-                {/* Help / Onboarding */}
+                {/* Help & Onboarding */}
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider pt-4">Help & Onboarding</h3>
                 <Card variant="default" className="p-4 flex items-center justify-between">
                   <div>
@@ -229,6 +245,39 @@ export default function Profile() {
                     disabled={updateProfile.isPending}
                   />
                 </Card>
+                <Card variant="default" className="p-4 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Quick Log</p>
+                    <p className="text-xs text-muted-foreground">Hide advanced fields by default when logging</p>
+                  </div>
+                  <Switch
+                    checked={profile?.quick_log_enabled ?? true}
+                    onCheckedChange={async (value) => {
+                      try {
+                        await updateProfile.mutateAsync({ quick_log_enabled: value });
+                        toast.success(value ? "Quick Log enabled" : "Full Log mode active");
+                      } catch {
+                        toast.error("Failed to update preference");
+                      }
+                    }}
+                    disabled={updateProfile.isPending}
+                  />
+                </Card>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setActiveSection("calibration")}
+                >
+                  <Sliders className="w-4 h-4 mr-2" />
+                  Edit Scale Calibration
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setActiveSection("onboarding")}
+                >
+                  Re-run Onboarding
+                </Button>
                 <Button
                   variant="outline"
                   className="w-full"

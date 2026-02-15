@@ -2,6 +2,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
+export interface CalibrationAnchors {
+  [key: string]: { zero: string; ten: string };
+}
+
 export interface Profile {
   id: string;
   user_id: string;
@@ -13,6 +17,9 @@ export interface Profile {
   community_sharing_enabled: boolean;
   guide_mode_enabled: boolean;
   dismissed_tip_ids: string[];
+  onboarding_completed: boolean;
+  calibration_anchors: CalibrationAnchors | null;
+  quick_log_enabled: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -48,7 +55,7 @@ export function useUpdateProfile() {
 
       const { data, error } = await supabase
         .from("profiles")
-        .update(updates)
+        .update(updates as any)
         .eq("user_id", user.id)
         .select()
         .single();

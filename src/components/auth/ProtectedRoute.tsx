@@ -1,6 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2 } from "lucide-react";
+import { OnboardingGate } from "@/components/onboarding/OnboardingGate";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -21,5 +22,9 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to="/auth" replace />;
   }
 
-  return <>{children}</>;
+  return (
+    <OnboardingGate>
+      {children}
+    </OnboardingGate>
+  );
 }
