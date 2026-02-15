@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Check, ChevronDown, Sparkles } from "lucide-react";
 import { HelpTip } from "@/components/guide/HelpTip";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useSessionLogs, type SessionLog } from "@/hooks/useSessionLogs";
+import { normalizeOutcome } from "@/lib/sessionOutcome";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
@@ -84,6 +85,24 @@ export function SessionCompletionMoment({ sessionId, strainName, intent }: Props
   const [comfort, setComfort] = useState<number | null>(null);
 
   const feedback = getSmartFeedback(sessions, strainName, intent);
+
+  // Compare to previous session with same strain+intent
+  const comparison = useMemo(() => {
+    // Exclude current session (most recent) and find previous matching one
+    const previous = sessions
+      .filter((s) => s.id !== sessionId)
+      .find(
+        (s) =>
+          s.strain_name_text.toLowerCase() === strainName.toLowerCase() &&
+          s.intent === intent
+      );
+    if (!previous) return null;
+
+    const prevOutcome = normalizeOutcome(previous.outcome);
+    const prevComfort = previous.comfort_score;
+
+    return { prevOutcome, prevComfort };
+  }, [sessions, sessionId, strainName, intent]);
 
   const saveField = async (fields: Record<string, unknown>) => {
     if (!sessionId || !user) return;
@@ -293,6 +312,50 @@ export function SessionCompletionMoment({ sessionId, strainName, intent }: Props
           </CollapsibleContent>
         </Collapsible>
       </motion.div>
+
+      {/* Comparison to Last Session */}
+      {comparison && (selectedOutcome || comfort !== null) && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="bg-secondary/60 rounded-xl p-3 mb-4 text-left"
+        >
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+            Compared to your last session
+          </p>
+          <div className="space-y-1">
+            {selectedOutcome && comparison.prevOutcome && (
+              <p className="text-xs text-muted-foreground">
+                Outcome:{" "}
+                <span className="text-foreground font-medium">
+                  {selectedOutcome === comparison.prevOutcome
+                    ? "Same as last time"
+                    : selectedOutcome === "positive" && comparison.prevOutcome !== "positive"
+                    ? "Better than last time"
+                    : selectedOutcome === "negative" && comparison.prevOutcome !== "negative"
+                    ? "Worse than last time"
+                    : "Different from last time"}
+                </span>
+              </p>
+            )}
+            {comfort !== null && comparison.prevComfort !== null && comparison.prevComfort !== undefined && (
+              <p className="text-xs text-muted-foreground">
+                Comfort:{" "}
+                <span className="text-foreground font-medium">
+                  {comfort === comparison.prevComfort
+                    ? "Similar comfort level"
+                    : comfort === 1 && comparison.prevComfort !== 1
+                    ? "More comfortable this time"
+                    : comfort !== 1 && comparison.prevComfort === 1
+                    ? "Less comfortable this time"
+                    : "Different comfort level"}
+                </span>
+              </p>
+            )}
+          </div>
+        </motion.div>
+      )}
 
       {/* Smart Feedback */}
       <motion.div

@@ -17,8 +17,10 @@ import { DurationSection, type DurationBucket } from "@/components/log/DurationS
 import { BodyMindSlider } from "@/components/log/BodyMindSlider";
 import { OverallExperienceSection } from "@/components/log/OverallExperienceSection";
 import { SessionCompletionMoment } from "@/components/log/SessionCompletionMoment";
+import { SessionHistoryCard } from "@/components/log/SessionHistoryCard";
 import { useCreateSessionLog, SessionIntent, SessionMethod, DoseLevel, EffectSliders } from "@/hooks/useSessionLogs";
 import { useCustomEffects } from "@/hooks/useCustomEffects";
+import { useSessionMemory } from "@/hooks/useSessionMemory";
 import { computeSessionOutcomeForPreview } from "@/lib/sessionOutcome";
 import { toast } from "sonner";
 
@@ -83,6 +85,10 @@ export default function LogSession() {
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const { data: memory } = useSessionMemory(
+    selectedIntent || undefined,
+    strainText || undefined
+  );
   const steps: Step[] = ["intent", "strain", "method", "dose", "effects", "done"];
   const currentStepIndex = steps.indexOf(step);
   const progress = ((currentStepIndex + 1) / steps.length) * 100;
@@ -271,6 +277,9 @@ export default function LogSession() {
                     />
                   </div>
                 )}
+
+                {/* Session History Card */}
+                {strainText && <SessionHistoryCard memory={memory} />}
 
                 <div className="mt-8">
                   <Button variant="primary" size="lg" className="w-full" disabled={!strainText} onClick={goNext}>
