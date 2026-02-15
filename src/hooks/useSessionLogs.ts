@@ -61,6 +61,8 @@ export interface SessionLog {
   effect_body_mind: number | null;
   outcome_preference: string | null;
   custom_effects: CustomEffectEntry[] | null;
+  intent_match_score: number | null;
+  comfort_score: number | null;
 }
 
 export interface CreateSessionLogInput {
