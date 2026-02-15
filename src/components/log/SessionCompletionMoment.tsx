@@ -79,27 +79,41 @@ export function SessionCompletionMoment({ sessionId, strainName, intent }: Props
   const [notesOpen, setNotesOpen] = useState(false);
   const [reflectionNote, setReflectionNote] = useState("");
   const [noteSaved, setNoteSaved] = useState(false);
+  const [intentMatch, setIntentMatch] = useState<number | null>(null);
+  const [comfort, setComfort] = useState<number | null>(null);
 
   const feedback = getSmartFeedback(sessions, strainName, intent);
 
-  const handleOutcomeSelect = async (outcome: OutcomeChoice) => {
-    setSelectedOutcome(outcome);
+  const saveField = async (fields: Record<string, unknown>) => {
     if (!sessionId || !user) return;
-
-    setSavingOutcome(true);
     try {
       await supabase
         .from("session_logs")
-        .update({ outcome } as any)
+        .update(fields as any)
         .eq("id", sessionId)
         .eq("user_id", user.id);
       queryClient.invalidateQueries({ queryKey: ["session-logs"] });
       queryClient.invalidateQueries({ queryKey: ["recent-sessions"] });
     } catch {
-      // silent fail — outcome is optional
-    } finally {
-      setSavingOutcome(false);
+      // silent fail — these fields are optional
     }
+  };
+
+  const handleOutcomeSelect = async (outcome: OutcomeChoice) => {
+    setSelectedOutcome(outcome);
+    setSavingOutcome(true);
+    await saveField({ outcome });
+    setSavingOutcome(false);
+  };
+
+  const handleIntentMatch = (val: number) => {
+    setIntentMatch(val);
+    saveField({ intent_match_score: val });
+  };
+
+  const handleComfort = (val: number) => {
+    setComfort(val);
+    saveField({ comfort_score: val });
   };
 
   const handleSaveNote = async () => {
@@ -175,6 +189,58 @@ export function SessionCompletionMoment({ sessionId, strainName, intent }: Props
               </span>
             </button>
           ))}
+        </div>
+      </motion.div>
+
+      {/* Quick Rating Sliders */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="mb-8 space-y-5"
+      >
+        <div className="text-left">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+            Did this match your intent?
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {(["Missed", "Close", "Perfect"] as const).map((label, i) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => handleIntentMatch(i)}
+                className={`p-2.5 rounded-xl text-xs font-medium transition-all ${
+                  intentMatch === i
+                    ? "ring-2 ring-primary bg-primary/5 scale-[1.02]"
+                    : "bg-secondary hover:bg-secondary/80"
+                } text-muted-foreground`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="text-left">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+            How comfortable did this feel?
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            {(["Too strong", "Comfortable", "Too light"] as const).map((label, i) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => handleComfort(i)}
+                className={`p-2.5 rounded-xl text-xs font-medium transition-all ${
+                  comfort === i
+                    ? "ring-2 ring-primary bg-primary/5 scale-[1.02]"
+                    : "bg-secondary hover:bg-secondary/80"
+                } text-muted-foreground`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </motion.div>
 

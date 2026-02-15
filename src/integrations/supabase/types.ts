@@ -249,6 +249,7 @@ export type Database = {
           batch_id: string | null
           canonical_strain_id: string | null
           coa_attached: boolean
+          comfort_score: number | null
           created_at: string
           custom_effects: Json | null
           dose: string
@@ -269,6 +270,7 @@ export type Database = {
           effects: string[] | null
           id: string
           intent: string
+          intent_match_score: number | null
           local_time: string | null
           method: string
           notes: string | null
@@ -284,6 +286,7 @@ export type Database = {
           batch_id?: string | null
           canonical_strain_id?: string | null
           coa_attached?: boolean
+          comfort_score?: number | null
           created_at?: string
           custom_effects?: Json | null
           dose: string
@@ -304,6 +307,7 @@ export type Database = {
           effects?: string[] | null
           id?: string
           intent: string
+          intent_match_score?: number | null
           local_time?: string | null
           method: string
           notes?: string | null
@@ -319,6 +323,7 @@ export type Database = {
           batch_id?: string | null
           canonical_strain_id?: string | null
           coa_attached?: boolean
+          comfort_score?: number | null
           created_at?: string
           custom_effects?: Json | null
           dose?: string
@@ -339,6 +344,7 @@ export type Database = {
           effects?: string[] | null
           id?: string
           intent?: string
+          intent_match_score?: number | null
           local_time?: string | null
           method?: string
           notes?: string | null
