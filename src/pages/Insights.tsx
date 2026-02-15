@@ -6,6 +6,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { useProfile } from "@/hooks/useProfile";
 import { useSessionLogs, useSessionStats } from "@/hooks/useSessionLogs";
 import { useInsights } from "@/hooks/useInsights";
+import { usePersonalPatterns } from "@/hooks/usePersonalPatterns";
 import { PatternCard, NoPatternCard } from "@/components/insights/PatternCard";
 import { MilestoneCallout } from "@/components/insights/MilestoneCallout";
 import { DataQualityIndicator } from "@/components/insights/DataQualityIndicator";
@@ -20,6 +21,7 @@ export default function Insights() {
   const { data: sessions, isLoading: sessionsLoading } = useSessionLogs();
   const { data: stats, isLoading: statsLoading } = useSessionStats();
   const { data: insights, isLoading: insightsLoading } = useInsights();
+  const { data: personalPatterns, isLoading: personalPatternsLoading } = usePersonalPatterns();
   
   const isPremium = profile?.is_premium || false;
 
@@ -231,6 +233,59 @@ export default function Insights() {
             {insights?.patterns && insights.patterns.length > 0 && (
               <p className="text-xs text-muted-foreground text-center mt-4 px-4">
                 Based on your logged sessions. These observations are personal patterns, not medical advice.
+              </p>
+            )}
+          </section>
+
+          {/* Personal Patterns */}
+          <section>
+            <h2 className="font-serif text-lg font-medium text-foreground mb-4">
+              Personal Patterns
+            </h2>
+            <TooltipProvider>
+              {personalPatternsLoading ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-24 rounded-xl" />
+                  <Skeleton className="h-24 rounded-xl" />
+                </div>
+              ) : personalPatterns && personalPatterns.length > 0 ? (
+                <motion.div
+                  className="space-y-3"
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: {},
+                    visible: {
+                      transition: { staggerChildren: 0.1 },
+                    },
+                  }}
+                >
+                  {personalPatterns.map((pattern) => (
+                    <motion.div
+                      key={pattern.id}
+                      variants={{
+                        hidden: { opacity: 0, y: 12 },
+                        visible: { opacity: 1, y: 0 },
+                      }}
+                      transition={{ duration: 0.35, ease: "easeOut" }}
+                    >
+                      <PatternCard pattern={pattern} />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              ) : (
+                <Card variant="glass" className="overflow-hidden">
+                  <CardContent className="p-5 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      Log at least 5 sessions to start detecting personal patterns.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </TooltipProvider>
+            {personalPatterns && personalPatterns.length > 0 && (
+              <p className="text-xs text-muted-foreground text-center mt-4 px-4">
+                Based on your personal session data. These are observations, not medical advice.
               </p>
             )}
           </section>
