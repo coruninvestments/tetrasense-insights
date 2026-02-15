@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check, ChevronDown, Sparkles } from "lucide-react";
+import { HelpTip } from "@/components/guide/HelpTip";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -167,9 +168,12 @@ export function SessionCompletionMoment({ sessionId, strainName, intent }: Props
         transition={{ delay: 0.35 }}
         className="mb-8"
       >
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          How was it?
-        </p>
+        <div className="flex items-center justify-center gap-1.5 mb-3">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            How was it?
+          </p>
+          <HelpTip id="completion_outcome" title="Outcome Rating" description="This helps Tetra learn what works for you over time." />
+        </div>
         <div className="grid grid-cols-3 gap-2">
           {outcomeOptions.map((opt) => (
             <button
@@ -200,9 +204,12 @@ export function SessionCompletionMoment({ sessionId, strainName, intent }: Props
         className="mb-8 space-y-5"
       >
         <div className="text-left">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-            Did this match your intent?
-          </p>
+          <div className="flex items-center gap-1.5 mb-2">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Did this match your intent?
+            </p>
+            <HelpTip id="completion_intent_match" title="Intent Match" description="This compares your goal with the actual result." />
+          </div>
           <div className="grid grid-cols-3 gap-2">
             {(["Missed", "Close", "Perfect"] as const).map((label, i) => (
               <button
@@ -222,9 +229,12 @@ export function SessionCompletionMoment({ sessionId, strainName, intent }: Props
         </div>
 
         <div className="text-left">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-            How comfortable did this feel?
-          </p>
+          <div className="flex items-center gap-1.5 mb-2">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              How comfortable did this feel?
+            </p>
+            <HelpTip id="completion_comfort" title="Comfort Level" description="Helps identify doses that feel too strong or too light." />
+          </div>
           <div className="grid grid-cols-3 gap-2">
             {(["Too strong", "Comfortable", "Too light"] as const).map((label, i) => (
               <button
