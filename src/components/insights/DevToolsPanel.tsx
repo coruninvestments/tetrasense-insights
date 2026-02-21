@@ -381,31 +381,7 @@ function DevToolsPanelContent() {
           >
             Reset defaults
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={async () => {
-              setIsRefreshingStats(true);
-              try {
-                const { data, error } = await supabase.rpc("refresh_community_strain_stats" as any);
-                if (error) {
-                  toast({ title: "Refresh failed", description: error.message, variant: "destructive" });
-                } else {
-                  queryClient.invalidateQueries({ queryKey: ["community-strain-stats"] });
-                  toast({ title: "Community stats refreshed", description: `${data} rows rebuilt.` });
-                }
-              } catch (err) {
-                toast({ title: "Refresh failed", description: String(err), variant: "destructive" });
-              } finally {
-                setIsRefreshingStats(false);
-              }
-            }}
-            disabled={isSeeding || isClearing || isRefreshingStats}
-            className="text-xs h-7"
-          >
-            {isRefreshingStats ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : null}
-            Refresh Stats
-          </Button>
+          {/* Refresh Stats removed — EXECUTE revoked from authenticated users */}
         </div>
         <OutcomePreview />
       </CardContent>

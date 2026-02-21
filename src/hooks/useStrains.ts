@@ -47,17 +47,20 @@ export function useStrains(search?: string, type?: string | null) {
       const { data: strains, error } = await query;
       if (error) throw error;
 
-      if (!search) {
+      // Sanitize search input
+      const sanitized = search?.trim().slice(0, 50).replace(/[%_\\]/g, "") || "";
+      
+      if (!sanitized) {
         return (strains as Strain[]).map(s => ({ ...s, matchedAlias: undefined })) as StrainWithMatch[];
       }
 
-      const searchLower = search.toLowerCase();
+      const searchLower = sanitized.toLowerCase();
       
-      // Get aliases that match search
+      // Get aliases that match search (wildcards escaped above)
       const { data: aliases, error: aliasError } = await supabase
         .from("strain_aliases")
         .select("*")
-        .ilike("alias_name", `%${search}%`);
+        .ilike("alias_name", `%${sanitized}%`);
       
       if (aliasError) throw aliasError;
 
@@ -73,7 +76,7 @@ export function useStrains(search?: string, type?: string | null) {
       const results: StrainWithMatch[] = [];
       
       for (const strain of strains as Strain[]) {
-        const nameMatch = strain.name.toLowerCase().includes(searchLower);
+      const nameMatch = strain.name.toLowerCase().includes(searchLower);
         const aliasMatch = aliasMap.get(strain.id);
         
         if (nameMatch || aliasMatch) {

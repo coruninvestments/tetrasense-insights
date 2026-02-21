@@ -22,17 +22,20 @@ export function useCanonicalStrains(search?: string) {
 
       if (error) throw error;
 
-      if (!search) {
+      // Sanitize search input
+      const sanitized = search?.trim().slice(0, 50).replace(/[%_\\]/g, "") || "";
+
+      if (!sanitized) {
         return (strains as CanonicalStrain[]).map(s => ({ ...s, matchedAlias: undefined }));
       }
 
-      const searchLower = search.toLowerCase();
+      const searchLower = sanitized.toLowerCase();
 
-      // Get aliases that match
+      // Get aliases that match (wildcards escaped above)
       const { data: aliases, error: aliasError } = await supabase
         .from("strain_aliases_canonical")
         .select("*")
-        .ilike("alias_name", `%${search}%`);
+        .ilike("alias_name", `%${sanitized}%`);
 
       if (aliasError) throw aliasError;
 
