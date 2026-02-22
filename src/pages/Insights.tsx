@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { DevToolsPanel } from "@/components/insights/DevToolsPanel";
 import { HelpTip } from "@/components/guide/HelpTip";
+import { DecisionInsightsSection } from "@/components/insights/DecisionInsightsSection";
 
 export default function Insights() {
   const { data: profile } = useProfile();
@@ -174,6 +175,21 @@ export default function Insights() {
 
           {/* Weekly Usage Summary */}
           <WeeklyUsageSection />
+
+          {/* Decision Insights Engine */}
+          <section>
+            <div className="flex items-center gap-2 mb-4">
+              <h2 className="font-serif text-lg font-medium text-foreground">
+                Decision Insights
+              </h2>
+              <HelpTip
+                id="decision-insights-info"
+                title="About Decision Insights"
+                description="Shows what strains and methods work best for your goals, based on your logged outcomes. Not medical advice."
+              />
+            </div>
+            <DecisionInsightsSection />
+          </section>
 
           {/* Your Cannabis Relationship */}
           <div id="relationship-section">
