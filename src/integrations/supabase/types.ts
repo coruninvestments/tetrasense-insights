@@ -208,12 +208,16 @@ export type Database = {
           calibration_anchors: Json | null
           community_sharing_enabled: boolean
           created_at: string
+          disclaimer_accepted_at: string | null
+          disclaimer_version: string | null
           dismissed_tip_ids: string[]
           display_name: string | null
           guide_mode_enabled: boolean
           id: string
           is_premium: boolean | null
+          legal_age_confirmed: boolean
           onboarding_completed: boolean
+          privacy_acknowledged_at: string | null
           quick_log_enabled: boolean
           sensitivity_flags: string[] | null
           updated_at: string
@@ -228,12 +232,16 @@ export type Database = {
           calibration_anchors?: Json | null
           community_sharing_enabled?: boolean
           created_at?: string
+          disclaimer_accepted_at?: string | null
+          disclaimer_version?: string | null
           dismissed_tip_ids?: string[]
           display_name?: string | null
           guide_mode_enabled?: boolean
           id?: string
           is_premium?: boolean | null
+          legal_age_confirmed?: boolean
           onboarding_completed?: boolean
+          privacy_acknowledged_at?: string | null
           quick_log_enabled?: boolean
           sensitivity_flags?: string[] | null
           updated_at?: string
@@ -248,12 +256,16 @@ export type Database = {
           calibration_anchors?: Json | null
           community_sharing_enabled?: boolean
           created_at?: string
+          disclaimer_accepted_at?: string | null
+          disclaimer_version?: string | null
           dismissed_tip_ids?: string[]
           display_name?: string | null
           guide_mode_enabled?: boolean
           id?: string
           is_premium?: boolean | null
+          legal_age_confirmed?: boolean
           onboarding_completed?: boolean
+          privacy_acknowledged_at?: string | null
           quick_log_enabled?: boolean
           sensitivity_flags?: string[] | null
           updated_at?: string
