@@ -23,6 +23,10 @@ export interface Profile {
   active_batch_id: string | null;
   active_product_id: string | null;
   active_strain_id: string | null;
+  legal_age_confirmed: boolean;
+  disclaimer_accepted_at: string | null;
+  disclaimer_version: string | null;
+  privacy_acknowledged_at: string | null;
   created_at: string;
   updated_at: string;
 }
