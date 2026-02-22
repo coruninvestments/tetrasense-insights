@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useUpdateProfile } from "@/hooks/useProfile";
-import { CURRENT_DISCLAIMER_VERSION } from "@/utils/onboarding";
+import { CURRENT_DISCLAIMER_VERSION, DISCLAIMER_LINES } from "@/utils/onboarding";
 
 interface OnboardingFlowProps {
   onComplete: () => void;
@@ -138,15 +138,10 @@ function StepAge({ checked, onCheckedChange }: { checked: boolean; onCheckedChan
 function StepDisclaimer({ checked, onCheckedChange }: { checked: boolean; onCheckedChange: (v: boolean) => void }) {
   return (
     <div className="text-center space-y-6">
-      <h2 className="font-serif text-2xl font-medium text-foreground">Medical Disclaimer</h2>
+      <h2 className="font-serif text-2xl font-medium text-foreground">Disclaimer</h2>
 
       <ul className="text-left text-sm text-muted-foreground space-y-3">
-        {[
-          "This app is not a medical device.",
-          "It is not a substitute for professional medical advice.",
-          "Do not drive or operate machinery while impaired.",
-          "If you feel unwell, seek medical help immediately.",
-        ].map((item) => (
+        {DISCLAIMER_LINES.map((item) => (
           <li key={item} className="flex items-start gap-2">
             <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
             <span>{item}</span>
@@ -157,7 +152,7 @@ function StepDisclaimer({ checked, onCheckedChange }: { checked: boolean; onChec
       <div className="flex items-start gap-3 text-left">
         <Checkbox id="disclaimer" checked={checked} onCheckedChange={(v) => onCheckedChange(v === true)} className="mt-0.5" />
         <Label htmlFor="disclaimer" className="text-sm leading-relaxed text-foreground cursor-pointer">
-          I understand this app is for personal tracking and education only, not medical advice.
+          I have read and understand this disclaimer.
         </Label>
       </div>
     </div>
