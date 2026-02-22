@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { User, Settings, Shield, Bell, ChevronRight, LogOut, Crown, ArrowLeft, Sliders } from "lucide-react";
+import { User, Settings, Shield, Bell, ChevronRight, LogOut, Crown, ArrowLeft, Sliders, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
@@ -34,6 +35,7 @@ export default function Profile() {
   const { data: stats, isLoading: statsLoading } = useSessionStats();
   const updateProfile = useUpdateProfile();
   const [activeSection, setActiveSection] = useState<Section>("main");
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
 
   const isPremium = profile?.is_premium || false;
 
@@ -179,20 +181,22 @@ export default function Profile() {
                   }}
                   isPending={updateProfile.isPending}
                 />
-                <Card variant="default" className="p-4 flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">Anonymous Data Sharing</p>
-                    <p className="text-xs text-muted-foreground">Help improve community insights</p>
-                  </div>
-                  <Switch />
+
+                <Card variant="default" className="p-4 space-y-2">
+                  <p className="text-sm font-medium text-foreground">Medical Disclaimer</p>
+                  <p className="text-xs text-muted-foreground">
+                    Accepted version: {profile?.disclaimer_version ?? "—"}
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => setShowDisclaimer(true)}
+                  >
+                    Review Disclaimer
+                  </Button>
                 </Card>
-                <Card variant="default" className="p-4 flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">Profile Visibility</p>
-                    <p className="text-xs text-muted-foreground">Allow others to see your stats</p>
-                  </div>
-                  <Switch defaultChecked={false} />
-                </Card>
+
                 <Button variant="outline" className="w-full text-destructive border-destructive/30 hover:bg-destructive/10">
                   Export My Data
                 </Button>
@@ -302,6 +306,7 @@ export default function Profile() {
   }
 
   return (
+    <>
     <AppLayout>
       <div className="min-h-screen bg-background">
         <header className="px-5 pt-12 pb-6 safe-top">
@@ -409,5 +414,34 @@ export default function Profile() {
         </div>
       </div>
     </AppLayout>
+
+    {/* Disclaimer review modal */}
+    <Dialog open={showDisclaimer} onOpenChange={setShowDisclaimer}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Medical Disclaimer</DialogTitle>
+        </DialogHeader>
+        <ul className="text-sm text-muted-foreground space-y-3 py-2">
+          {[
+            "This app is not a medical device.",
+            "It is not a substitute for professional medical advice.",
+            "Do not drive or operate machinery while impaired.",
+            "If you feel unwell, seek medical help immediately.",
+          ].map((item) => (
+            <li key={item} className="flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="text-xs text-muted-foreground">
+          Version: {profile?.disclaimer_version ?? "—"} · Accepted: {profile?.disclaimer_accepted_at ? new Date(profile.disclaimer_accepted_at).toLocaleDateString() : "—"}
+        </p>
+        <DialogFooter>
+          <Button variant="ghost" onClick={() => setShowDisclaimer(false)} className="w-full">Close</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
