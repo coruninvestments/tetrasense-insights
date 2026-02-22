@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useProfile } from "@/hooks/useProfile";
+import { isOnboardingComplete } from "@/utils/onboarding";
 import { OnboardingFlow } from "./OnboardingFlow";
 
 interface OnboardingGateProps {
@@ -12,7 +13,7 @@ export function OnboardingGate({ children }: OnboardingGateProps) {
 
   if (isLoading || dismissed) return <>{children}</>;
   if (!profile) return <>{children}</>;
-  if (profile.onboarding_completed) return <>{children}</>;
+  if (isOnboardingComplete(profile)) return <>{children}</>;
 
   return <OnboardingFlow onComplete={() => setDismissed(true)} />;
 }
