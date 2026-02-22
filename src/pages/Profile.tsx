@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { PrivacyCommunitySection } from "@/components/profile/PrivacyCommunitySection";
 import { CalibrationScreen } from "@/components/onboarding/CalibrationScreen";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
+import { DISCLAIMER_LINES } from "@/utils/onboarding";
 
 type Section = "main" | "edit" | "notifications" | "privacy" | "settings" | "calibration" | "onboarding";
 
@@ -419,15 +420,10 @@ export default function Profile() {
     <Dialog open={showDisclaimer} onOpenChange={setShowDisclaimer}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Medical Disclaimer</DialogTitle>
+          <DialogTitle>Disclaimer</DialogTitle>
         </DialogHeader>
         <ul className="text-sm text-muted-foreground space-y-3 py-2">
-          {[
-            "This app is not a medical device.",
-            "It is not a substitute for professional medical advice.",
-            "Do not drive or operate machinery while impaired.",
-            "If you feel unwell, seek medical help immediately.",
-          ].map((item) => (
+          {DISCLAIMER_LINES.map((item) => (
             <li key={item} className="flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
               <span>{item}</span>
