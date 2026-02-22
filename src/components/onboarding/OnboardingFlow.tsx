@@ -1,84 +1,65 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Zap, Sliders, TrendingUp, ChevronRight } from "lucide-react";
+import { ShieldCheck, FileWarning, Lock, ChevronRight, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { useUpdateProfile } from "@/hooks/useProfile";
+import { CURRENT_DISCLAIMER_VERSION } from "@/utils/onboarding";
 
 interface OnboardingFlowProps {
   onComplete: () => void;
 }
 
-const steps = [
-  {
-    icon: Shield,
-    title: "Your data is private by default",
-    description:
-      "All session data stays personal. You can optionally opt-in to anonymous community sharing later — nothing is shared without your explicit consent.",
-    accent: "text-primary",
-  },
-  {
-    icon: Zap,
-    title: "Logging is fast & consistent",
-    description:
-      "Each session takes under a minute to log. Pick your intent, strain, dose, and rate your effects. Quick Log mode hides advanced options so you can log even faster.",
-    accent: "text-primary",
-  },
-  {
-    icon: Sliders,
-    title: "Your scale, your anchors",
-    description:
-      "Effect sliders go from 0 to 10. You can calibrate what 0 and 10 mean for each effect in Settings — so your ratings stay consistent and personal over time.",
-    accent: "text-primary",
-  },
-  {
-    icon: TrendingUp,
-    title: "What you'll unlock",
-    description:
-      "After 5 sessions, Personal Patterns will surface your trends. The Explore tab shows read-only community data. Premium insights are coming soon.",
-    accent: "text-primary",
-  },
-];
-
 export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [currentStep, setCurrentStep] = useState(0);
+  const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
+  const [privacyAcknowledged, setPrivacyAcknowledged] = useState(false);
+  const [communitySharing, setCommunitySharing] = useState(false);
   const updateProfile = useUpdateProfile();
+
+  const totalSteps = 3;
+
+  const canContinue = () => {
+    if (currentStep === 0) return ageConfirmed;
+    if (currentStep === 1) return disclaimerAccepted;
+    if (currentStep === 2) return privacyAcknowledged;
+    return false;
+  };
 
   const handleFinish = async () => {
     try {
-      await updateProfile.mutateAsync({ onboarding_completed: true });
+      await updateProfile.mutateAsync({
+        legal_age_confirmed: true,
+        disclaimer_accepted_at: new Date().toISOString(),
+        disclaimer_version: CURRENT_DISCLAIMER_VERSION,
+        privacy_acknowledged_at: new Date().toISOString(),
+        community_sharing_enabled: communitySharing,
+        onboarding_completed: true,
+      } as any);
     } catch {
-      // continue anyway — onboarding state will retry next load
+      // continue — will retry on next load
     }
     onComplete();
   };
 
   const handleNext = () => {
-    if (currentStep < steps.length - 1) {
+    if (currentStep < totalSteps - 1) {
       setCurrentStep(currentStep + 1);
     } else {
       handleFinish();
     }
   };
 
-  const handleSkip = () => {
-    handleFinish();
-  };
-
-  const step = steps[currentStep];
-  const Icon = step.icon;
-  const isLast = currentStep === steps.length - 1;
+  const stepIcons = [ShieldCheck, FileWarning, Lock];
+  const Icon = stepIcons[currentStep];
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
-      {/* Skip */}
-      <div className="flex justify-end px-5 pt-12 safe-top">
-        <Button variant="ghost" size="sm" onClick={handleSkip} className="text-muted-foreground">
-          Skip
-        </Button>
-      </div>
-
       {/* Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-8">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 overflow-y-auto">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
@@ -86,26 +67,30 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.25 }}
-            className="text-center max-w-sm"
+            className="w-full max-w-sm"
           >
-            <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-8">
-              <Icon className={`w-10 h-10 ${step.accent}`} />
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-6">
+              <Icon className="w-8 h-8 text-primary" />
             </div>
-            <h2 className="font-serif text-2xl font-medium text-foreground mb-4">
-              {step.title}
-            </h2>
-            <p className="text-muted-foreground leading-relaxed">
-              {step.description}
-            </p>
+
+            {currentStep === 0 && <StepAge checked={ageConfirmed} onCheckedChange={setAgeConfirmed} />}
+            {currentStep === 1 && <StepDisclaimer checked={disclaimerAccepted} onCheckedChange={setDisclaimerAccepted} />}
+            {currentStep === 2 && (
+              <StepPrivacy
+                privacyChecked={privacyAcknowledged}
+                onPrivacyChange={setPrivacyAcknowledged}
+                sharingEnabled={communitySharing}
+                onSharingChange={setCommunitySharing}
+              />
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
 
       {/* Footer */}
-      <div className="px-8 pb-12 safe-bottom space-y-4">
-        {/* Dots */}
+      <div className="px-6 pb-10 pt-4 safe-bottom space-y-4">
         <div className="flex justify-center gap-2">
-          {steps.map((_, i) => (
+          {Array.from({ length: totalSteps }).map((_, i) => (
             <div
               key={i}
               className={`w-2 h-2 rounded-full transition-colors ${
@@ -116,15 +101,101 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         </div>
 
         <Button
-          variant="primary"
           size="lg"
           className="w-full"
           onClick={handleNext}
-          disabled={updateProfile.isPending}
+          disabled={!canContinue() || updateProfile.isPending}
         >
-          {isLast ? "Get Started" : "Next"}
-          {!isLast && <ChevronRight className="w-4 h-4 ml-1" />}
+          {currentStep === totalSteps - 1 ? "Finish" : "Continue"}
+          {currentStep < totalSteps - 1 && <ChevronRight className="w-4 h-4 ml-1" />}
         </Button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Step Components ─── */
+
+function StepAge({ checked, onCheckedChange }: { checked: boolean; onCheckedChange: (v: boolean) => void }) {
+  return (
+    <div className="text-center space-y-6">
+      <h2 className="font-serif text-2xl font-medium text-foreground">Age &amp; Legal Responsibility</h2>
+
+      <div className="flex items-start gap-3 text-left">
+        <Checkbox id="age" checked={checked} onCheckedChange={(v) => onCheckedChange(v === true)} className="mt-0.5" />
+        <Label htmlFor="age" className="text-sm leading-relaxed text-foreground cursor-pointer">
+          I confirm I am of legal age to use cannabis in my location.
+        </Label>
+      </div>
+
+      <p className="text-xs text-muted-foreground">
+        You are responsible for following local laws. This app does not verify your age or location.
+      </p>
+    </div>
+  );
+}
+
+function StepDisclaimer({ checked, onCheckedChange }: { checked: boolean; onCheckedChange: (v: boolean) => void }) {
+  return (
+    <div className="text-center space-y-6">
+      <h2 className="font-serif text-2xl font-medium text-foreground">Medical Disclaimer</h2>
+
+      <ul className="text-left text-sm text-muted-foreground space-y-3">
+        {[
+          "This app is not a medical device.",
+          "It is not a substitute for professional medical advice.",
+          "Do not drive or operate machinery while impaired.",
+          "If you feel unwell, seek medical help immediately.",
+        ].map((item) => (
+          <li key={item} className="flex items-start gap-2">
+            <AlertTriangle className="w-4 h-4 text-destructive shrink-0 mt-0.5" />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="flex items-start gap-3 text-left">
+        <Checkbox id="disclaimer" checked={checked} onCheckedChange={(v) => onCheckedChange(v === true)} className="mt-0.5" />
+        <Label htmlFor="disclaimer" className="text-sm leading-relaxed text-foreground cursor-pointer">
+          I understand this app is for personal tracking and education only, not medical advice.
+        </Label>
+      </div>
+    </div>
+  );
+}
+
+function StepPrivacy({
+  privacyChecked,
+  onPrivacyChange,
+  sharingEnabled,
+  onSharingChange,
+}: {
+  privacyChecked: boolean;
+  onPrivacyChange: (v: boolean) => void;
+  sharingEnabled: boolean;
+  onSharingChange: (v: boolean) => void;
+}) {
+  return (
+    <div className="text-center space-y-6">
+      <h2 className="font-serif text-2xl font-medium text-foreground">Privacy &amp; Data</h2>
+
+      <div className="flex items-start gap-3 text-left">
+        <Checkbox id="privacy" checked={privacyChecked} onCheckedChange={(v) => onPrivacyChange(v === true)} className="mt-0.5" />
+        <Label htmlFor="privacy" className="text-sm leading-relaxed text-foreground cursor-pointer">
+          I understand my personal logs are private by default.
+        </Label>
+      </div>
+
+      <div className="bg-muted/50 rounded-xl p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="community-toggle" className="text-sm font-medium text-foreground cursor-pointer">
+            Share anonymized community data
+          </Label>
+          <Switch id="community-toggle" checked={sharingEnabled} onCheckedChange={onSharingChange} />
+        </div>
+        <p className="text-xs text-muted-foreground text-left leading-relaxed">
+          If enabled, only aggregated strain-level stats are used. No personal identifiers, notes, or timestamps are ever shared.
+        </p>
       </div>
     </div>
   );
