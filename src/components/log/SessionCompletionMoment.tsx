@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Check, ChevronDown, Sparkles } from "lucide-react";
+import { Check, ChevronDown, Sparkles, TrendingUp, AlertTriangle } from "lucide-react";
 import { HelpTip } from "@/components/guide/HelpTip";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +17,8 @@ interface Props {
   sessionId?: string;
   strainName: string;
   intent: string;
+  method?: string;
+  doseLevel?: string;
 }
 
 const outcomeOptions: { id: OutcomeChoice; emoji: string; label: string }[] = [
@@ -25,52 +27,101 @@ const outcomeOptions: { id: OutcomeChoice; emoji: string; label: string }[] = [
   { id: "negative", emoji: "👎", label: "Not ideal" },
 ];
 
-function getSmartFeedback(
+type PatternSignal = {
+  type: "positive" | "caution";
+  message: string;
+  detail?: string;
+};
+
+function detectPatternSignal(
   sessions: SessionLog[],
   strainName: string,
-  intent: string
-): string {
-  if (sessions.length < 2) {
-    return "Keep logging to unlock deeper insights.";
-  }
+  intent: string,
+  method?: string
+): PatternSignal | null {
+  const past = sessions.filter((s) => s.id); // all past sessions (current excluded by caller)
 
-  // Check if this strain has worked well before for this intent
-  const strainSessions = sessions.filter(
+  // Check strain + intent combo
+  const matchingSessions = past.filter(
     (s) =>
       s.strain_name_text.toLowerCase() === strainName.toLowerCase() &&
-      s.outcome === "positive"
+      s.intent === intent
   );
-  if (strainSessions.length >= 2) {
-    const intentLabel = intent.replace("_", " ");
-    return `This strain has worked well for ${intentLabel} before.`;
+
+  if (matchingSessions.length >= 2) {
+    const positives = matchingSessions.filter((s) => normalizeOutcome(s.outcome) === "positive").length;
+    const negatives = matchingSessions.filter((s) => normalizeOutcome(s.outcome) === "negative").length;
+    const posRate = positives / matchingSessions.length;
+    const negRate = negatives / matchingSessions.length;
+
+    if (posRate >= 0.6) {
+      return {
+        type: "positive",
+        message: "Good choice — this aligns with what works best for you.",
+        detail: `This strain has worked well for ${intent.replace("_", " ")} in ${positives} of ${matchingSessions.length} sessions.`,
+      };
+    }
+    if (negRate >= 0.4) {
+      return {
+        type: "caution",
+        message: "Heads up — similar sessions in the past led to less favorable outcomes.",
+        detail: `${negatives} of ${matchingSessions.length} past sessions with this combo felt off. Consider adjusting dose or method.`,
+      };
+    }
   }
 
-  // Check time-of-day pattern
-  const now = new Date();
-  const currentHour = now.getHours();
-  const isEvening = currentHour >= 18 || currentHour < 4;
-  const eveningSessions = sessions.filter((s) => {
-    if (!s.local_time) return false;
-    const match = s.local_time.match(/(\d+):/);
-    if (!match) return false;
-    const hour = parseInt(match[1]);
-    const isPM = s.local_time.includes("PM");
-    const h24 = isPM && hour !== 12 ? hour + 12 : !isPM && hour === 12 ? 0 : hour;
-    return h24 >= 18 || h24 < 4;
-  });
-  if (isEvening && eveningSessions.length >= 3) {
-    return "You usually log evening sessions around this time.";
+  // Check strain overall (any intent)
+  const strainSessions = past.filter(
+    (s) => s.strain_name_text.toLowerCase() === strainName.toLowerCase()
+  );
+  if (strainSessions.length >= 3) {
+    const negatives = strainSessions.filter((s) => normalizeOutcome(s.outcome) === "negative").length;
+    const negRate = negatives / strainSessions.length;
+    if (negRate >= 0.5) {
+      return {
+        type: "caution",
+        message: "Heads up — this strain hasn't been consistent for you.",
+        detail: `${negatives} of ${strainSessions.length} sessions had less favorable outcomes.`,
+      };
+    }
   }
 
-  // Consistency message
-  if (sessions.length >= 5) {
-    return "You're building consistency — insights improve over time.";
+  // Check method pattern
+  if (method) {
+    const methodSessions = past.filter((s) => s.method === method && s.intent === intent);
+    if (methodSessions.length >= 3) {
+      const positives = methodSessions.filter((s) => normalizeOutcome(s.outcome) === "positive").length;
+      if (positives / methodSessions.length >= 0.6) {
+        return {
+          type: "positive",
+          message: `${method} tends to work well for you when the goal is ${intent.replace("_", " ")}.`,
+        };
+      }
+    }
   }
 
-  return "Keep logging to unlock deeper insights.";
+  // Fallback: general encouragement
+  if (past.length < 3) {
+    return null; // not enough data, skip pattern feedback
+  }
+
+  return null;
 }
 
-export function SessionCompletionMoment({ sessionId, strainName, intent }: Props) {
+function getSmartFeedback(
+  sessions: SessionLog[],
+  sessionCount: number
+): string {
+  if (sessionCount < 3) {
+    return "Keep logging to unlock deeper insights.";
+  }
+  if (sessionCount >= 5) {
+    return "You're building consistency — insights improve over time.";
+  }
+  return "Each session helps Tetra understand you better.";
+}
+
+export function SessionCompletionMoment({ sessionId, strainName, intent, method, doseLevel }: Props) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -84,7 +135,9 @@ export function SessionCompletionMoment({ sessionId, strainName, intent }: Props
   const [intentMatch, setIntentMatch] = useState<number | null>(null);
   const [comfort, setComfort] = useState<number | null>(null);
 
-  const feedback = getSmartFeedback(sessions, strainName, intent);
+  const pastSessions = useMemo(() => sessions.filter((s) => s.id !== sessionId), [sessions, sessionId]);
+  const patternSignal = useMemo(() => detectPatternSignal(pastSessions, strainName, intent, method), [pastSessions, strainName, intent, method]);
+  const feedback = getSmartFeedback(sessions, sessions.length);
 
   // Compare to previous session with same strain+intent
   const comparison = useMemo(() => {
@@ -352,6 +405,36 @@ export function SessionCompletionMoment({ sessionId, strainName, intent }: Props
                     : "Different comfort level"}
                 </span>
               </p>
+            )}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Pattern Signal */}
+      {patternSignal && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className={`flex items-start gap-2.5 rounded-xl p-3.5 mb-4 text-left ${
+            patternSignal.type === "positive"
+              ? "bg-primary/5 border border-primary/20"
+              : "bg-destructive/5 border border-destructive/20"
+          }`}
+        >
+          {patternSignal.type === "positive" ? (
+            <TrendingUp className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+          ) : (
+            <AlertTriangle className="w-4 h-4 text-destructive mt-0.5 shrink-0" />
+          )}
+          <div>
+            <p className={`text-sm font-medium leading-snug ${
+              patternSignal.type === "positive" ? "text-primary" : "text-destructive"
+            }`}>
+              {patternSignal.message}
+            </p>
+            {patternSignal.detail && (
+              <p className="text-xs text-muted-foreground mt-1">{patternSignal.detail}</p>
             )}
           </div>
         </motion.div>

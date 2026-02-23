@@ -476,6 +476,8 @@ export default function LogSession() {
                 sessionId={createSession.data?.id}
                 strainName={strainText}
                 intent={selectedIntent as string}
+                method={selectedMethod as string}
+                doseLevel={doseLevel}
               />
             )}
           </motion.div>
