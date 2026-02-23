@@ -18,6 +18,7 @@ import { DevToolsPanel } from "@/components/insights/DevToolsPanel";
 import { HelpTip } from "@/components/guide/HelpTip";
 import { DecisionInsightsSection } from "@/components/insights/DecisionInsightsSection";
 import { RecommendationSection } from "@/components/insights/RecommendationSection";
+import { EffectDriversSection } from "@/components/insights/EffectDriversSection";
 
 export default function Insights() {
   const { data: profile } = useProfile();
@@ -70,6 +71,9 @@ export default function Insights() {
           
           {/* Personalized Recommendation + Warnings */}
           <RecommendationSection />
+          
+          {/* Effect Drivers */}
+          <EffectDriversSection />
           
           {/* Premium Banner */}
           {!isPremium && (
