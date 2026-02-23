@@ -17,6 +17,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { DevToolsPanel } from "@/components/insights/DevToolsPanel";
 import { HelpTip } from "@/components/guide/HelpTip";
 import { DecisionInsightsSection } from "@/components/insights/DecisionInsightsSection";
+import { RecommendationSection } from "@/components/insights/RecommendationSection";
 
 export default function Insights() {
   const { data: profile } = useProfile();
@@ -66,6 +67,9 @@ export default function Insights() {
           
           {/* Dev Tools Panel - only shows in development */}
           <DevToolsPanel />
+          
+          {/* Personalized Recommendation + Warnings */}
+          <RecommendationSection />
           
           {/* Premium Banner */}
           {!isPremium && (
