@@ -18,6 +18,7 @@ import { DevToolsPanel } from "@/components/insights/DevToolsPanel";
 import { HelpTip } from "@/components/guide/HelpTip";
 import { DecisionInsightsSection } from "@/components/insights/DecisionInsightsSection";
 import { RecommendationSection } from "@/components/insights/RecommendationSection";
+import { EffectDriversSection } from "@/components/insights/EffectDriversSection";
 
 export default function Insights() {
   const { data: profile } = useProfile();
@@ -193,6 +194,21 @@ export default function Insights() {
               />
             </div>
             <DecisionInsightsSection />
+          </section>
+
+          {/* Effect Drivers */}
+          <section>
+            <div className="flex items-center gap-2 mb-4">
+              <h2 className="font-serif text-lg font-medium text-foreground">
+                What Drives Your Best Sessions
+              </h2>
+              <HelpTip
+                id="effect-drivers-info"
+                title="About Effect Drivers"
+                description="Compares the sensations you report in positive vs negative sessions to find what matters most. Not medical advice."
+              />
+            </div>
+            <EffectDriversSection />
           </section>
 
           {/* Your Cannabis Relationship */}
