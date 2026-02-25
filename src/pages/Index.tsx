@@ -6,6 +6,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { InsightCard } from "@/components/home/InsightCard";
 import { QuickStat } from "@/components/home/QuickStat";
 import { RecentSession } from "@/components/home/RecentSession";
+import { TodaysGoalCard } from "@/components/home/TodaysGoalCard";
 import { useRecentSessions, useSessionStats } from "@/hooks/useSessionLogs";
 import { useInsights } from "@/hooks/useInsights";
 import { useAuth } from "@/hooks/useAuth";
@@ -61,6 +62,9 @@ const Index = () => {
               </Button>
             </Link>
           </motion.div>
+
+          {/* Today's Goal */}
+          <TodaysGoalCard />
 
           {/* Insight Card - Show dynamic insights */}
           {insights?.patterns && insights.patterns.length > 0 ? (

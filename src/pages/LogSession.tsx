@@ -4,7 +4,7 @@ import { ArrowLeft, Check, ChevronRight, ChevronDown } from "lucide-react";
 import { HelpTip } from "@/components/guide/HelpTip";
 import { useProfile } from "@/hooks/useProfile";
 import { useActiveBatch } from "@/hooks/useActiveBatch";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -59,6 +59,7 @@ type Step = "intent" | "strain" | "method" | "dose" | "effects" | "done";
 
 export default function LogSession() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const createSession = useCreateSessionLog();
   const { customEffects: customEffectDefs, addCustomEffect } = useCustomEffects();
   const { data: profile } = useProfile();
@@ -66,14 +67,18 @@ export default function LogSession() {
   const isQuickLog = profile?.quick_log_enabled ?? true;
   const [activeBatchUsed, setActiveBatchUsed] = useState(false);
   const [step, setStep] = useState<Step>("intent");
-  const [selectedIntent, setSelectedIntent] = useState<SessionIntent | "">("");
-  const [strainText, setStrainText] = useState("");
+  const [selectedIntent, setSelectedIntent] = useState<SessionIntent | "">(
+    (searchParams.get("intent") as SessionIntent) || ""
+  );
+  const [strainText, setStrainText] = useState(searchParams.get("strain") || "");
   const [selectedStrainId, setSelectedStrainId] = useState<string | null>(null);
   const [canonicalStrainId, setCanonicalStrainId] = useState<string | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
   const [coaAttached, setCoaAttached] = useState(false);
-  const [selectedMethod, setSelectedMethod] = useState<SessionMethod | "">("");
+  const [selectedMethod, setSelectedMethod] = useState<SessionMethod | "">(
+    (searchParams.get("method") as SessionMethod) || ""
+  );
   const [doseLevel, setDoseLevel] = useState<DoseLevel>("medium");
   const [doseAmountMg, setDoseAmountMg] = useState<string>("");
   const [effects, setEffects] = useState<EffectSliders>({
