@@ -21,6 +21,14 @@ function DriverRow({ driver, variant }: { driver: EffectDriver; variant: "positi
   );
 }
 
+function EarlySignalBadge() {
+  return (
+    <span className="inline-flex items-center text-[10px] font-medium text-warning bg-warning/10 rounded-full px-2 py-0.5 ml-2">
+      Early signal
+    </span>
+  );
+}
+
 export function EffectDriversSection() {
   const { data, isLoading } = useEffectDrivers();
 
@@ -39,7 +47,7 @@ export function EffectDriversSection() {
         <CardContent className="p-5 text-center">
           <Activity className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
           <p className="text-sm text-muted-foreground">
-            Log more sessions with varied outcomes to discover what drives your best experiences.
+            Log a few more sessions to unlock your effect patterns.
           </p>
         </CardContent>
       </Card>
@@ -48,6 +56,7 @@ export function EffectDriversSection() {
 
   const hasPositive = data.positiveDrivers.length > 0;
   const hasNegative = data.negativeDrivers.length > 0;
+  const isEarly = data.signalMode === "early";
 
   if (!hasPositive && !hasNegative) {
     return (
@@ -64,6 +73,13 @@ export function EffectDriversSection() {
 
   return (
     <div className="space-y-4">
+      {isEarly && (
+        <p className="text-xs text-muted-foreground flex items-center gap-1">
+          <Info className="w-3.5 h-3.5 shrink-0" />
+          Early signal — log more sessions for higher confidence.
+        </p>
+      )}
+
       {hasPositive && (
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -77,6 +93,7 @@ export function EffectDriversSection() {
                 <span className="text-sm font-medium text-foreground">
                   You tend to have better outcomes when you feel
                 </span>
+                {isEarly && <EarlySignalBadge />}
               </div>
               <div className="divide-y divide-border">
                 {data.positiveDrivers.map((d) => (
@@ -104,6 +121,7 @@ export function EffectDriversSection() {
                 <span className="text-sm font-medium text-foreground">
                   You tend to have worse outcomes when you feel
                 </span>
+                {isEarly && <EarlySignalBadge />}
               </div>
               <div className="divide-y divide-border">
                 {data.negativeDrivers.map((d) => (

@@ -22,10 +22,13 @@ export interface EffectDriver {
   difference: number; // positive means higher in positive sessions
 }
 
+export type SignalMode = "strong" | "early" | "none";
+
 export interface EffectDriversData {
   positiveDrivers: EffectDriver[];
   negativeDrivers: EffectDriver[];
   hasEnoughData: boolean;
+  signalMode: SignalMode;
   positiveSampleSize: number;
   negativeSampleSize: number;
 }
@@ -42,15 +45,28 @@ function computeDrivers(sessions: SessionLog[]): EffectDriversData {
     (s) => normalizeOutcome(s.outcome) === "negative"
   );
 
-  if (positive.length < 2 || negative.length < 1) {
+  // Not enough data at all
+  if (positive.length < 1 || negative.length < 1) {
     return {
       positiveDrivers: [],
       negativeDrivers: [],
       hasEnoughData: false,
+      signalMode: "none",
       positiveSampleSize: positive.length,
       negativeSampleSize: negative.length,
     };
   }
+
+  // Determine signal mode: strong requires 2+ pos AND 2+ neg
+  const isStrong = positive.length >= 2 && negative.length >= 2;
+  const signalMode: SignalMode = isStrong ? "strong" : "early";
+
+  const avgThreshold = isStrong ? 4 : 3.5;
+  const gapThreshold = isStrong ? 1.5 : 1.0;
+  const negGapThreshold = isStrong ? 1.5 : 1.0;
+  const negAvgThreshold = isStrong ? 4 : 3.5;
+  const anxietyAvgThreshold = isStrong ? 3 : 2.5;
+  const anxietyGapThreshold = isStrong ? 1 : 0.75;
 
   const drivers: EffectDriver[] = EFFECT_KEYS.map((ek) => {
     const avgPos = avg(positive, ek.key);
@@ -65,22 +81,17 @@ function computeDrivers(sessions: SessionLog[]): EffectDriversData {
     };
   });
 
-  // Positive drivers: effects significantly higher in positive sessions (≥4 avg) with meaningful gap
   const positiveDrivers = drivers
-    .filter((d) => d.key !== "effect_anxiety" && d.avgPositive >= 4 && d.difference >= 1.5)
+    .filter((d) => d.key !== "effect_anxiety" && d.avgPositive >= avgThreshold && d.difference >= gapThreshold)
     .sort((a, b) => b.difference - a.difference)
     .slice(0, 3);
 
-  // Negative drivers: effects correlated with worse outcomes
-  // For anxiety: higher in negative is bad
-  // For others: lower positive avg but high negative avg
   const negativeDrivers = drivers
     .filter((d) => {
       if (d.key === "effect_anxiety") {
-        return d.avgNegative >= 3 && d.avgNegative - d.avgPositive >= 1;
+        return d.avgNegative >= anxietyAvgThreshold && d.avgNegative - d.avgPositive >= anxietyGapThreshold;
       }
-      // Effects that are notably higher in negative sessions
-      return d.difference <= -1.5 && d.avgNegative >= 4;
+      return d.difference <= -negGapThreshold && d.avgNegative >= negAvgThreshold;
     })
     .sort((a, b) => a.difference - b.difference)
     .slice(0, 3);
@@ -89,6 +100,7 @@ function computeDrivers(sessions: SessionLog[]): EffectDriversData {
     positiveDrivers,
     negativeDrivers,
     hasEnoughData: true,
+    signalMode,
     positiveSampleSize: positive.length,
     negativeSampleSize: negative.length,
   };
@@ -103,6 +115,7 @@ export function useEffectDrivers() {
         positiveDrivers: [],
         negativeDrivers: [],
         hasEnoughData: false,
+        signalMode: "none" as const,
         positiveSampleSize: 0,
         negativeSampleSize: 0,
       } as EffectDriversData;
