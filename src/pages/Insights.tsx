@@ -19,6 +19,7 @@ import { HelpTip } from "@/components/guide/HelpTip";
 import { DecisionInsightsSection } from "@/components/insights/DecisionInsightsSection";
 import { RecommendationSection } from "@/components/insights/RecommendationSection";
 import { EffectDriversSection } from "@/components/insights/EffectDriversSection";
+import { ActionTipsSection } from "@/components/insights/ActionTipsSection";
 
 export default function Insights() {
   const { data: profile } = useProfile();
@@ -209,6 +210,7 @@ export default function Insights() {
               />
             </div>
             <EffectDriversSection />
+            <ActionTipsSection />
           </section>
 
           {/* Your Cannabis Relationship */}
