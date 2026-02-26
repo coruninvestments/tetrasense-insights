@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { Lock, Flame, Clock, TrendingUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,6 +23,7 @@ import { EffectDriversSection } from "@/components/insights/EffectDriversSection
 import { ActionTipsSection } from "@/components/insights/ActionTipsSection";
 import { ContextCorrelationsSection } from "@/components/insights/ContextCorrelationsSection";
 import { DoseInsightsSection } from "@/components/insights/DoseInsightsSection";
+import { logEvent } from "@/lib/analytics";
 
 export default function Insights() {
   const { data: profile } = useProfile();
@@ -31,6 +33,8 @@ export default function Insights() {
   const { data: personalPatterns, isLoading: personalPatternsLoading } = usePersonalPatterns();
   
   const isPremium = profile?.is_premium || false;
+
+  useEffect(() => { logEvent("viewed_insights"); }, []);
 
   // Calculate real insights from session data
   const topIntent = sessions?.reduce((acc, session) => {

@@ -14,6 +14,7 @@ import {
 import { Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "@/hooks/use-toast";
+import { logEvent } from "@/lib/analytics";
 
 interface PrivacyCommunitySectionProps {
   enabled: boolean;
@@ -57,12 +58,14 @@ export function PrivacyCommunitySection({ enabled, onToggle, isPending }: Privac
       setShowConfirm(true);
     } else {
       onToggle(false);
+      logEvent("toggled_community_sharing");
     }
   };
 
   const handleConfirm = async () => {
     try {
       await onToggle(true);
+      logEvent("toggled_community_sharing");
       setShowConfirm(false);
     } catch {
       toast({ title: "Error", description: "Failed to enable sharing. Please try again.", variant: "destructive" });
