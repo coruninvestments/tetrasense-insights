@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Leaf, Mail, Lock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
@@ -29,8 +30,19 @@ export default function Auth() {
       } else {
         const { error } = await signUp(email, password);
         if (error) throw error;
-        toast.success("Account created! You're now signed in.");
-        navigate("/");
+        // Supabase may require email confirmation — no session yet
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        if (currentSession) {
+          toast.success("Account created! You're now signed in.");
+          navigate("/");
+        } else {
+          toast.success("Check your email to confirm your account.", {
+            duration: 6000,
+          });
+          setIsLogin(true);
+          setEmail("");
+          setPassword("");
+        }
       }
     } catch (error: any) {
       toast.error(error.message || "Something went wrong");
