@@ -61,12 +61,12 @@ function computeDrivers(sessions: SessionLog[]): EffectDriversData {
   const isStrong = positive.length >= 2 && negative.length >= 2;
   const signalMode: SignalMode = isStrong ? "strong" : "early";
 
-  const avgThreshold = isStrong ? 4 : 3.5;
-  const gapThreshold = isStrong ? 1.5 : 1.0;
-  const negGapThreshold = isStrong ? 1.5 : 1.0;
-  const negAvgThreshold = isStrong ? 4 : 3.5;
-  const anxietyAvgThreshold = isStrong ? 3 : 2.5;
-  const anxietyGapThreshold = isStrong ? 1 : 0.75;
+  const avgThreshold = isStrong ? 7 : 6;
+  const gapThreshold = isStrong ? 2.5 : 1.5;
+  const negGapThreshold = isStrong ? 2.5 : 1.5;
+  const negAvgThreshold = isStrong ? 7 : 6;
+  const anxietyAvgThreshold = isStrong ? 5 : 4;
+  const anxietyGapThreshold = isStrong ? 2 : 1.5;
 
   const drivers: EffectDriver[] = EFFECT_KEYS.map((ek) => {
     const avgPos = avg(positive, ek.key);

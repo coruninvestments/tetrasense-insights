@@ -15,7 +15,7 @@ function DriverRow({ driver, variant }: { driver: EffectDriver; variant: "positi
         <span className="text-sm font-medium text-foreground">{driver.label}</span>
       </div>
       <span className="text-xs text-muted-foreground shrink-0">
-        avg {avgValue.toFixed(1)} · {diffAbs.toFixed(1)} pts gap
+        avg {avgValue.toFixed(1)}/10 · {diffAbs.toFixed(1)} pt gap
       </span>
     </div>
   );
