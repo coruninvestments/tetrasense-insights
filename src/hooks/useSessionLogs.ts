@@ -63,6 +63,14 @@ export interface SessionLog {
   custom_effects: CustomEffectEntry[] | null;
   intent_match_score: number | null;
   comfort_score: number | null;
+  time_of_day: string | null;
+  setting: string | null;
+  stomach: string | null;
+  caffeine: boolean;
+  hydration: string | null;
+  sleep_quality: string | null;
+  mood_before: string | null;
+  stress_before: string | null;
 }
 
 export interface CreateSessionLogInput {
@@ -85,6 +93,14 @@ export interface CreateSessionLogInput {
   product_id?: string | null;
   batch_id?: string | null;
   coa_attached?: boolean;
+  time_of_day?: string | null;
+  setting?: string | null;
+  stomach?: string | null;
+  caffeine?: boolean;
+  hydration?: string | null;
+  sleep_quality?: string | null;
+  mood_before?: string | null;
+  stress_before?: string | null;
 }
 
 export function useSessionLogs() {
@@ -248,6 +264,14 @@ export function useCreateSessionLog() {
           product_id: input.product_id || null,
           batch_id: input.batch_id || null,
           coa_attached: input.coa_attached ?? false,
+          time_of_day: input.time_of_day || null,
+          setting: input.setting || null,
+          stomach: input.stomach || null,
+          caffeine: input.caffeine ?? false,
+          hydration: input.hydration || null,
+          sleep_quality: input.sleep_quality || null,
+          mood_before: input.mood_before || null,
+          stress_before: input.stress_before || null,
         } as any)
         .select()
         .single();

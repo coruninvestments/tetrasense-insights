@@ -299,6 +299,7 @@ export type Database = {
       session_logs: {
         Row: {
           batch_id: string | null
+          caffeine: boolean
           canonical_strain_id: string | null
           coa_attached: boolean
           comfort_score: number | null
@@ -320,22 +321,30 @@ export type Database = {
           effect_sleepiness: number | null
           effect_throat_irritation: number | null
           effects: string[] | null
+          hydration: string | null
           id: string
           intent: string
           intent_match_score: number | null
           local_time: string | null
           method: string
+          mood_before: string | null
           notes: string | null
           outcome: string | null
           outcome_preference: string | null
           product_id: string | null
+          setting: string | null
+          sleep_quality: string | null
+          stomach: string | null
           strain_id: string | null
           strain_name_text: string
           strain_type: string | null
+          stress_before: string | null
+          time_of_day: string | null
           user_id: string
         }
         Insert: {
           batch_id?: string | null
+          caffeine?: boolean
           canonical_strain_id?: string | null
           coa_attached?: boolean
           comfort_score?: number | null
@@ -357,22 +366,30 @@ export type Database = {
           effect_sleepiness?: number | null
           effect_throat_irritation?: number | null
           effects?: string[] | null
+          hydration?: string | null
           id?: string
           intent: string
           intent_match_score?: number | null
           local_time?: string | null
           method: string
+          mood_before?: string | null
           notes?: string | null
           outcome?: string | null
           outcome_preference?: string | null
           product_id?: string | null
+          setting?: string | null
+          sleep_quality?: string | null
+          stomach?: string | null
           strain_id?: string | null
           strain_name_text: string
           strain_type?: string | null
+          stress_before?: string | null
+          time_of_day?: string | null
           user_id: string
         }
         Update: {
           batch_id?: string | null
+          caffeine?: boolean
           canonical_strain_id?: string | null
           coa_attached?: boolean
           comfort_score?: number | null
@@ -394,18 +411,25 @@ export type Database = {
           effect_sleepiness?: number | null
           effect_throat_irritation?: number | null
           effects?: string[] | null
+          hydration?: string | null
           id?: string
           intent?: string
           intent_match_score?: number | null
           local_time?: string | null
           method?: string
+          mood_before?: string | null
           notes?: string | null
           outcome?: string | null
           outcome_preference?: string | null
           product_id?: string | null
+          setting?: string | null
+          sleep_quality?: string | null
+          stomach?: string | null
           strain_id?: string | null
           strain_name_text?: string
           strain_type?: string | null
+          stress_before?: string | null
+          time_of_day?: string | null
           user_id?: string
         }
         Relationships: [
