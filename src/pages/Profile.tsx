@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { User, Settings, Shield, Bell, ChevronRight, LogOut, Crown, ArrowLeft, Sliders, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -20,6 +20,9 @@ import { CalibrationScreen } from "@/components/onboarding/CalibrationScreen";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { DISCLAIMER_LINES } from "@/utils/onboarding";
 import { FeedbackSection } from "@/components/profile/FeedbackSection";
+import { AchievementBadges } from "@/components/achievements/AchievementBadges";
+import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
+import type { AchievementKey } from "@/lib/achievements";
 
 type Section = "main" | "edit" | "notifications" | "privacy" | "settings" | "calibration" | "onboarding";
 
@@ -38,6 +41,17 @@ export default function Profile() {
   const updateProfile = useUpdateProfile();
   const [activeSection, setActiveSection] = useState<Section>("main");
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [unlockedAchievement, setUnlockedAchievement] = useState<AchievementKey | null>(null);
+
+  // Listen for achievement unlocks from anywhere in the app
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const key = (e as CustomEvent).detail as AchievementKey;
+      setUnlockedAchievement(key);
+    };
+    window.addEventListener("achievement-unlocked", handler);
+    return () => window.removeEventListener("achievement-unlocked", handler);
+  }, []);
 
   const isPremium = profile?.is_premium || false;
 
@@ -402,6 +416,9 @@ export default function Profile() {
             </Card>
           </section>
 
+          {/* Achievements */}
+          <AchievementBadges />
+
           {/* Feedback */}
           <FeedbackSection />
 
@@ -442,6 +459,10 @@ export default function Profile() {
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    <AchievementUnlockedModal
+      achievementKey={unlockedAchievement}
+      onClose={() => setUnlockedAchievement(null)}
+    />
     </>
   );
 }

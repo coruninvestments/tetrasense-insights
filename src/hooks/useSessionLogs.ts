@@ -4,6 +4,7 @@ import { useAuth } from "./useAuth";
 import { SessionOutcome, computeSessionOutcome } from "@/lib/sessionOutcome";
 import { computeDoseNormalizedScore } from "@/lib/doseNormalization";
 import { checkSessionMilestones } from "@/lib/analytics";
+import { checkSessionAchievements, type AchievementKey } from "@/lib/achievements";
 
 export type SessionIntent = 'sleep' | 'relaxation' | 'creativity' | 'focus' | 'pain_relief' | 'social' | 'recreation' | 'learning';
 export type SessionMethod = 'smoke' | 'vape' | 'edible' | 'tincture' | 'topical' | 'other';
@@ -294,7 +295,7 @@ export function useCreateSessionLog() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ["session-logs"] });
       queryClient.invalidateQueries({ queryKey: ["recent-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["session-stats"] });
@@ -303,6 +304,14 @@ export function useCreateSessionLog() {
       const cached = queryClient.getQueryData<SessionLog[]>(["session-logs", user?.id]);
       const total = (cached?.length ?? 0) + 1;
       checkSessionMilestones(total);
+
+      // Check achievements
+      const newlyUnlocked = await checkSessionAchievements(total);
+      if (newlyUnlocked.length > 0) {
+        queryClient.invalidateQueries({ queryKey: ["achievements"] });
+        // Store for modal display
+        window.dispatchEvent(new CustomEvent("achievement-unlocked", { detail: newlyUnlocked[0] }));
+      }
     },
   });
 }
