@@ -16,6 +16,9 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,6 +51,24 @@ export default function Auth() {
       toast.error(error.message || "Something went wrong");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail) return;
+    setForgotLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success("Password reset email sent. Check your inbox.", { duration: 6000 });
+      setShowForgot(false);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to send reset email.");
+    } finally {
+      setForgotLoading(false);
     }
   };
 
@@ -158,7 +179,48 @@ export default function Auth() {
             >
               {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
             </Button>
+
+            {isLogin && (
+              <button
+                type="button"
+                onClick={() => { setShowForgot(true); setForgotEmail(email); }}
+                className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors pt-1"
+              >
+                Forgot password?
+              </button>
+            )}
           </form>
+
+          {showForgot && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              className="mt-4 pt-4 border-t border-border"
+            >
+              <p className="text-sm text-foreground font-medium mb-3">Reset your password</p>
+              <form onSubmit={handleForgotPassword} className="space-y-3">
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                  <input
+                    type="email"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                    placeholder="Your email address"
+                    required
+                    className="w-full h-12 pl-12 pr-4 rounded-xl bg-secondary border-0 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button type="button" variant="outline" size="lg" className="flex-1" onClick={() => setShowForgot(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" variant="primary" size="lg" className="flex-1" disabled={forgotLoading}>
+                    {forgotLoading ? "Sending..." : "Send Reset Link"}
+                  </Button>
+                </div>
+              </form>
+            </motion.div>
+          )}
 
           {!isLogin && (
             <p className="text-xs text-muted-foreground text-center mt-4">
