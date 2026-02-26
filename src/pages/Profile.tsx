@@ -19,6 +19,7 @@ import { PrivacyCommunitySection } from "@/components/profile/PrivacyCommunitySe
 import { CalibrationScreen } from "@/components/onboarding/CalibrationScreen";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { DISCLAIMER_LINES } from "@/utils/onboarding";
+import { FeedbackSection } from "@/components/profile/FeedbackSection";
 
 type Section = "main" | "edit" | "notifications" | "privacy" | "settings" | "calibration" | "onboarding";
 
@@ -400,6 +401,9 @@ export default function Profile() {
               ))}
             </Card>
           </section>
+
+          {/* Feedback */}
+          <FeedbackSection />
 
           {/* Sign Out */}
           <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10" onClick={handleSignOut}>
