@@ -82,6 +82,8 @@ export default function LogSession() {
   );
   const [doseLevel, setDoseLevel] = useState<DoseLevel>("medium");
   const [doseAmountMg, setDoseAmountMg] = useState<string>("");
+  const [doseUnit, setDoseUnit] = useState<string | null>(null);
+  const [doseCount, setDoseCount] = useState<string>("");
   const [effects, setEffects] = useState<EffectSliders>({
     sleepiness: 0, relaxation: 0, anxiety: 0, focus: 0, pain_relief: 0, euphoria: 0,
   });
@@ -146,7 +148,9 @@ export default function LogSession() {
           strain_name_text: strainText,
           method: selectedMethod as SessionMethod,
           dose_level: doseLevel,
-          dose_amount_mg: doseAmountMg ? parseFloat(doseAmountMg) : null,
+          dose_amount_mg: doseUnit === "mg" ? (doseCount ? parseFloat(doseCount) : (doseAmountMg ? parseFloat(doseAmountMg) : null)) : (doseAmountMg ? parseFloat(doseAmountMg) : null),
+          dose_unit: doseUnit || undefined,
+          dose_count: doseCount ? parseFloat(doseCount) : undefined,
           effects,
           physicalEffects,
           durationBucket: durationBucket || undefined,
@@ -409,12 +413,65 @@ export default function LogSession() {
                     </Card>
                   ))}
                 </div>
-                <div className="mt-6">
-                  <label className="text-sm text-muted-foreground mb-2 block">Dose amount (optional)</label>
-                  <div className="flex items-center gap-2">
-                    <Input type="number" value={doseAmountMg} onChange={(e) => setDoseAmountMg(e.target.value)} placeholder="e.g., 10" className="flex-1" />
-                    <span className="text-sm text-muted-foreground">mg</span>
+                <div className="mt-6 space-y-4">
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-2 block">Dose unit (optional)</label>
+                    <div className="flex flex-wrap gap-2">
+                      {(["hit", "puff", "bowl", "dab", "g", "mg", "other"] as const).map((unit) => (
+                        <button
+                          key={unit}
+                          type="button"
+                          onClick={() => {
+                            setDoseUnit(doseUnit === unit ? null : unit);
+                            // If switching away from mg, clear synced values
+                            if (unit === "mg" && doseUnit !== "mg" && doseAmountMg) {
+                              setDoseCount(doseAmountMg);
+                            }
+                          }}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                            doseUnit === unit
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-secondary text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {unit}
+                        </button>
+                      ))}
+                    </div>
                   </div>
+
+                  {doseUnit && (
+                    <div>
+                      <label className="text-sm text-muted-foreground mb-2 block">
+                        Amount{doseUnit === "mg" ? " (mg)" : ` (${doseUnit}s)`}
+                      </label>
+                      <Input
+                        type="number"
+                        step="0.5"
+                        min="0"
+                        value={doseUnit === "mg" ? (doseCount || doseAmountMg) : doseCount}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setDoseCount(val);
+                          if (doseUnit === "mg") {
+                            setDoseAmountMg(val);
+                          }
+                        }}
+                        placeholder={doseUnit === "mg" ? "e.g., 10" : "e.g., 2"}
+                        className="w-32"
+                      />
+                    </div>
+                  )}
+
+                  {!doseUnit && (
+                    <div>
+                      <label className="text-sm text-muted-foreground mb-2 block">Dose amount in mg (optional)</label>
+                      <div className="flex items-center gap-2">
+                        <Input type="number" value={doseAmountMg} onChange={(e) => setDoseAmountMg(e.target.value)} placeholder="e.g., 10" className="flex-1" />
+                        <span className="text-sm text-muted-foreground">mg</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="mt-8">
                   <Button variant="primary" size="lg" className="w-full" onClick={goNext}>
