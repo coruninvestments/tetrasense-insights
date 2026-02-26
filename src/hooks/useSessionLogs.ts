@@ -71,6 +71,9 @@ export interface SessionLog {
   sleep_quality: string | null;
   mood_before: string | null;
   stress_before: string | null;
+  dose_unit: string | null;
+  dose_count: number | null;
+  dose_normalized_score: number | null;
 }
 
 export interface CreateSessionLogInput {
@@ -101,6 +104,9 @@ export interface CreateSessionLogInput {
   sleep_quality?: string | null;
   mood_before?: string | null;
   stress_before?: string | null;
+  dose_unit?: string | null;
+  dose_count?: number | null;
+  dose_normalized_score?: number | null;
 }
 
 export function useSessionLogs() {
@@ -272,6 +278,9 @@ export function useCreateSessionLog() {
           sleep_quality: input.sleep_quality || null,
           mood_before: input.mood_before || null,
           stress_before: input.stress_before || null,
+          dose_unit: input.dose_unit || null,
+          dose_count: input.dose_count ?? null,
+          dose_normalized_score: input.dose_normalized_score ?? null,
         } as any)
         .select()
         .single();
