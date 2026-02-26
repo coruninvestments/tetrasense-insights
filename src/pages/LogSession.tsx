@@ -494,6 +494,11 @@ export default function LogSession() {
                 intent={selectedIntent as string}
                 method={selectedMethod as string}
                 doseLevel={doseLevel}
+                sessionContext={{
+                  caffeine: context.caffeine,
+                  stomach: context.stomach,
+                  sleep_quality: context.sleep_quality,
+                }}
               />
             )}
           </motion.div>
