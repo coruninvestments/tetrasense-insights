@@ -9,6 +9,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import type { SessionIntent, SessionMethod, DoseLevel } from "@/hooks/useSessionLogs";
 import type { SessionOutcome } from "@/lib/sessionOutcome";
+import { computeDoseNormalizedScore } from "@/lib/doseNormalization";
 
 // Only render in development
 export function DevToolsPanel() {
@@ -33,6 +34,7 @@ const SAMPLE_STRAINS = [
 const INTENTS: SessionIntent[] = ["sleep", "relaxation", "creativity", "focus", "pain_relief", "social", "recreation", "learning"];
 const METHODS: SessionMethod[] = ["smoke", "vape", "edible", "tincture"];
 const DOSE_LEVELS: DoseLevel[] = ["low", "medium", "high"];
+const DOSE_UNITS = ["hit", "puff", "bowl", "mg"] as const;
 
 function randomPick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -108,7 +110,17 @@ function generateSampleSession(userId: string, daysAgo: number) {
   date.setDate(date.getDate() - daysAgo);
   date.setHours(randomInt(8, 23), randomInt(0, 59), 0, 0);
 
-  // Return only the exact columns confirmed by the real create mutation
+  // Dose structure
+  const doseUnit = randomPick([...DOSE_UNITS]);
+  const doseCount = (Math.round((0.5 + Math.random() * 2.5) * 2) / 2); // 0.5–3.0 step 0.5
+  const doseAmountMg = doseUnit === "mg" ? doseCount * 10 : null;
+  const doseNormalizedScore = computeDoseNormalizedScore({
+    dose_level: doseLevel,
+    dose_unit: doseUnit,
+    dose_count: doseCount,
+    dose_amount_mg: doseAmountMg,
+  });
+
   return {
     user_id: userId,
     created_at: date.toISOString(),
@@ -119,6 +131,10 @@ function generateSampleSession(userId: string, daysAgo: number) {
     method,
     dose: doseLevel,
     dose_level: doseLevel,
+    dose_unit: doseUnit,
+    dose_count: doseCount,
+    dose_amount_mg: doseAmountMg,
+    dose_normalized_score: doseNormalizedScore,
     effect_sleepiness: baseSleepiness,
     effect_relaxation: baseRelaxation,
     effect_anxiety: baseAnxiety,
@@ -127,7 +143,7 @@ function generateSampleSession(userId: string, daysAgo: number) {
     effect_euphoria: baseEuphoria,
     outcome: targetOutcome,
     notes: null,
-  };
+  } as any;
 }
 
 function DevToolsPanelContent() {
