@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { SessionOutcome, computeSessionOutcome } from "@/lib/sessionOutcome";
+import { computeDoseNormalizedScore } from "@/lib/doseNormalization";
 
 export type SessionIntent = 'sleep' | 'relaxation' | 'creativity' | 'focus' | 'pain_relief' | 'social' | 'recreation' | 'learning';
 export type SessionMethod = 'smoke' | 'vape' | 'edible' | 'tincture' | 'topical' | 'other';
@@ -106,7 +107,6 @@ export interface CreateSessionLogInput {
   stress_before?: string | null;
   dose_unit?: string | null;
   dose_count?: number | null;
-  dose_normalized_score?: number | null;
 }
 
 export function useSessionLogs() {
@@ -280,7 +280,12 @@ export function useCreateSessionLog() {
           stress_before: input.stress_before || null,
           dose_unit: input.dose_unit || null,
           dose_count: input.dose_count ?? null,
-          dose_normalized_score: input.dose_normalized_score ?? null,
+          dose_normalized_score: computeDoseNormalizedScore({
+            dose_level: input.dose_level,
+            dose_unit: input.dose_unit,
+            dose_count: input.dose_count,
+            dose_amount_mg: input.dose_amount_mg,
+          }),
         } as any)
         .select()
         .single();
