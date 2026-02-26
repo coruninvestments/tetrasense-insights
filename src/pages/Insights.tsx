@@ -21,6 +21,7 @@ import { RecommendationSection } from "@/components/insights/RecommendationSecti
 import { EffectDriversSection } from "@/components/insights/EffectDriversSection";
 import { ActionTipsSection } from "@/components/insights/ActionTipsSection";
 import { ContextCorrelationsSection } from "@/components/insights/ContextCorrelationsSection";
+import { DoseInsightsSection } from "@/components/insights/DoseInsightsSection";
 
 export default function Insights() {
   const { data: profile } = useProfile();
@@ -214,6 +215,9 @@ export default function Insights() {
             <ActionTipsSection />
             <div className="mt-4">
               <ContextCorrelationsSection />
+            </div>
+            <div className="mt-4">
+              <DoseInsightsSection />
             </div>
           </section>
 
