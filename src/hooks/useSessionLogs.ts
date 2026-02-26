@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { SessionOutcome, computeSessionOutcome } from "@/lib/sessionOutcome";
 import { computeDoseNormalizedScore } from "@/lib/doseNormalization";
+import { checkSessionMilestones } from "@/lib/analytics";
 
 export type SessionIntent = 'sleep' | 'relaxation' | 'creativity' | 'focus' | 'pain_relief' | 'social' | 'recreation' | 'learning';
 export type SessionMethod = 'smoke' | 'vape' | 'edible' | 'tincture' | 'topical' | 'other';
@@ -297,6 +298,11 @@ export function useCreateSessionLog() {
       queryClient.invalidateQueries({ queryKey: ["session-logs"] });
       queryClient.invalidateQueries({ queryKey: ["recent-sessions"] });
       queryClient.invalidateQueries({ queryKey: ["session-stats"] });
+
+      // Check milestones (fire-and-forget)
+      const cached = queryClient.getQueryData<SessionLog[]>(["session-logs", user?.id]);
+      const total = (cached?.length ?? 0) + 1;
+      checkSessionMilestones(total);
     },
   });
 }

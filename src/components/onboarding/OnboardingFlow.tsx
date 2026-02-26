@@ -7,6 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useUpdateProfile } from "@/hooks/useProfile";
 import { CURRENT_DISCLAIMER_VERSION, DISCLAIMER_LINES } from "@/utils/onboarding";
+import { logEvent } from "@/lib/analytics";
 
 interface OnboardingFlowProps {
   onComplete: () => void;
@@ -39,6 +40,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         community_sharing_enabled: communitySharing,
         onboarding_completed: true,
       } as any);
+      logEvent("onboarding_completed");
     } catch {
       // continue — will retry on next load
     }

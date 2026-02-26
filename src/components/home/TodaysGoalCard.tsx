@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useDecisionInsights } from "@/hooks/useDecisionInsights";
+import { logEvent } from "@/lib/analytics";
 
 const INTENTS = [
   { id: "sleep", label: "Sleep", emoji: "🌙" },
@@ -73,11 +74,11 @@ export function TodaysGoalCard() {
             {INTENTS.map((intent) => (
               <button
                 key={intent.id}
-                onClick={() =>
-                  setSelectedIntent(
-                    selectedIntent === intent.id ? null : intent.id
-                  )
-                }
+                onClick={() => {
+                  const next = selectedIntent === intent.id ? null : intent.id;
+                  setSelectedIntent(next);
+                  if (next) logEvent("used_todays_goal");
+                }}
                 className={`text-xs px-3 py-1.5 rounded-full transition-colors ${
                   selectedIntent === intent.id
                     ? "bg-primary text-primary-foreground"
