@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Lock, Flame, Clock, TrendingUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,6 +24,10 @@ import { ActionTipsSection } from "@/components/insights/ActionTipsSection";
 import { ContextCorrelationsSection } from "@/components/insights/ContextCorrelationsSection";
 import { DoseInsightsSection } from "@/components/insights/DoseInsightsSection";
 import { logEvent } from "@/lib/analytics";
+import { tryUnlock } from "@/lib/achievements";
+import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
+import type { AchievementKey } from "@/lib/achievements";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Insights() {
   const { data: profile } = useProfile();
@@ -31,10 +35,20 @@ export default function Insights() {
   const { data: stats, isLoading: statsLoading } = useSessionStats();
   const { data: insights, isLoading: insightsLoading } = useInsights();
   const { data: personalPatterns, isLoading: personalPatternsLoading } = usePersonalPatterns();
+  const queryClient = useQueryClient();
+  const [unlockedAchievement, setUnlockedAchievement] = useState<AchievementKey | null>(null);
   
   const isPremium = profile?.is_premium || false;
 
-  useEffect(() => { logEvent("viewed_insights"); }, []);
+  useEffect(() => {
+    logEvent("viewed_insights");
+    tryUnlock("first_insight_view").then((key) => {
+      if (key) {
+        queryClient.invalidateQueries({ queryKey: ["achievements"] });
+        setUnlockedAchievement(key);
+      }
+    });
+  }, []);
 
   // Calculate real insights from session data
   const topIntent = sessions?.reduce((acc, session) => {
@@ -53,6 +67,7 @@ export default function Insights() {
   const topStrainName = topStrain ? Object.entries(topStrain).sort((a, b) => b[1] - a[1])[0]?.[0] : null;
 
   return (
+    <>
     <AppLayout>
       <div className="min-h-screen bg-background">
         <header className="px-5 pt-12 pb-6 safe-top">
@@ -357,5 +372,10 @@ export default function Insights() {
         </div>
       </div>
     </AppLayout>
+    <AchievementUnlockedModal
+      achievementKey={unlockedAchievement}
+      onClose={() => setUnlockedAchievement(null)}
+    />
+    </>
   );
 }
