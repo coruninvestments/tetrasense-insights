@@ -307,7 +307,10 @@ export type Database = {
           custom_effects: Json | null
           dose: string
           dose_amount_mg: number | null
+          dose_count: number | null
           dose_level: Database["public"]["Enums"]["dose_level"] | null
+          dose_normalized_score: number | null
+          dose_unit: string | null
           effect_anxiety: number | null
           effect_body_heaviness: number | null
           effect_body_mind: number | null
@@ -352,7 +355,10 @@ export type Database = {
           custom_effects?: Json | null
           dose: string
           dose_amount_mg?: number | null
+          dose_count?: number | null
           dose_level?: Database["public"]["Enums"]["dose_level"] | null
+          dose_normalized_score?: number | null
+          dose_unit?: string | null
           effect_anxiety?: number | null
           effect_body_heaviness?: number | null
           effect_body_mind?: number | null
@@ -397,7 +403,10 @@ export type Database = {
           custom_effects?: Json | null
           dose?: string
           dose_amount_mg?: number | null
+          dose_count?: number | null
           dose_level?: Database["public"]["Enums"]["dose_level"] | null
+          dose_normalized_score?: number | null
+          dose_unit?: string | null
           effect_anxiety?: number | null
           effect_body_heaviness?: number | null
           effect_body_mind?: number | null
