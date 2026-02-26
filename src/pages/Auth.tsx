@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Leaf, Mail, Lock } from "lucide-react";
@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
-export default function Auth() {
+const Auth = forwardRef<HTMLDivElement>(function Auth(_props, ref) {
   const navigate = useNavigate();
   const { signIn, signUp } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
@@ -73,7 +73,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen bg-background gradient-hero flex flex-col">
+    <div ref={ref} className="min-h-screen bg-background gradient-hero flex flex-col">
       {/* Header */}
       <header className="px-6 pt-16 pb-8 text-center safe-top">
         <motion.div
@@ -257,4 +257,6 @@ export default function Auth() {
       </motion.div>
     </div>
   );
-}
+});
+
+export default Auth;
