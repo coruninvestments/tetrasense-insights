@@ -20,6 +20,7 @@ import { DecisionInsightsSection } from "@/components/insights/DecisionInsightsS
 import { RecommendationSection } from "@/components/insights/RecommendationSection";
 import { EffectDriversSection } from "@/components/insights/EffectDriversSection";
 import { ActionTipsSection } from "@/components/insights/ActionTipsSection";
+import { ContextCorrelationsSection } from "@/components/insights/ContextCorrelationsSection";
 
 export default function Insights() {
   const { data: profile } = useProfile();
@@ -211,6 +212,9 @@ export default function Insights() {
             </div>
             <EffectDriversSection />
             <ActionTipsSection />
+            <div className="mt-4">
+              <ContextCorrelationsSection />
+            </div>
           </section>
 
           {/* Your Cannabis Relationship */}

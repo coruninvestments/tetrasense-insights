@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Check, ChevronDown, Sparkles, TrendingUp, AlertTriangle } from "lucide-react";
+import { Check, ChevronDown, Sparkles, TrendingUp, AlertTriangle, Lightbulb } from "lucide-react";
 import { HelpTip } from "@/components/guide/HelpTip";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,7 @@ import { normalizeOutcome } from "@/lib/sessionOutcome";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
+import { useEffectDrivers } from "@/hooks/useEffectDrivers";
 
 type OutcomeChoice = "positive" | "neutral" | "negative";
 
@@ -19,6 +20,11 @@ interface Props {
   intent: string;
   method?: string;
   doseLevel?: string;
+  sessionContext?: {
+    caffeine?: boolean;
+    stomach?: string | null;
+    sleep_quality?: string | null;
+  };
 }
 
 const outcomeOptions: { id: OutcomeChoice; emoji: string; label: string }[] = [
@@ -121,11 +127,12 @@ function getSmartFeedback(
   return "Each session helps Tetra understand you better.";
 }
 
-export function SessionCompletionMoment({ sessionId, strainName, intent, method, doseLevel }: Props) {
+export function SessionCompletionMoment({ sessionId, strainName, intent, method, doseLevel, sessionContext }: Props) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data: sessions = [] } = useSessionLogs();
+  const { data: driverData } = useEffectDrivers();
 
   const [selectedOutcome, setSelectedOutcome] = useState<OutcomeChoice | null>(null);
   const [savingOutcome, setSavingOutcome] = useState(false);
@@ -138,6 +145,24 @@ export function SessionCompletionMoment({ sessionId, strainName, intent, method,
   const pastSessions = useMemo(() => sessions.filter((s) => s.id !== sessionId), [sessions, sessionId]);
   const patternSignal = useMemo(() => detectPatternSignal(pastSessions, strainName, intent, method), [pastSessions, strainName, intent, method]);
   const feedback = getSmartFeedback(sessions, sessions.length);
+
+  // Context-aware tips based on effect drivers
+  const contextTips = useMemo(() => {
+    const tips: { emoji: string; message: string }[] = [];
+    const anxietyIsNegDriver = driverData.negativeDrivers.some((d) => d.key === "effect_anxiety");
+    if (!anxietyIsNegDriver) return tips;
+
+    if (sessionContext?.caffeine) {
+      tips.push({ emoji: "☕", message: "Caffeine + cannabis can increase anxiety for some people — consider lowering caffeine." });
+    }
+    if (sessionContext?.stomach === "empty") {
+      tips.push({ emoji: "🍽️", message: "Empty stomach can intensify effects — try a light meal next time." });
+    }
+    if (sessionContext?.sleep_quality === "poor") {
+      tips.push({ emoji: "😴", message: "Poor sleep often increases sensitivity — consider a lower dose." });
+    }
+    return tips;
+  }, [driverData, sessionContext]);
 
   // Compare to previous session with same strain+intent
   const comparison = useMemo(() => {
@@ -437,6 +462,29 @@ export function SessionCompletionMoment({ sessionId, strainName, intent, method,
               <p className="text-xs text-muted-foreground mt-1">{patternSignal.detail}</p>
             )}
           </div>
+        </motion.div>
+      )}
+
+      {/* Context-Aware Tips */}
+      {contextTips.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.52 }}
+          className="bg-warning/5 border border-warning/20 rounded-xl p-3.5 mb-4 text-left space-y-2"
+        >
+          <div className="flex items-center gap-2 mb-1">
+            <Lightbulb className="w-4 h-4 text-warning shrink-0" />
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Context tip
+            </p>
+          </div>
+          {contextTips.map((tip, i) => (
+            <p key={i} className="text-xs text-muted-foreground leading-relaxed">
+              <span className="mr-1">{tip.emoji}</span>
+              {tip.message}
+            </p>
+          ))}
         </motion.div>
       )}
 
