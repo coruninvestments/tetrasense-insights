@@ -19,6 +19,7 @@ import { DurationSection, type DurationBucket } from "@/components/log/DurationS
 import { BodyMindSlider } from "@/components/log/BodyMindSlider";
 import { OverallExperienceSection } from "@/components/log/OverallExperienceSection";
 import { SessionCompletionMoment } from "@/components/log/SessionCompletionMoment";
+import { ContextSection, emptyContext, type SessionContext } from "@/components/log/ContextSection";
 import { SessionHistoryCard } from "@/components/log/SessionHistoryCard";
 import { useCreateSessionLog, SessionIntent, SessionMethod, DoseLevel, EffectSliders } from "@/hooks/useSessionLogs";
 import { useCustomEffects } from "@/hooks/useCustomEffects";
@@ -94,6 +95,7 @@ export default function LogSession() {
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const [context, setContext] = useState<SessionContext>(emptyContext);
   const { data: memory } = useSessionMemory(
     selectedIntent || undefined,
     strainText || undefined
@@ -157,6 +159,14 @@ export default function LogSession() {
           product_id: selectedProductId,
           batch_id: selectedBatchId,
           coa_attached: coaAttached,
+          time_of_day: context.time_of_day,
+          setting: context.setting,
+          stomach: context.stomach,
+          caffeine: context.caffeine,
+          hydration: context.hydration,
+          sleep_quality: context.sleep_quality,
+          mood_before: context.mood_before,
+          stress_before: context.stress_before,
         });
         // Auto-set active batch if a product was selected
         if (canonicalStrainId && selectedProductId) {
@@ -457,6 +467,7 @@ export default function LogSession() {
                   )}
 
                   <OverallExperienceSection value={outcomePreference} onChange={setOutcomePreference} />
+                  <ContextSection value={context} onChange={setContext} />
                   <div>
                     <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Notes (Optional)</h3>
                     <textarea
