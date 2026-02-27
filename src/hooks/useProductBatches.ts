@@ -49,6 +49,7 @@ export function usePublicBatches(productId: string | null) {
         .select("*")
         .eq("product_id", productId)
         .eq("is_public_library", true)
+        .eq("coa_status", "verified")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data as unknown as ProductBatch[];
@@ -77,6 +78,7 @@ export function usePublicBatchesByStrain(strainId: string | null) {
         .select("*")
         .in("product_id", productIds)
         .eq("is_public_library", true)
+        .eq("coa_status", "verified")
         .order("created_at", { ascending: false });
       if (bErr) throw bErr;
 
