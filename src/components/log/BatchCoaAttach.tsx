@@ -1,10 +1,11 @@
 import { useState, useRef } from "react";
-import { Upload, Link as LinkIcon, Loader2, X, FileCheck } from "lucide-react";
+import { Upload, Link as LinkIcon, Loader2, X, FileCheck, ScanLine } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAttachCoa } from "@/hooks/useProductBatches";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { QrScanner } from "./QrScanner";
 
 const ACCEPTED_FILE_TYPES = ".pdf,.jpg,.jpeg,.png";
 
@@ -22,6 +23,7 @@ export function BatchCoaAttach({ batchId, onDone }: BatchCoaAttachProps) {
   const [coaFile, setCoaFile] = useState<File | null>(null);
   const [coaFilePath, setCoaFilePath] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<"idle" | "uploading" | "done" | "error">("idle");
+  const [showScanner, setShowScanner] = useState(false);
 
   const hasSource = !!(coaUrl.trim() || coaFilePath);
 
@@ -62,12 +64,34 @@ export function BatchCoaAttach({ batchId, onDone }: BatchCoaAttachProps) {
     onDone();
   };
 
+  const handleQrScan = (url: string) => {
+    setCoaUrl(url);
+    setShowScanner(false);
+  };
+
   return (
     <div className="space-y-3 pt-2 border-t border-border mt-2">
-      {/* URL */}
+      {/* QR Scanner */}
+      {showScanner && (
+        <QrScanner onScan={handleQrScan} onClose={() => setShowScanner(false)} />
+      )}
+
+      {/* URL + Scan button */}
       <div className="flex items-center gap-2">
         <LinkIcon className="w-4 h-4 text-muted-foreground shrink-0" />
         <Input value={coaUrl} onChange={(e) => setCoaUrl(e.target.value)} placeholder="Paste COA URL…" className="h-8 text-xs" />
+        {!showScanner && (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-8 w-8 shrink-0"
+            title="Scan QR code"
+            onClick={() => setShowScanner(true)}
+          >
+            <ScanLine className="w-3.5 h-3.5" />
+          </Button>
+        )}
       </div>
 
       {/* File */}
