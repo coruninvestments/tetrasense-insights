@@ -1,10 +1,12 @@
 import { useState, useRef } from "react";
-import { FlaskConical, ChevronDown, ChevronUp, Plus, Check, Loader2, Link as LinkIcon, Shield, Lock, Users, Sparkles, Upload, X, FileCheck } from "lucide-react";
+import { FlaskConical, ChevronDown, ChevronUp, Plus, Check, Loader2, Link as LinkIcon, Shield, Lock, Users, Sparkles, Upload, X, FileCheck, Paperclip } from "lucide-react";
 import { normalizeLabPanel, SIMULATED_EXTRACTION } from "@/lib/coaPipeline";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { LabPanelSection } from "./LabPanelSection";
+import { CoaStatusBadge } from "./CoaStatusBadge";
+import { BatchCoaAttach } from "./BatchCoaAttach";
 import { usePublicBatchesByStrain, useCreateDraftBatch, type LabPanelCustomEntry, type ProductBatch } from "@/hooks/useProductBatches";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,6 +28,7 @@ export function BatchChooser({ canonicalStrainId, selectedBatchId, selectedProdu
   const createDraft = useCreateDraftBatch();
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [attachingBatchId, setAttachingBatchId] = useState<string | null>(null);
 
   // Draft form state
   const [productName, setProductName] = useState("");
@@ -164,32 +167,48 @@ export function BatchChooser({ canonicalStrainId, selectedBatchId, selectedProdu
           <div className="space-y-2">
             <span className="text-xs text-muted-foreground uppercase tracking-wider">Library batches</span>
             {publicBatches.map((batch: any) => (
-              <button
-                key={batch.id}
-                type="button"
-                onClick={() => handleSelectPublicBatch(batch)}
-                className={`w-full text-left p-3 rounded-xl transition-all ${
-                  selectedBatchId === batch.id ? "bg-primary/10 ring-2 ring-primary" : "bg-secondary hover:bg-secondary/80"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-sm font-medium text-foreground">
-                      {batch._product?.product_name || "Product"}{batch._product?.brand_name ? ` · ${batch._product.brand_name}` : ""}
+              <div key={batch.id} className="space-y-0">
+                <button
+                  type="button"
+                  onClick={() => handleSelectPublicBatch(batch)}
+                  className={`w-full text-left p-3 rounded-xl transition-all ${
+                    selectedBatchId === batch.id ? "bg-primary/10 ring-2 ring-primary" : "bg-secondary hover:bg-secondary/80"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-sm font-medium text-foreground truncate">
+                        {batch._product?.product_name || "Product"}{batch._product?.brand_name ? ` · ${batch._product.brand_name}` : ""}
+                      </span>
+                      {batch.batch_code && (
+                        <span className="text-xs text-muted-foreground">#{batch.batch_code}</span>
+                      )}
+                      <CoaStatusBadge status={batch.coa_status || "unverified"} />
+                    </div>
+                    {selectedBatchId === batch.id && <Check className="w-4 h-4 text-primary shrink-0" />}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Users className="w-3 h-3 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">
+                      Library batch
                     </span>
-                    {batch.batch_code && (
-                      <span className="text-xs text-muted-foreground ml-2">#{batch.batch_code}</span>
+                    {!batch.coa_url && !batch.coa_file_path && batch.created_by_user_id === user?.id && (
+                      <button
+                        type="button"
+                        className="text-xs text-primary hover:underline ml-auto flex items-center gap-1"
+                        onClick={(e) => { e.stopPropagation(); setAttachingBatchId(batch.id); }}
+                      >
+                        <Paperclip className="w-3 h-3" /> Attach COA
+                      </button>
                     )}
                   </div>
-                  {selectedBatchId === batch.id && <Check className="w-4 h-4 text-primary" />}
-                </div>
-                <div className="flex items-center gap-2 mt-1">
-                  <Users className="w-3 h-3 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">
-                    Library batch (eligible for aggregate stats only if you opt in)
-                  </span>
-                </div>
-              </button>
+                </button>
+                {attachingBatchId === batch.id && (
+                  <div className="px-3 pb-2">
+                    <BatchCoaAttach batchId={batch.id} onDone={() => setAttachingBatchId(null)} />
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         )}
