@@ -91,6 +91,38 @@ export function usePublicBatchesByStrain(strainId: string | null) {
   });
 }
 
+/** Attach or update COA on an existing batch */
+export function useAttachCoa() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async (input: {
+      batchId: string;
+      coa_url?: string | null;
+      coa_file_path?: string | null;
+    }) => {
+      if (!user) throw new Error("Not authenticated");
+      const { data, error } = await supabase
+        .from("product_batches")
+        .update({
+          coa_url: input.coa_url ?? null,
+          coa_file_path: input.coa_file_path ?? null,
+          coa_status: "pending",
+        } as any)
+        .eq("id", input.batchId)
+        .select()
+        .single();
+      if (error) throw error;
+      return data as unknown as ProductBatch;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["public-batches"] });
+      queryClient.invalidateQueries({ queryKey: ["public-batches-strain"] });
+    },
+  });
+}
+
 /** Create a private draft batch (also creates the product if needed) */
 export function useCreateDraftBatch() {
   const queryClient = useQueryClient();
@@ -123,7 +155,7 @@ export function useCreateDraftBatch() {
           lab_name: input.lab_name?.trim() || null,
           coa_url: input.coa_url?.trim() || null,
           coa_file_path: input.coa_file_path || null,
-          coa_status: "unverified",
+          coa_status: (input.coa_url || input.coa_file_path) ? "pending" : "unverified",
           lab_panel_common: input.lab_panel_common || null,
           lab_panel_custom: input.lab_panel_custom?.length
             ? (input.lab_panel_custom as unknown as Record<string, unknown>[])
