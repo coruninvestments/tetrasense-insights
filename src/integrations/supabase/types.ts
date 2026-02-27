@@ -178,6 +178,7 @@ export type Database = {
         Row: {
           batch_code: string | null
           coa_file_path: string | null
+          coa_reject_reason: string | null
           coa_status: string
           coa_url: string | null
           created_at: string
@@ -193,6 +194,7 @@ export type Database = {
         Insert: {
           batch_code?: string | null
           coa_file_path?: string | null
+          coa_reject_reason?: string | null
           coa_status?: string
           coa_url?: string | null
           created_at?: string
@@ -208,6 +210,7 @@ export type Database = {
         Update: {
           batch_code?: string | null
           coa_file_path?: string | null
+          coa_reject_reason?: string | null
           coa_status?: string
           coa_url?: string | null
           created_at?: string
@@ -683,6 +686,24 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       strain_community_stats: {
@@ -709,9 +730,53 @@ export type Database = {
       }
     }
     Functions: {
+      admin_approve_batch: { Args: { _batch_id: string }; Returns: undefined }
+      admin_pending_batches: {
+        Args: never
+        Returns: {
+          batch_code: string
+          brand_name: string
+          coa_file_path: string
+          coa_reject_reason: string
+          coa_status: string
+          coa_url: string
+          created_at: string
+          created_by_user_id: string
+          id: string
+          is_public_library: boolean
+          lab_name: string
+          lab_panel_common: Json
+          lab_panel_custom: Json
+          product_id: string
+          product_name: string
+          strain_name: string
+          tested_at: string
+        }[]
+      }
+      admin_reject_batch: {
+        Args: { _batch_id: string; _reason: string }
+        Returns: undefined
+      }
+      admin_update_lab_panel: {
+        Args: {
+          _batch_id: string
+          _lab_panel_common: Json
+          _lab_panel_custom: Json
+        }
+        Returns: undefined
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: { Args: never; Returns: boolean }
       refresh_community_strain_stats: { Args: never; Returns: number }
     }
     Enums: {
+      app_role: "admin" | "moderator" | "user"
       dose_level: "low" | "medium" | "high"
       session_intent:
         | "sleep"
@@ -856,6 +921,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "moderator", "user"],
       dose_level: ["low", "medium", "high"],
       session_intent: [
         "sleep",

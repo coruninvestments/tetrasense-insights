@@ -26,6 +26,7 @@ export function usePublicBatchBrowse() {
         .from("product_batches")
         .select("id, product_id, batch_code, tested_at, lab_name, coa_status, lab_panel_common, is_public_library, created_at")
         .eq("is_public_library", true)
+        .eq("coa_status", "verified")
         .order("created_at", { ascending: false })
         .limit(50);
       if (bErr) throw bErr;
