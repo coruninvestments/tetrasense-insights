@@ -9,7 +9,9 @@ type AnalyticsEvent =
   | "toggled_community_sharing"
   | "viewed_session_replay"
   | "tapped_similar_session"
-  | "opened_compare";
+  | "opened_compare"
+  | "viewed_confidence_meter"
+  | "tapped_confidence_cta";
 
 export async function logEvent(eventName: AnalyticsEvent) {
   try {
