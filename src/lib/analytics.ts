@@ -6,7 +6,10 @@ type AnalyticsEvent =
   | "sessions_logged_count_milestone"
   | "viewed_insights"
   | "used_todays_goal"
-  | "toggled_community_sharing";
+  | "toggled_community_sharing"
+  | "viewed_session_replay"
+  | "tapped_similar_session"
+  | "opened_compare";
 
 export async function logEvent(eventName: AnalyticsEvent) {
   try {
