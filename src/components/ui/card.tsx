@@ -10,9 +10,9 @@ const cardVariants = cva(
       variant: {
         default: "shadow-card",
         elevated: "shadow-elevated border-0",
-        glass: "bg-card/80 backdrop-blur-sm border-border/50",
+        glass: "bg-card/80 backdrop-blur-sm border-border/50 hover:bg-card/90",
         insight: "gradient-card border-primary/20 shadow-card",
-        interactive: "shadow-card hover:shadow-elevated hover:-translate-y-0.5 cursor-pointer",
+        interactive: "shadow-card hover:shadow-elevated hover:-translate-y-0.5 cursor-pointer active:scale-[0.98]",
       },
     },
     defaultVariants: {
