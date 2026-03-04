@@ -19,6 +19,7 @@ import CommunityExplore from "./pages/CommunityExplore";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import AdminCoa from "./pages/AdminCoa";
+import BestForYou from "./pages/BestForYou";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -107,6 +108,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <CommunityExplore />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/best"
+              element={
+                <ProtectedRoute>
+                  <BestForYou />
                 </ProtectedRoute>
               }
             />
