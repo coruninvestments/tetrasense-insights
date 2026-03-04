@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { normalizeOutcome } from "@/lib/sessionOutcome";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SignalPulse } from "@/components/motion/SignalPulse";
 
 function computeClarityScore(sessions: any[]): number {
   if (!sessions || sessions.length === 0) return 0;
@@ -62,6 +63,20 @@ export function ClarityScoreCard() {
   const label = getScoreLabel(score);
   const hasData = (sessions?.length ?? 0) > 0;
 
+  // Detect score change for active pulse
+  const prevScoreRef = useRef(score);
+  const [scoreChanged, setScoreChanged] = useState(false);
+
+  useEffect(() => {
+    if (prevScoreRef.current !== score && prevScoreRef.current !== 0) {
+      setScoreChanged(true);
+      const timer = setTimeout(() => setScoreChanged(false), 1200);
+      prevScoreRef.current = score;
+      return () => clearTimeout(timer);
+    }
+    prevScoreRef.current = score;
+  }, [score]);
+
   // SVG circle params
   const size = 100;
   const strokeWidth = 7;
@@ -86,44 +101,48 @@ export function ClarityScoreCard() {
       <Card>
         <CardContent className="p-5">
           <div className="flex items-center gap-5">
-            {/* Circular progress */}
-            <div className="relative flex-shrink-0 halo-focus">
-              <svg width={size} height={size} className="-rotate-90">
-                {/* Background track */}
-                <circle
-                  cx={size / 2}
-                  cy={size / 2}
-                  r={radius}
-                  fill="none"
-                  stroke="hsl(var(--secondary))"
-                  strokeWidth={strokeWidth}
-                />
-                {/* Progress arc */}
-                <motion.circle
-                  cx={size / 2}
-                  cy={size / 2}
-                  r={radius}
-                  fill="none"
-                  stroke="hsl(var(--primary))"
-                  strokeWidth={strokeWidth}
-                  strokeLinecap="round"
-                  strokeDasharray={circumference}
-                  initial={{ strokeDashoffset: circumference }}
-                  animate={{ strokeDashoffset: offset }}
-                  transition={{ duration: 1.2, ease: "easeOut", delay: 0.4 }}
-                />
-              </svg>
-              {/* Center text */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <motion.span
-                  className="text-2xl font-serif font-medium text-foreground leading-none"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                >
-                  {hasData ? `${score}%` : "—"}
-                </motion.span>
-              </div>
+            {/* Circular progress with Signal Pulse */}
+            <div className="flex-shrink-0">
+              <SignalPulse active={scoreChanged} intensity="low">
+                <div className="relative halo-focus">
+                  <svg width={size} height={size} className="-rotate-90">
+                    {/* Background track */}
+                    <circle
+                      cx={size / 2}
+                      cy={size / 2}
+                      r={radius}
+                      fill="none"
+                      stroke="hsl(var(--secondary))"
+                      strokeWidth={strokeWidth}
+                    />
+                    {/* Progress arc */}
+                    <motion.circle
+                      cx={size / 2}
+                      cy={size / 2}
+                      r={radius}
+                      fill="none"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth={strokeWidth}
+                      strokeLinecap="round"
+                      strokeDasharray={circumference}
+                      initial={{ strokeDashoffset: circumference }}
+                      animate={{ strokeDashoffset: offset }}
+                      transition={{ duration: 1.2, ease: "easeOut", delay: 0.4 }}
+                    />
+                  </svg>
+                  {/* Center text */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <motion.span
+                      className="text-2xl font-serif font-medium text-foreground leading-none"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      {hasData ? `${score}%` : "—"}
+                    </motion.span>
+                  </div>
+                </div>
+              </SignalPulse>
             </div>
 
             {/* Text */}
