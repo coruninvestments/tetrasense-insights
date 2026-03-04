@@ -1,6 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { logEvent } from "@/lib/analytics";
+
+/** Fields that can NEVER be updated from the client */
+const PROTECTED_FIELDS = ["is_premium"] as const;
+type ProtectedField = typeof PROTECTED_FIELDS[number];
 
 export interface CalibrationAnchors {
   [key: string]: { zero: string; ten: string };
@@ -60,9 +65,23 @@ export function useUpdateProfile() {
     mutationFn: async (updates: Partial<Omit<Profile, "id" | "user_id" | "created_at" | "updated_at">>) => {
       if (!user) throw new Error("Not authenticated");
 
+      // Runtime guard: strip and log any attempt to update protected fields
+      const sanitized = { ...updates };
+      let blocked = false;
+      for (const field of PROTECTED_FIELDS) {
+        if (field in sanitized) {
+          delete (sanitized as Record<string, unknown>)[field];
+          blocked = true;
+        }
+      }
+      if (blocked) {
+        console.error("[SECURITY] Blocked client-side attempt to update protected profile fields");
+        logEvent("blocked_client_write_products");
+      }
+
       const { data, error } = await supabase
         .from("profiles")
-        .update(updates as any)
+        .update(sanitized as any)
         .eq("user_id", user.id)
         .select()
         .single();
