@@ -309,7 +309,7 @@ export default function ProductLibrary() {
               animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col items-center text-center py-12 gap-4"
             >
-              <div className="w-full max-h-[160px] flex items-center justify-center opacity-50">
+              <div className="w-full h-[160px] flex items-center justify-center opacity-50">
                 <BrandImage
                   src={ASSETS.emptyLibraryDark}
                   alt="No results"

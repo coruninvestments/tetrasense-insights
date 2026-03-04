@@ -20,17 +20,19 @@ export const ASSETS = {
   favicon32: "/brand/favicon-32.png",
   maskableIcon: "/brand/maskable-icon-512.png",
 
-  /* ── Illustrations (theme-aware pairs) ─────────── */
-  heroPremiumDark: "/illustrations/premium-hero.dark.png",
-  heroPremiumLight: "/illustrations/premium-hero.light.png",
-  emptyInsightsDark: "/illustrations/empty-insights.dark.png",
-  emptyInsightsLight: "/illustrations/empty-insights.light.png",
-  emptyLibraryDark: "/illustrations/empty-library.dark.png",
-  emptyLibraryLight: "/illustrations/empty-library.light.png",
+  /* ── Illustrations (theme-aware SVG pairs) ─────── */
+  heroPremiumDark: "/illustrations/premium-hero.dark.svg",
+  heroPremiumLight: "/illustrations/premium-hero.light.svg",
+  emptyInsightsDark: "/illustrations/empty-insights.dark.svg",
+  emptyInsightsLight: "/illustrations/empty-insights.light.svg",
+  emptyLibraryDark: "/illustrations/empty-library.dark.svg",
+  emptyLibraryLight: "/illustrations/empty-library.light.svg",
 
   /* ── Badges ────────────────────────────────────── */
   badgeVerified: "/badges/verified.svg",
+  badgeVerifiedCoa: "/badges/verified-coa.svg",
   badgePremium: "/badges/premium.svg",
+  badgePremiumLock: "/badges/premium-lock.svg",
   badgeLocked: "/badges/locked.svg",
 } as const;
 

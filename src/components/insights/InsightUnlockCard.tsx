@@ -37,7 +37,7 @@ export function InsightUnlockCard({
         <CardContent className="p-6 flex flex-col items-center text-center gap-3">
           {/* Theme-aware illustration */}
           {showIllustration && (
-            <div className="w-full max-h-[140px] flex items-center justify-center opacity-60 mb-1">
+            <div className="w-full h-[140px] flex items-center justify-center opacity-60 mb-1">
               <BrandImage
                 src={ASSETS.emptyInsightsDark}
                 alt="Unlock insights"
