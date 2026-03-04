@@ -17,7 +17,7 @@ export function BottomNav() {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 overflow-hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 overflow-hidden">
       {/* Contained glow backdrop — sits behind everything */}
       <div className="absolute left-1/2 -translate-x-1/2 bottom-2 w-24 h-24 rounded-full bg-primary/10 blur-2xl pointer-events-none" />
 
