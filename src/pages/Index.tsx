@@ -6,6 +6,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { SignalLeafLogo } from "@/components/brand/SignalLeafLogo";
 import { TodaysGoalCard } from "@/components/home/TodaysGoalCard";
 import { PatternSnapshotCard } from "@/components/home/PatternSnapshotCard";
+import { ClarityScoreCard } from "@/components/home/ClarityScoreCard";
 import { QuickStatsCard } from "@/components/home/QuickStatsCard";
 import { RecentSession } from "@/components/home/RecentSession";
 import { useRecentSessions } from "@/hooks/useSessionLogs";
@@ -53,7 +54,10 @@ const Index = () => {
           {/* Card 2 — Pattern Snapshot */}
           <PatternSnapshotCard />
 
-          {/* Card 3 — Recent Sessions */}
+          {/* Card 3 — Clarity Score */}
+          <ClarityScoreCard />
+
+          {/* Card 4 — Recent Sessions */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
