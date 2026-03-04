@@ -33,7 +33,7 @@ export function AchievementUnlockedModal({ achievementKey, onClose }: Props) {
               transition={{ type: "spring", damping: 15, stiffness: 200 }}
               className="flex flex-col items-center gap-3"
             >
-              <span className="text-5xl">{def.emoji}</span>
+              <span className="text-5xl stardust inline-block">{def.emoji}</span>
               <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
                 Achievement Unlocked
               </p>

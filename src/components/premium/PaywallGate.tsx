@@ -153,8 +153,8 @@ export function PaywallModal({ open, onClose }: { open: boolean; onClose: () => 
 
                 {/* Title block */}
                 <div className="relative text-center px-6 pb-6">
-                  <div className="w-12 h-12 rounded-2xl bg-primary-foreground/20 flex items-center justify-center mx-auto mb-3">
-                    <Sparkles className="w-6 h-6 text-primary-foreground" />
+                  <div className="w-12 h-12 rounded-2xl bg-primary-foreground/20 flex items-center justify-center mx-auto mb-3 halo-focus stardust">
+                    <Sparkles className="w-6 h-6 text-primary-foreground relative z-[2]" />
                   </div>
                   <h2 className="font-serif text-xl font-medium text-primary-foreground">
                     Signal Leaf Premium

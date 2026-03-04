@@ -39,7 +39,7 @@ export function SignalLeafLogo({
     theme === "light" ? "text-primary-foreground" : "text-foreground";
 
   const LogoIcon = (
-    <div className={cn(config.icon, iconBg, "flex items-center justify-center flex-shrink-0 overflow-hidden")}>
+    <div className={cn(config.icon, iconBg, "flex items-center justify-center flex-shrink-0 overflow-hidden stardust")}>
       <img
         src={ASSETS.logoIcon}
         alt="Signal Leaf"
