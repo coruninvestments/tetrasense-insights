@@ -13,6 +13,12 @@ export const ASSETS = {
   logoIcon: "/brand/signal-leaf-icon.svg",
   mark: "/brand/signal-leaf-mark.svg",
   appIcon: "/brand/app-icon-1024.png",
+  appIcon192: "/brand/app-icon-192.png",
+  appIcon512: "/brand/app-icon-512.png",
+  appleTouchIcon: "/brand/apple-touch-icon.png",
+  favicon16: "/brand/favicon-16.png",
+  favicon32: "/brand/favicon-32.png",
+  maskableIcon: "/brand/maskable-icon-512.png",
 
   /* ── Illustrations (theme-aware pairs) ─────────── */
   heroPremiumDark: "/illustrations/premium-hero.dark.png",

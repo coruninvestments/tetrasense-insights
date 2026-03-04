@@ -1,0 +1,38 @@
+{
+  "name": "Signal Leaf",
+  "short_name": "Signal Leaf",
+  "description": "Track, understand, and optimize your cannabis experience with data-driven insights.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a100d",
+  "theme_color": "#6faf9f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/brand/favicon-16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/brand/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/brand/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/brand/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/brand/maskable-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
