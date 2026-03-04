@@ -28,6 +28,7 @@ import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { DISCLAIMER_LINES } from "@/utils/onboarding";
 import { FeedbackSection } from "@/components/profile/FeedbackSection";
 import { AchievementBadges } from "@/components/achievements/AchievementBadges";
+import { PaywallModal } from "@/components/premium/PaywallGate";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
 import type { AchievementKey } from "@/lib/achievements";
 import { format } from "date-fns";
@@ -50,6 +51,7 @@ export default function Profile() {
   const [activeSection, setActiveSection] = useState<Section>("main");
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [unlockedAchievement, setUnlockedAchievement] = useState<AchievementKey | null>(null);
+  const [showPaywall, setShowPaywall] = useState(false);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -353,18 +355,25 @@ export default function Profile() {
             {/* Premium CTA */}
             {!isPremium && (
               <motion.div variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.05 }}>
-                <Card className="gradient-primary border-0 p-5">
+                <button
+                  type="button"
+                  onClick={() => setShowPaywall(true)}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setShowPaywall(true); } }}
+                  className="w-full text-left gradient-primary border-0 p-5 rounded-xl shadow-card transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 cursor-pointer"
+                  aria-label="Upgrade to Premium"
+                >
                   <div className="flex items-center gap-4">
-                    <div className="w-11 h-11 rounded-xl bg-primary-foreground/20 flex items-center justify-center">
+                    <div className="w-11 h-11 rounded-xl bg-primary-foreground/20 flex items-center justify-center pointer-events-none">
                       <Crown className="w-5 h-5 text-primary-foreground" />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 pointer-events-none">
                       <h3 className="font-medium text-primary-foreground mb-0.5">Upgrade to Premium</h3>
                       <p className="text-sm text-primary-foreground/80">Unlock insights & pattern analysis</p>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-primary-foreground/60" />
+                    <ChevronRight className="w-5 h-5 text-primary-foreground/60 pointer-events-none" />
                   </div>
-                </Card>
+                </button>
+                <PaywallModal open={showPaywall} onClose={() => setShowPaywall(false)} />
               </motion.div>
             )}
 

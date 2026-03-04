@@ -83,7 +83,7 @@ function LockedCard({ feature, onTap }: { feature?: string; onTap: () => void })
   );
 }
 
-function PaywallModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function PaywallModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
     <AnimatePresence>
       {open && (
