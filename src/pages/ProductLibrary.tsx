@@ -1,7 +1,8 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Search, ShieldCheck, Beaker, BarChart3, Leaf } from "lucide-react";
+import { Search, ShieldCheck, ShieldAlert, Clock, Beaker, BarChart3, Leaf } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -73,16 +74,17 @@ export default function ProductLibrary() {
     return result;
   }, [sessions]);
 
-  // Build set of strain names with verified COAs
-  const verifiedStrainNames = useMemo(() => {
-    if (!verifiedBatches) return new Set<string>();
-    const names = new Set<string>();
-    // verifiedBatches may have product info
+  // Build map of strain names to COA status (verified > pending > none)
+  const strainCoaStatus = useMemo(() => {
+    if (!verifiedBatches) return new Map<string, "verified" | "pending">();
+    const map = new Map<string, "verified" | "pending">();
     for (const b of verifiedBatches as any[]) {
-      const name = b.strain_name || b.product_name;
-      if (name) names.add(name.toLowerCase());
+      const name = (b.strain_name || b.product_name || "").toLowerCase();
+      if (!name) continue;
+      // verified batches from usePublicBatchBrowse are always verified
+      map.set(name, "verified");
     }
-    return names;
+    return map;
   }, [verifiedBatches]);
 
   // Terpene highlights from verified batch lab panels
@@ -212,10 +214,10 @@ export default function ProductLibrary() {
             </div>
           ) : filtered.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {filtered.map((strain, idx) => {
+               {filtered.map((strain, idx) => {
                 const stats = strainStats.get(strain.name.toLowerCase());
                 const terps = strainTerpenes.get(strain.name.toLowerCase());
-                const isVerified = verifiedStrainNames.has(strain.name.toLowerCase());
+                const coaStatus = strainCoaStatus.get(strain.name.toLowerCase()) ?? null;
 
                 return (
                   <motion.div
@@ -231,7 +233,7 @@ export default function ProductLibrary() {
                         description={strain.description ?? undefined}
                         thcMin={strain.thc_min ?? undefined}
                         thcMax={strain.thc_max ?? undefined}
-                        isVerified={isVerified}
+                        coaStatus={coaStatus}
                         terpenes={terps}
                         sessionCount={stats?.count}
                         positiveRate={stats?.positiveRate}
@@ -288,7 +290,7 @@ function ProductCard({
   description,
   thcMin,
   thcMax,
-  isVerified,
+  coaStatus,
   terpenes,
   sessionCount,
   positiveRate,
@@ -298,7 +300,7 @@ function ProductCard({
   description?: string;
   thcMin?: number;
   thcMax?: number;
-  isVerified: boolean;
+  coaStatus: "verified" | "pending" | null;
   terpenes?: string[];
   sessionCount?: number;
   positiveRate?: number;
@@ -324,12 +326,7 @@ function ProductCard({
               <Badge className={`text-[10px] font-medium border-0 ${typeStyle}`}>
                 {type}
               </Badge>
-              {isVerified && (
-                <Badge className="text-[10px] font-medium border-0 bg-success/15 text-success gap-1">
-                  <ShieldCheck className="w-3 h-3" />
-                  Verified
-                </Badge>
-              )}
+              {coaStatus && <CoaBadgeWithTooltip status={coaStatus} />}
             </div>
           </div>
           {thcLabel && (
@@ -375,5 +372,39 @@ function ProductCard({
         )}
       </CardContent>
     </Card>
+  );
+}
+
+function CoaBadgeWithTooltip({ status }: { status: "verified" | "pending" }) {
+  const isVerified = status === "verified";
+
+  return (
+    <TooltipProvider delayDuration={200}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span>
+            <Badge
+              className={`text-[10px] font-medium border-0 gap-1 cursor-help ${
+                isVerified
+                  ? "bg-success/15 text-success"
+                  : "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+              }`}
+            >
+              {isVerified ? (
+                <ShieldCheck className="w-3 h-3" />
+              ) : (
+                <Clock className="w-3 h-3" />
+              )}
+              {isVerified ? "Verified" : "Pending"}
+            </Badge>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top" className="max-w-[200px] text-xs">
+          {isVerified
+            ? "Verified laboratory analysis available for this batch."
+            : "Pending verification — lab results are awaiting review."}
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
