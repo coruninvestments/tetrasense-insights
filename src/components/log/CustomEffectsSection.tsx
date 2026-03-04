@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EffectSlider } from "./EffectSlider";
@@ -52,7 +52,7 @@ export function CustomEffectsSection({ definitions, values, onValuesChange, onAd
             <EffectSlider
               key={def.name}
               label={def.name}
-              emoji="⚡"
+              icon={Zap}
               value={getValue(def.name)}
               onChange={(v) => updateValue(def.name, v)}
             />

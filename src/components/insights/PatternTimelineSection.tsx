@@ -228,7 +228,7 @@ export function PatternTimelineSection() {
                     type="number"
                     domain={[0.5, 3.5]}
                     ticks={[1, 2, 3]}
-                    tickFormatter={(v) => v === 3 ? "👍" : v === 2 ? "😐" : "👎"}
+                    tickFormatter={(v) => v === 3 ? "+" : v === 2 ? "~" : "-"}
                     tick={{ fontSize: 12 }}
                     axisLine={false}
                     tickLine={false}

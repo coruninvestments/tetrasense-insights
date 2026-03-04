@@ -1,25 +1,18 @@
 import { useMemo } from "react";
 import { useSessionLogs, SessionLog } from "./useSessionLogs";
 import { normalizeOutcome } from "@/lib/sessionOutcome";
+import { EFFECT_DRIVER_KEYS } from "@/lib/effects";
+import type { LucideIcon } from "lucide-react";
 
-const EFFECT_KEYS = [
-  { key: "effect_sleepiness", label: "Sleepiness", emoji: "😴" },
-  { key: "effect_relaxation", label: "Relaxation", emoji: "🧘" },
-  { key: "effect_focus", label: "Focus", emoji: "🎯" },
-  { key: "effect_pain_relief", label: "Pain Relief", emoji: "💊" },
-  { key: "effect_euphoria", label: "Euphoria", emoji: "✨" },
-  { key: "effect_anxiety", label: "Anxiety", emoji: "😰" },
-] as const;
-
-type EffectKey = (typeof EFFECT_KEYS)[number]["key"];
+type EffectKey = (typeof EFFECT_DRIVER_KEYS)[number]["key"];
 
 export interface EffectDriver {
-  key: EffectKey;
+  key: string;
   label: string;
-  emoji: string;
+  icon: LucideIcon;
   avgPositive: number;
   avgNegative: number;
-  difference: number; // positive means higher in positive sessions
+  difference: number;
 }
 
 export type SignalMode = "strong" | "early" | "none";
@@ -33,8 +26,8 @@ export interface EffectDriversData {
   negativeSampleSize: number;
 }
 
-function avg(sessions: SessionLog[], key: EffectKey): number {
-  const vals = sessions.map((s) => (s[key] as number) ?? 0);
+function avg(sessions: SessionLog[], key: string): number {
+  const vals = sessions.map((s) => (s[key as keyof SessionLog] as number) ?? 0);
   if (vals.length === 0) return 0;
   return vals.reduce((a, b) => a + b, 0) / vals.length;
 }
@@ -45,7 +38,6 @@ function computeDrivers(sessions: SessionLog[]): EffectDriversData {
     (s) => normalizeOutcome(s.outcome) === "negative"
   );
 
-  // Not enough data at all
   if (positive.length < 1 || negative.length < 1) {
     return {
       positiveDrivers: [],
@@ -57,7 +49,6 @@ function computeDrivers(sessions: SessionLog[]): EffectDriversData {
     };
   }
 
-  // Determine signal mode: strong requires 2+ pos AND 2+ neg
   const isStrong = positive.length >= 2 && negative.length >= 2;
   const signalMode: SignalMode = isStrong ? "strong" : "early";
 
@@ -68,13 +59,13 @@ function computeDrivers(sessions: SessionLog[]): EffectDriversData {
   const anxietyAvgThreshold = isStrong ? 5 : 4;
   const anxietyGapThreshold = isStrong ? 2 : 1.5;
 
-  const drivers: EffectDriver[] = EFFECT_KEYS.map((ek) => {
+  const drivers: EffectDriver[] = EFFECT_DRIVER_KEYS.map((ek) => {
     const avgPos = avg(positive, ek.key);
     const avgNeg = avg(negative, ek.key);
     return {
       key: ek.key,
       label: ek.label,
-      emoji: ek.emoji,
+      icon: ek.icon,
       avgPositive: avgPos,
       avgNegative: avgNeg,
       difference: avgPos - avgNeg,

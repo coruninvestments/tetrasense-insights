@@ -1,6 +1,18 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import type { LucideIcon } from "lucide-react";
+import {
+  TIME_OPTIONS,
+  SETTING_OPTIONS,
+  STOMACH_OPTIONS,
+  HYDRATION_OPTIONS,
+  SLEEP_OPTIONS,
+  MOOD_OPTIONS,
+  STRESS_OPTIONS,
+  CAFFEINE_ICON,
+  type ContextOption,
+} from "@/lib/context";
 
 export interface SessionContext {
   time_of_day: string | null;
@@ -26,7 +38,7 @@ export const emptyContext: SessionContext = {
 
 interface ChipGroupProps {
   label: string;
-  options: { id: string; label: string; emoji?: string }[];
+  options: ContextOption[];
   value: string | null;
   onChange: (v: string | null) => void;
 }
@@ -36,71 +48,28 @@ function ChipGroup({ label, options, value, onChange }: ChipGroupProps) {
     <div className="space-y-1.5">
       <span className="text-xs font-medium text-muted-foreground">{label}</span>
       <div className="flex flex-wrap gap-2">
-        {options.map((o) => (
-          <button
-            key={o.id}
-            type="button"
-            onClick={() => onChange(value === o.id ? null : o.id)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-              value === o.id
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {o.emoji && <span className="mr-1">{o.emoji}</span>}
-            {o.label}
-          </button>
-        ))}
+        {options.map((o) => {
+          const Icon = o.icon;
+          return (
+            <button
+              key={o.id}
+              type="button"
+              onClick={() => onChange(value === o.id ? null : o.id)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                value === o.id
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Icon className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+              {o.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
 }
-
-const timeOptions = [
-  { id: "morning", label: "Morning", emoji: "🌅" },
-  { id: "afternoon", label: "Afternoon", emoji: "☀️" },
-  { id: "evening", label: "Evening", emoji: "🌆" },
-  { id: "night", label: "Night", emoji: "🌙" },
-];
-
-const settingOptions = [
-  { id: "home", label: "Home", emoji: "🏠" },
-  { id: "outdoors", label: "Outdoors", emoji: "🌳" },
-  { id: "social", label: "Social", emoji: "👥" },
-  { id: "alone", label: "Alone", emoji: "🧘" },
-  { id: "public", label: "Public", emoji: "🏙️" },
-];
-
-const stomachOptions = [
-  { id: "empty", label: "Empty" },
-  { id: "light", label: "Light" },
-  { id: "normal", label: "Normal" },
-  { id: "heavy", label: "Full" },
-];
-
-const hydrationOptions = [
-  { id: "low", label: "Low", emoji: "🏜️" },
-  { id: "ok", label: "OK", emoji: "💧" },
-  { id: "high", label: "Well", emoji: "🌊" },
-];
-
-const sleepOptions = [
-  { id: "poor", label: "Poor", emoji: "😴" },
-  { id: "ok", label: "OK", emoji: "😐" },
-  { id: "good", label: "Good", emoji: "😊" },
-];
-
-const moodOptions = [
-  { id: "low", label: "Low", emoji: "😔" },
-  { id: "neutral", label: "Neutral", emoji: "😐" },
-  { id: "good", label: "Good", emoji: "😊" },
-];
-
-const stressOptions = [
-  { id: "low", label: "Low", emoji: "😌" },
-  { id: "medium", label: "Medium", emoji: "😐" },
-  { id: "high", label: "High", emoji: "😤" },
-];
 
 interface ContextSectionProps {
   value: SessionContext;
@@ -109,6 +78,7 @@ interface ContextSectionProps {
 
 export function ContextSection({ value, onChange, defaultOpen = false }: ContextSectionProps & { defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
+  const CaffeineIcon = CAFFEINE_ICON;
 
   const update = <K extends keyof SessionContext>(key: K, v: SessionContext[K]) => {
     onChange({ ...value, [key]: v });
@@ -140,51 +110,19 @@ export function ContextSection({ value, onChange, defaultOpen = false }: Context
 
       {open && (
         <div className="mt-4 space-y-5">
-          <ChipGroup
-            label="Time of day"
-            options={timeOptions}
-            value={value.time_of_day}
-            onChange={(v) => update("time_of_day", v)}
-          />
-          <ChipGroup
-            label="Setting"
-            options={settingOptions}
-            value={value.setting}
-            onChange={(v) => update("setting", v)}
-          />
-          <ChipGroup
-            label="Stomach"
-            options={stomachOptions}
-            value={value.stomach}
-            onChange={(v) => update("stomach", v)}
-          />
-          <ChipGroup
-            label="Hydration"
-            options={hydrationOptions}
-            value={value.hydration}
-            onChange={(v) => update("hydration", v)}
-          />
-          <ChipGroup
-            label="Sleep quality (last night)"
-            options={sleepOptions}
-            value={value.sleep_quality}
-            onChange={(v) => update("sleep_quality", v)}
-          />
-          <ChipGroup
-            label="Mood before"
-            options={moodOptions}
-            value={value.mood_before}
-            onChange={(v) => update("mood_before", v)}
-          />
-          <ChipGroup
-            label="Stress level"
-            options={stressOptions}
-            value={value.stress_before}
-            onChange={(v) => update("stress_before", v)}
-          />
+          <ChipGroup label="Time of day" options={TIME_OPTIONS} value={value.time_of_day} onChange={(v) => update("time_of_day", v)} />
+          <ChipGroup label="Setting" options={SETTING_OPTIONS} value={value.setting} onChange={(v) => update("setting", v)} />
+          <ChipGroup label="Stomach" options={STOMACH_OPTIONS} value={value.stomach} onChange={(v) => update("stomach", v)} />
+          <ChipGroup label="Hydration" options={HYDRATION_OPTIONS} value={value.hydration} onChange={(v) => update("hydration", v)} />
+          <ChipGroup label="Sleep quality (last night)" options={SLEEP_OPTIONS} value={value.sleep_quality} onChange={(v) => update("sleep_quality", v)} />
+          <ChipGroup label="Mood before" options={MOOD_OPTIONS} value={value.mood_before} onChange={(v) => update("mood_before", v)} />
+          <ChipGroup label="Stress level" options={STRESS_OPTIONS} value={value.stress_before} onChange={(v) => update("stress_before", v)} />
 
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">☕ Had caffeine today?</span>
+            <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+              <CaffeineIcon className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+              Had caffeine today?
+            </span>
             <Switch
               checked={value.caffeine}
               onCheckedChange={(v) => update("caffeine", v)}

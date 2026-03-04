@@ -1,4 +1,5 @@
 import { Slider } from "@/components/ui/slider";
+import { Flower2, Brain } from "lucide-react";
 
 interface Props {
   value: number;
@@ -13,8 +14,8 @@ export function BodyMindSlider({ value, onChange }: Props) {
       </h3>
       <div className="space-y-3">
         <div className="flex justify-between text-xs text-muted-foreground font-medium">
-          <span>🧘 Body</span>
-          <span>🧠 Mind</span>
+          <span className="flex items-center gap-1"><Flower2 className="h-3.5 w-3.5" strokeWidth={2} /> Body</span>
+          <span className="flex items-center gap-1"><Brain className="h-3.5 w-3.5" strokeWidth={2} /> Mind</span>
         </div>
         <Slider
           value={[value]}

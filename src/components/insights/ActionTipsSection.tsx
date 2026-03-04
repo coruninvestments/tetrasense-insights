@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
-import { Lightbulb } from "lucide-react";
+import { Lightbulb, AlertTriangle, Target, Flower2, Moon, Sparkles } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffectDrivers } from "@/hooks/useEffectDrivers";
+import type { LucideIcon } from "lucide-react";
 
 interface TipGroup {
   label: string;
-  emoji: string;
+  icon: LucideIcon;
   tips: string[];
 }
 
@@ -20,7 +21,7 @@ function deriveTips(
   if (negKeys.has("effect_anxiety")) {
     groups.push({
       label: "Managing anxiety",
-      emoji: "😰",
+      icon: AlertTriangle,
       tips: [
         "Try a lower dose next time",
         "Avoid stimulant-leaning sessions for this intent",
@@ -33,7 +34,7 @@ function deriveTips(
   if (posKeys.has("effect_focus")) {
     groups.push({
       label: "Leveraging focus",
-      emoji: "🎯",
+      icon: Target,
       tips: [
         "Choose sessions that produce focus and calm",
         "Replicate your best method and timing",
@@ -44,7 +45,7 @@ function deriveTips(
   if (posKeys.has("effect_relaxation")) {
     groups.push({
       label: "Leveraging relaxation",
-      emoji: "🧘",
+      icon: Flower2,
       tips: [
         "Lean into sessions that produce deep relaxation",
         "Replicate your best method and timing",
@@ -55,7 +56,7 @@ function deriveTips(
   if (posKeys.has("effect_sleepiness")) {
     groups.push({
       label: "Optimizing for sleep",
-      emoji: "😴",
+      icon: Moon,
       tips: [
         "Schedule these sessions close to bedtime",
         "Pair with a calm setting for best results",
@@ -66,7 +67,7 @@ function deriveTips(
   if (negKeys.has("effect_sleepiness") && !posKeys.has("effect_sleepiness")) {
     groups.push({
       label: "Avoiding unwanted drowsiness",
-      emoji: "💤",
+      icon: Moon,
       tips: [
         "Try a different strain or lower dose for daytime use",
         "Switch to methods with faster onset for more control",
@@ -77,7 +78,7 @@ function deriveTips(
   if (posKeys.has("effect_euphoria")) {
     groups.push({
       label: "Maximizing enjoyment",
-      emoji: "✨",
+      icon: Sparkles,
       tips: [
         "Note what strains and methods produce this feeling",
         "Keep dose consistent — more isn't always better",
@@ -109,21 +110,25 @@ export function ActionTipsSection() {
             <span className="text-sm font-medium text-foreground">Action Tips</span>
           </div>
           <div className="space-y-4">
-            {tips.map((group) => (
-              <div key={group.label}>
-                <p className="text-xs font-medium text-muted-foreground mb-1.5">
-                  {group.emoji} {group.label}
-                </p>
-                <ul className="space-y-1">
-                  {group.tips.map((tip) => (
-                    <li key={tip} className="flex items-start gap-2 text-sm text-foreground">
-                      <span className="text-muted-foreground mt-0.5">•</span>
-                      <span>{tip}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            {tips.map((group) => {
+              const Icon = group.icon;
+              return (
+                <div key={group.label}>
+                  <p className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+                    <Icon className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+                    {group.label}
+                  </p>
+                  <ul className="space-y-1">
+                    {group.tips.map((tip) => (
+                      <li key={tip} className="flex items-start gap-2 text-sm text-foreground">
+                        <span className="text-muted-foreground mt-0.5">·</span>
+                        <span>{tip}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
           </div>
           <p className="text-[11px] text-muted-foreground mt-3">
             Based on your session patterns — not medical advice.

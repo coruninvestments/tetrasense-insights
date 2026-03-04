@@ -76,7 +76,7 @@ export function PatternCard({ pattern }: { pattern: PatternInsight }) {
             </p>
             {pattern.suggestion && (
               <p className="text-xs text-muted-foreground/80 mt-2 italic leading-relaxed">
-                💡 {pattern.suggestion}
+                {pattern.suggestion}
               </p>
             )}
           </div>

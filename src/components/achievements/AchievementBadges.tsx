@@ -15,7 +15,7 @@ export function AchievementBadges() {
   const handleShare = (key: string) => {
     const def = getAchievementDef(key);
     if (!def) return;
-    const text = `🏆 I earned "${def.title}" on Signal Leaf! ${def.description}`;
+    const text = `I earned "${def.title}" on Signal Leaf! ${def.description}`;
     navigator.clipboard?.writeText(text);
     toast.success("Copied to clipboard!");
   };
@@ -61,7 +61,9 @@ export function AchievementBadges() {
                     <div className="absolute inset-0 pointer-events-none opacity-[0.07] bg-[radial-gradient(ellipse_at_top_left,_hsl(45_100%_60%),_transparent_60%)]" />
                   )}
                   <div className="flex items-center gap-4 relative">
-                    <span className="text-4xl">{foundingDef.emoji}</span>
+                    <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center">
+                      {(() => { const Icon = foundingDef.icon; return <Icon className="h-6 w-6 text-amber-500" strokeWidth={2} />; })()}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <p className={`text-sm font-semibold ${foundingUnlocked ? "text-amber-500" : "text-foreground"}`}>
                         {foundingDef.title}
@@ -97,6 +99,7 @@ export function AchievementBadges() {
           {regularDefs.map((def, i) => {
             const unlocked = unlockedKeys.has(def.key);
             const record = achievements?.find((a) => a.key === def.key);
+            const Icon = def.icon;
 
             return (
               <motion.div
@@ -111,7 +114,9 @@ export function AchievementBadges() {
                     unlocked ? "" : "opacity-40 grayscale"
                   }`}
                 >
-                  <span className="text-3xl">{def.emoji}</span>
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                    <Icon className="h-5 w-5 text-primary" strokeWidth={2} />
+                  </div>
                   <p className="text-sm font-medium text-foreground mt-2">{def.title}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">{def.description}</p>
                   {unlocked && record && (

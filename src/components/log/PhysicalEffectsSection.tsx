@@ -1,4 +1,6 @@
+import { Droplets, Eye, Wind, Dumbbell } from "lucide-react";
 import { EffectSlider } from "./EffectSlider";
+import type { LucideIcon } from "lucide-react";
 
 export interface PhysicalEffects {
   dry_mouth: number;
@@ -12,11 +14,11 @@ interface Props {
   onChange: (key: keyof PhysicalEffects, value: number) => void;
 }
 
-const config = [
-  { key: "dry_mouth" as const, label: "Dry Mouth", emoji: "💧" },
-  { key: "dry_eyes" as const, label: "Dry / Red Eyes", emoji: "👁️" },
-  { key: "throat_irritation" as const, label: "Throat Irritation", emoji: "🫁" },
-  { key: "body_heaviness" as const, label: "Body Heaviness", emoji: "🏋️" },
+const config: { key: keyof PhysicalEffects; label: string; icon: LucideIcon }[] = [
+  { key: "dry_mouth", label: "Dry Mouth", icon: Droplets },
+  { key: "dry_eyes", label: "Dry / Red Eyes", icon: Eye },
+  { key: "throat_irritation", label: "Throat Irritation", icon: Wind },
+  { key: "body_heaviness", label: "Body Heaviness", icon: Dumbbell },
 ];
 
 export function PhysicalEffectsSection({ effects, onChange }: Props) {
@@ -30,7 +32,7 @@ export function PhysicalEffectsSection({ effects, onChange }: Props) {
           <EffectSlider
             key={item.key}
             label={item.label}
-            emoji={item.emoji}
+            icon={item.icon}
             value={effects[item.key]}
             onChange={(v) => onChange(item.key, v)}
           />
