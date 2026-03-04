@@ -1,48 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 160" fill="none">
-  <!-- Light theme: premium hero — radiant leaf with signal rings & stars -->
-  <circle cx="160" cy="80" r="70" fill="#6FAF9F" opacity="0.05"/>
-  <circle cx="160" cy="80" r="50" fill="#6FAF9F" opacity="0.07"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
 
-  <!-- Signal rings -->
-  <circle cx="160" cy="80" r="55" stroke="#3D6B5E" stroke-width="0.6" opacity="0.1" stroke-dasharray="2 8"/>
-  <circle cx="160" cy="80" r="42" stroke="#3D6B5E" stroke-width="0.8" opacity="0.15" stroke-dasharray="3 6"/>
-  <circle cx="160" cy="80" r="28" stroke="#3D6B5E" stroke-width="1" opacity="0.2"/>
+<defs>
+<radialGradient id="premiumHaloLight" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#6FAF9F" stop-opacity="0.35"/>
+<stop offset="70%" stop-color="#6FAF9F" stop-opacity="0.15"/>
+<stop offset="100%" stop-color="#6FAF9F" stop-opacity="0"/>
+</radialGradient>
+</defs>
 
-  <!-- Central leaf -->
-  <path d="M156 58 C156 58 146 70 146 82 C146 92 151 97 160 97 C169 97 174 92 174 82 C174 70 164 58 164 58 Q160 52 156 58Z"
-    stroke="#3D6B5E" stroke-width="1.2" fill="#3D6B5E" fill-opacity="0.06" stroke-linecap="round"/>
-  <line x1="160" y1="64" x2="160" y2="92" stroke="#3D6B5E" stroke-width="0.7" opacity="0.25"/>
-  <path d="M160 72 Q154 75 150 80" stroke="#3D6B5E" stroke-width="0.5" fill="none" opacity="0.15" stroke-linecap="round"/>
-  <path d="M160 78 Q166 81 170 84" stroke="#3D6B5E" stroke-width="0.5" fill="none" opacity="0.15" stroke-linecap="round"/>
+<rect width="600" height="400" fill="#F2EFE8"/>
 
-  <!-- Crown -->
-  <g stroke="#1E2B25" stroke-width="0.8" stroke-linecap="round" opacity="0.2">
-    <polyline points="150,48 153,42 156,46 160,38 164,46 167,42 170,48"/>
-  </g>
+<circle cx="300" cy="200" r="140" fill="url(#premiumHaloLight)"/>
 
-  <!-- Star constellation -->
-  <g fill="#3D6B5E">
-    <circle cx="90" cy="35" r="1.5" opacity="0.25"/>
-    <circle cx="105" cy="50" r="1" opacity="0.18"/>
-    <circle cx="75" cy="55" r="0.8" opacity="0.12"/>
-    <circle cx="230" cy="40" r="1.2" opacity="0.22"/>
-    <circle cx="215" cy="60" r="1" opacity="0.18"/>
-    <circle cx="245" cy="55" r="0.8" opacity="0.12"/>
-    <circle cx="130" cy="30" r="0.6" opacity="0.1"/>
-    <circle cx="190" cy="32" r="0.8" opacity="0.15"/>
-  </g>
+<circle cx="300" cy="200" r="110"
+stroke="#3D6B5E"
+stroke-width="2"
+fill="none"
+opacity="0.8"/>
 
-  <!-- Sparkle crosses -->
-  <g stroke="#1E2B25" stroke-width="0.7" stroke-linecap="round" opacity="0.1">
-    <line x1="95" y1="42" x2="95" y2="48"/>
-    <line x1="92" y1="45" x2="98" y2="45"/>
-    <line x1="225" y1="48" x2="225" y2="54"/>
-    <line x1="222" y1="51" x2="228" y2="51"/>
-    <line x1="140" y1="110" x2="140" y2="116"/>
-    <line x1="137" y1="113" x2="143" y2="113"/>
-    <line x1="180" y1="108" x2="180" y2="114"/>
-    <line x1="177" y1="111" x2="183" y2="111"/>
-  </g>
+<circle cx="300" cy="200" r="70"
+stroke="#3D6B5E"
+stroke-width="1"
+fill="none"
+opacity="0.5"/>
 
-  <line x1="110" y1="120" x2="210" y2="120" stroke="#3D6B5E" stroke-width="0.5" opacity="0.08" stroke-linecap="round"/>
+<circle cx="300" cy="200" r="4" fill="#3D6B5E"/>
+
 </svg>
