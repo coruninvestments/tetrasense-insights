@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Lock, Crown, Sparkles, X, Bell } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { BrandImage } from "@/components/brand/BrandImage";
 import { ASSETS } from "@/lib/assets";
 import { toast } from "@/hooks/use-toast";
+import { useTheme } from "next-themes";
 
 interface PaywallGateProps {
   children: ReactNode;
@@ -84,20 +85,31 @@ function LockedCard({ feature, onTap }: { feature?: string; onTap: () => void })
 }
 
 export function PaywallModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  // Wait for theme to resolve before rendering to prevent wrong-theme flash
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  const ready = mounted && !!resolvedTheme;
+
   return (
-    <AnimatePresence>
-      {open && (
+    <AnimatePresence mode="wait">
+      {open && ready && (
         <motion.div
+          key="paywall-overlay"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
           className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-4"
         >
           {/* Backdrop */}
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={onClose} />
 
-          {/* Modal */}
+          {/* Modal — layout={false} prevents layout-animation jumps */}
           <motion.div
+            key="paywall-panel"
+            layout={false}
             initial={{ y: 40, opacity: 0, scale: 0.97 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 40, opacity: 0, scale: 0.97 }}
@@ -114,7 +126,7 @@ export function PaywallModal({ open, onClose }: { open: boolean; onClose: () => 
 
             {/* Scrollable body */}
             <div className="overflow-y-auto overscroll-contain flex-1" style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 80px)" }}>
-              {/* Hero with stardust ring */}
+              {/* Hero with stardust ring — fixed height prevents layout shift on image load */}
               <div className="relative gradient-primary overflow-hidden">
                 {/* Stardust radial overlay */}
                 <div
@@ -129,8 +141,8 @@ export function PaywallModal({ open, onClose }: { open: boolean; onClose: () => 
                   }}
                 />
 
-                {/* Hero image */}
-                <div className="relative flex items-center justify-center pt-6 pb-2 px-6 min-h-[140px]">
+                {/* Hero image — fixed container prevents reflow on load */}
+                <div className="relative flex items-center justify-center pt-6 pb-2 px-6 h-[140px]">
                   <BrandImage
                     src={ASSETS.heroPremiumDark}
                     alt="Signal Leaf Premium"
