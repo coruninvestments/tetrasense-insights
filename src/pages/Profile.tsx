@@ -42,7 +42,7 @@ const sectionVariants = {
 export default function Profile() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
-  const { isPremium, tier, isDev, devOverride, setDevOverride } = useSubscription();
+  const { isPremium, tier, canUseDevPremium, devOverride, setDevOverride } = useSubscription();
   const { user, signOut } = useAuth();
   const { data: profile, isLoading: profileLoading } = useProfile();
   const { data: stats, isLoading: statsLoading } = useSessionStats();
@@ -290,7 +290,7 @@ export default function Profile() {
                 >Reset Tips</Button>
 
                 {/* Dev Premium Override */}
-                {isDev && setDevOverride && (
+                {canUseDevPremium && setDevOverride && (
                   <Card className="p-4 flex items-center justify-between border-dashed border-warning/40">
                     <div className="flex items-center gap-3">
                       <Zap className="w-4 h-4 text-warning" />
