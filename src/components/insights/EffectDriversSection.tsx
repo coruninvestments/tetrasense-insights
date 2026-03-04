@@ -3,6 +3,8 @@ import { Sparkles, AlertTriangle, Activity, Info } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEffectDrivers, EffectDriver } from "@/hooks/useEffectDrivers";
+import { useSessionLogs } from "@/hooks/useSessionLogs";
+import { InsightUnlockCard } from "./InsightUnlockCard";
 
 function DriverRow({ driver, variant }: { driver: EffectDriver; variant: "positive" | "negative" }) {
   const avgValue = variant === "positive" ? driver.avgPositive : driver.avgNegative;
@@ -31,6 +33,8 @@ function EarlySignalBadge() {
 
 export function EffectDriversSection() {
   const { data, isLoading } = useEffectDrivers();
+  const { data: sessions } = useSessionLogs();
+  const sessionCount = sessions?.length ?? 0;
 
   if (isLoading) {
     return (
@@ -43,14 +47,13 @@ export function EffectDriversSection() {
 
   if (!data.hasEnoughData) {
     return (
-      <Card variant="glass">
-        <CardContent className="p-5 text-center">
-          <Activity className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">
-            Log a few more sessions to unlock your effect patterns.
-          </p>
-        </CardContent>
-      </Card>
+      <InsightUnlockCard
+        icon={Activity}
+        title="Log a few more sessions to reveal effect patterns"
+        subtitle="More data improves accuracy"
+        current={sessionCount}
+        target={3}
+      />
     );
   }
 

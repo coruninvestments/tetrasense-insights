@@ -1,9 +1,10 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, MapPin } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSessionLogs, type SessionLog } from "@/hooks/useSessionLogs";
 import { normalizeOutcome } from "@/lib/sessionOutcome";
+import { InsightUnlockCard } from "./InsightUnlockCard";
 
 interface ContextCorrelation {
   label: string;
@@ -126,13 +127,28 @@ function computeCorrelations(sessions: SessionLog[]): ContextCorrelation[] {
 
 export function ContextCorrelationsSection() {
   const { data: sessions, isLoading } = useSessionLogs();
+  const sessionCount = sessions?.length ?? 0;
 
   const correlations = useMemo(() => {
     if (!sessions || sessions.length < 3) return [];
     return computeCorrelations(sessions);
   }, [sessions]);
 
-  if (isLoading || correlations.length === 0) return null;
+  if (isLoading) return null;
+
+  if (sessionCount < 3) {
+    return (
+      <InsightUnlockCard
+        icon={MapPin}
+        title="Log 3 sessions with context to see risk patterns"
+        subtitle="Add setting, mood, and hydration for best results"
+        current={sessionCount}
+        target={3}
+      />
+    );
+  }
+
+  if (correlations.length === 0) return null;
 
   return (
     <motion.div

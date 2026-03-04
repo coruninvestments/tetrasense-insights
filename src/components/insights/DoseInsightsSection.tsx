@@ -4,6 +4,7 @@ import { Target, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSessionLogs, type SessionLog } from "@/hooks/useSessionLogs";
 import { normalizeOutcome } from "@/lib/sessionOutcome";
+import { InsightUnlockCard } from "./InsightUnlockCard";
 
 interface DoseInsight {
   sweetSpotLow: number;
@@ -55,13 +56,26 @@ function computeDoseInsight(sessions: SessionLog[]): DoseInsight | null {
 
 export function DoseInsightsSection() {
   const { data: sessions, isLoading } = useSessionLogs();
+  const sessionCount = sessions?.length ?? 0;
 
   const insight = useMemo(() => {
     if (!sessions) return null;
     return computeDoseInsight(sessions);
   }, [sessions]);
 
-  if (isLoading || !insight) return null;
+  if (isLoading) return null;
+
+  if (!insight) {
+    return (
+      <InsightUnlockCard
+        icon={Target}
+        title="Log 5 sessions to find your dose sweet spot"
+        subtitle="We'll identify your ideal dose range"
+        current={sessionCount}
+        target={5}
+      />
+    );
+  }
 
   return (
     <div className="space-y-3">
