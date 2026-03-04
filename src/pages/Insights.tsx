@@ -14,6 +14,7 @@ import { AchievementUnlockedModal } from "@/components/achievements/AchievementU
 import type { AchievementKey } from "@/lib/achievements";
 import { useQueryClient } from "@tanstack/react-query";
 import { SignalLeafLogo } from "@/components/brand/SignalLeafLogo";
+import { PaywallGate } from "@/components/premium/PaywallGate";
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -118,7 +119,7 @@ export default function Insights() {
               <ContextCorrelationsSection />
             </motion.section>
 
-            {/* Section 7 — Pattern Timeline */}
+            {/* Section 7 — Pattern Timeline (Premium) */}
             <motion.section
               variants={sectionVariants}
               initial="hidden"
@@ -126,7 +127,9 @@ export default function Insights() {
               transition={{ delay: 0.3 }}
             >
               <SectionHeader number={7} title="Pattern Timeline" />
-              <PatternTimelineSection />
+              <PaywallGate feature="Pattern Timeline">
+                <PatternTimelineSection />
+              </PaywallGate>
             </motion.section>
 
             {/* Disclaimer */}

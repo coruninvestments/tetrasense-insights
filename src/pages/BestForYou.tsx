@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Trophy, AlertTriangle, ChevronDown, ChevronUp, ShieldCheck } from "lucide-react";
+import { Trophy, AlertTriangle, ChevronDown, ChevronUp, ShieldCheck, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { SignalLeafLogo } from "@/components/brand/SignalLeafLogo";
@@ -14,6 +14,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { useSessionLogs, type SessionIntent } from "@/hooks/useSessionLogs";
 import { usePublicBatchBrowse } from "@/hooks/usePublicBatchBrowse";
 import { computeStrainRankings, type StrainRanking } from "@/lib/bestForYou";
+import { useSubscription } from "@/hooks/useSubscription";
+import { PaywallGate } from "@/components/premium/PaywallGate";
 
 const INTENTS: { value: SessionIntent; label: string }[] = [
   { value: "sleep", label: "Sleep" },
@@ -32,6 +34,7 @@ export default function BestForYou() {
   const [intentFilter, setIntentFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("All");
   const [minSessions, setMinSessions] = useState(2);
+  const { isPremium } = useSubscription();
 
   const { data: sessions, isLoading } = useSessionLogs();
   const { data: verifiedBatches } = usePublicBatchBrowse();
@@ -115,14 +118,28 @@ export default function BestForYou() {
           {/* Min sessions slider */}
           <div className="flex items-center gap-3">
             <span className="text-xs text-muted-foreground whitespace-nowrap">Min sessions</span>
-            <Slider
-              value={[minSessions]}
-              onValueChange={([v]) => setMinSessions(v)}
-              min={1}
-              max={10}
-              step={1}
-              className="flex-1"
-            />
+            {isPremium ? (
+              <Slider
+                value={[minSessions]}
+                onValueChange={([v]) => setMinSessions(v)}
+                min={1}
+                max={10}
+                step={1}
+                className="flex-1"
+              />
+            ) : (
+              <div className="flex-1 flex items-center gap-2">
+                <Slider
+                  value={[minSessions]}
+                  onValueChange={([v]) => setMinSessions(Math.min(v, 2))}
+                  min={1}
+                  max={2}
+                  step={1}
+                  className="flex-1"
+                />
+                <Lock className="w-3.5 h-3.5 text-muted-foreground/50" />
+              </div>
+            )}
             <span className="text-xs font-medium text-foreground w-4 text-right">{minSessions}</span>
           </div>
         </div>
@@ -152,6 +169,7 @@ export default function BestForYou() {
                   rank={idx + 1}
                   strain={strain}
                   hasVerifiedCoa={coaMap.has(strain.strainName.toLowerCase())}
+                  isPremium={isPremium}
                 />
               </motion.div>
             ))
@@ -171,10 +189,12 @@ function RankingCard({
   rank,
   strain,
   hasVerifiedCoa,
+  isPremium,
 }: {
   rank: number;
   strain: StrainRanking;
   hasVerifiedCoa: boolean;
+  isPremium: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const typeLower = (strain.strainType ?? "hybrid").toLowerCase();
@@ -226,23 +246,30 @@ function RankingCard({
               )}
             </div>
 
-            {/* Why it ranks — collapsible */}
-            <Collapsible open={open} onOpenChange={setOpen}>
-              <CollapsibleTrigger className="flex items-center gap-1 mt-2 text-[11px] text-primary hover:underline">
-                Why it ranks
-                {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-              </CollapsibleTrigger>
-              <CollapsibleContent>
-                <ul className="mt-1.5 space-y-0.5">
-                  {strain.reasons.map((r, i) => (
-                    <li key={i} className="text-[11px] text-muted-foreground flex items-start gap-1.5">
-                      <span className="text-primary mt-0.5">•</span>
-                      {r}
-                    </li>
-                  ))}
-                </ul>
-              </CollapsibleContent>
-            </Collapsible>
+            {/* Why it ranks — collapsible (premium) */}
+            {isPremium ? (
+              <Collapsible open={open} onOpenChange={setOpen}>
+                <CollapsibleTrigger className="flex items-center gap-1 mt-2 text-[11px] text-primary hover:underline">
+                  Why it ranks
+                  {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <ul className="mt-1.5 space-y-0.5">
+                    {strain.reasons.map((r, i) => (
+                      <li key={i} className="text-[11px] text-muted-foreground flex items-start gap-1.5">
+                        <span className="text-primary mt-0.5">•</span>
+                        {r}
+                      </li>
+                    ))}
+                  </ul>
+                </CollapsibleContent>
+              </Collapsible>
+            ) : (
+              <div className="flex items-center gap-1 mt-2 text-[11px] text-muted-foreground/50">
+                <Lock className="w-3 h-3" />
+                <span>Why it ranks · Premium</span>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>

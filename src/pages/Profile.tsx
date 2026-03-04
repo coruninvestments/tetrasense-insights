@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   User, LogOut, Mail, Calendar, Crown, ChevronRight,
-  Bell, Moon, Sun, Users, ArrowLeft, Sliders, AlertTriangle, Shield, Settings, Monitor,
+  Bell, Moon, Sun, Users, ArrowLeft, Sliders, AlertTriangle, Shield, Settings, Monitor, Zap,
 } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useSubscription } from "@/hooks/useSubscription";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,6 +42,7 @@ const sectionVariants = {
 export default function Profile() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
+  const { isPremium, tier, isDev, devOverride, setDevOverride } = useSubscription();
   const { user, signOut } = useAuth();
   const { data: profile, isLoading: profileLoading } = useProfile();
   const { data: stats, isLoading: statsLoading } = useSessionStats();
@@ -57,7 +60,7 @@ export default function Profile() {
     return () => window.removeEventListener("achievement-unlocked", handler);
   }, []);
 
-  const isPremium = profile?.is_premium || false;
+  // isPremium comes from useSubscription above
   const displayName = profile?.display_name || user?.email?.split("@")[0] || "Welcome";
   const memberSince = user?.created_at
     ? format(new Date(user.created_at), "MMMM yyyy")
@@ -285,6 +288,23 @@ export default function Profile() {
                     catch { toast.error("Failed to reset tips"); }
                   }}
                 >Reset Tips</Button>
+
+                {/* Dev Premium Override */}
+                {isDev && setDevOverride && (
+                  <Card className="p-4 flex items-center justify-between border-dashed border-warning/40">
+                    <div className="flex items-center gap-3">
+                      <Zap className="w-4 h-4 text-warning" />
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Dev: Pretend Premium</p>
+                        <p className="text-xs text-muted-foreground">Simulate premium for testing</p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={devOverride}
+                      onCheckedChange={(v) => setDevOverride(v)}
+                    />
+                  </Card>
+                )}
               </motion.div>
             )}
           </div>
@@ -433,7 +453,12 @@ export default function Profile() {
                   <Crown className="w-4 h-4 text-muted-foreground" />
                   <div>
                     <p className="text-xs text-muted-foreground">Subscription</p>
-                    <p className="text-sm text-foreground">{isPremium ? "Premium" : "Free"}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-foreground">{tier === "premium" ? "Premium" : "Free"}</p>
+                      {isPremium && (
+                        <Badge className="text-[9px] font-medium border-0 bg-primary/15 text-primary">Active</Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
                 {!statsLoading && (
