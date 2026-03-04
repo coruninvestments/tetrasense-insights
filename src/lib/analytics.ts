@@ -11,7 +11,9 @@ type AnalyticsEvent =
   | "tapped_similar_session"
   | "opened_compare"
   | "viewed_confidence_meter"
-  | "tapped_confidence_cta";
+  | "tapped_confidence_cta"
+  | "streak_incremented"
+  | "viewed_streak_card";
 
 export async function logEvent(eventName: AnalyticsEvent) {
   try {

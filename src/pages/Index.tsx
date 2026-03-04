@@ -9,6 +9,7 @@ import { PatternSnapshotCard } from "@/components/home/PatternSnapshotCard";
 import { ClarityScoreCard } from "@/components/home/ClarityScoreCard";
 import { ConfidenceMeterCard } from "@/components/home/ConfidenceMeterCard";
 import { QuickStatsCard } from "@/components/home/QuickStatsCard";
+import { StreakCard } from "@/components/dashboard/StreakCard";
 import { BestForYouCard } from "@/components/home/BestForYouCard";
 import { RecentSession } from "@/components/home/RecentSession";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -62,6 +63,9 @@ const Index = () => {
 
           {/* Card 3b — Confidence Meter */}
           <ConfidenceMeterCard />
+
+          {/* Streak Card */}
+          <StreakCard />
 
           {/* Card — Best For You */}
           <BestForYouCard />
