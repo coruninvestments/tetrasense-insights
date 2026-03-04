@@ -12,6 +12,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       defaultTheme="dark"
       storageKey="signal_leaf_theme"
       enableSystem
+      disableTransitionOnChange
     >
       {children}
     </NextThemesProvider>

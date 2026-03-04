@@ -72,7 +72,8 @@ export function BrandImage({
       className={className}
       width={width}
       height={height}
-      loading="lazy"
+      loading="eager"
+      decoding="async"
       onError={() => setFailed(true)}
     />
   );
