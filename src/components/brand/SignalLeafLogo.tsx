@@ -41,15 +41,15 @@ export function SignalLeafLogo({
   const textColor =
     theme === "light" ? "text-primary-foreground" : "text-foreground";
 
-  // Try to load SVG logo, fallback to Leaf icon
+  const svgSrc = variant === "full" ? "/brand/signal-leaf-logo.svg" : "/brand/signal-leaf-icon.svg";
+
   const LogoIcon = (
-    <div className={cn(config.icon, iconBg, "flex items-center justify-center flex-shrink-0")}>
+    <div className={cn(config.icon, iconBg, "flex items-center justify-center flex-shrink-0 overflow-hidden")}>
       <img
-        src="/brand/signal-leaf-logo.svg"
+        src="/brand/signal-leaf-icon.svg"
         alt="Signal Leaf"
         className={cn(config.iconSize, "object-contain")}
         onError={(e) => {
-          // Fallback: hide img and show Leaf icon sibling
           (e.target as HTMLElement).style.display = "none";
           const sibling = (e.target as HTMLElement).nextElementSibling as HTMLElement;
           if (sibling) sibling.style.display = "block";

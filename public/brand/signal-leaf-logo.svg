@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" fill="none">
+  <!-- Signal Leaf Full Logo — Replace this file with your final brand SVG -->
+  <rect width="240" height="60" rx="8" fill="none"/>
+  <!-- Icon -->
+  <g transform="translate(4,6)">
+    <path d="M24 4C24 4 20 12 12 20C8 24 4 28 4 34C4 40.627 9.373 46 16 46C18.5 46 20.8 45.2 22.7 43.8L24 42.8L25.3 43.8C27.2 45.2 29.5 46 32 46C38.627 46 44 40.627 44 34C44 28 40 24 36 20C28 12 24 4 24 4Z" fill="#5a8a6e"/>
+    <!-- Signal waves -->
+    <path d="M18 28C20 26 22 25 24 25C26 25 28 26 30 28" stroke="#3d6b52" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+    <path d="M16 32C19 29 21.5 27.5 24 27.5C26.5 27.5 29 29 32 32" stroke="#3d6b52" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+    <path d="M14 36C18 32 21 30 24 30C27 30 30 32 34 36" stroke="#3d6b52" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  </g>
+  <!-- Text -->
+  <text x="60" y="38" font-family="serif" font-size="26" font-weight="500" fill="#e8e4dc">Signal Leaf</text>
+</svg>
