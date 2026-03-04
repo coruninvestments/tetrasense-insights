@@ -87,7 +87,7 @@ export function ClarityScoreCard() {
         <CardContent className="p-5">
           <div className="flex items-center gap-5">
             {/* Circular progress */}
-            <div className="relative flex-shrink-0">
+            <div className="relative flex-shrink-0 halo-focus">
               <svg width={size} height={size} className="-rotate-90">
                 {/* Background track */}
                 <circle

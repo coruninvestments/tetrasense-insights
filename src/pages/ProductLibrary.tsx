@@ -170,7 +170,7 @@ export default function ProductLibrary() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background aurora-bg">
         {/* Header */}
         <header className="px-5 pt-12 pb-2 safe-top">
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>

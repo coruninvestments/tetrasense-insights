@@ -206,8 +206,8 @@ export function PatternTimelineSection() {
       </div>
 
       {/* Chart */}
-      <Card>
-        <CardContent className="p-4">
+      <Card className="halo-focus overflow-hidden">
+        <CardContent className="p-4 relative z-[1]">
           {chartData.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">No sessions match these filters.</p>
           ) : (
