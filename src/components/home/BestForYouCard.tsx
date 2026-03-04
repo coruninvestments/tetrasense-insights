@@ -89,6 +89,13 @@ export function BestForYouCard() {
                   </Link>
                 );
               })}
+              <Link
+                to="/best"
+                className="mt-2 flex items-center justify-center gap-1.5 w-full py-2 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/15 transition-colors"
+              >
+                <Trophy className="w-3.5 h-3.5" />
+                View full ranking
+              </Link>
             </div>
           ) : (
             <EmptyState

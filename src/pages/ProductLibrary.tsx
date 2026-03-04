@@ -224,7 +224,7 @@ export default function ProductLibrary() {
           </div>
 
           {/* Sort toggle */}
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2 flex-wrap items-center">
             <span className="text-[11px] text-muted-foreground uppercase tracking-wide self-center mr-1">Sort</span>
             <FilterChip
               label="Default"
@@ -243,6 +243,12 @@ export default function ProductLibrary() {
               <Trophy className="w-3 h-3" />
               Best for you
             </button>
+            <Link
+              to="/best"
+              className="rounded-full px-2.5 py-1 text-[11px] font-medium bg-primary/10 text-primary hover:bg-primary/15 transition-colors flex items-center gap-1 ml-auto"
+            >
+              Full ranking →
+            </Link>
           </div>
         </div>
 
