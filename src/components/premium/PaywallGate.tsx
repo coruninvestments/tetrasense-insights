@@ -101,87 +101,90 @@ function PaywallModal({ open, onClose }: { open: boolean; onClose: () => void })
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 40, opacity: 0, scale: 0.97 }}
             transition={{ type: "spring", damping: 28, stiffness: 300 }}
-            className="relative w-full max-w-sm bg-card border border-border rounded-2xl shadow-elevated overflow-hidden"
+            className="relative w-[min(92vw,560px)] max-h-[calc(100vh-2rem)] bg-card border border-border rounded-2xl shadow-elevated overflow-hidden flex flex-col"
           >
-            {/* Close */}
+            {/* Sticky close button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-secondary/80 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+              className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-secondary/80 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
 
-            {/* Hero with stardust ring */}
-            <div className="relative gradient-primary overflow-hidden">
-              {/* Stardust radial overlay */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: [
-                    "radial-gradient(ellipse 60% 50% at 50% 40%, hsl(163 30% 70% / 0.12) 0%, transparent 70%)",
-                    "radial-gradient(ellipse 40% 35% at 50% 45%, hsl(163 40% 80% / 0.08) 0%, transparent 60%)",
-                    "radial-gradient(circle at 30% 20%, hsl(200 40% 80% / 0.06) 0%, transparent 40%)",
-                    "radial-gradient(circle at 70% 30%, hsl(163 50% 90% / 0.05) 0%, transparent 35%)",
-                  ].join(", "),
-                }}
-              />
-
-              {/* Hero image */}
-              <div className="relative flex items-center justify-center pt-6 pb-2 px-6 min-h-[140px]">
-                <BrandImage
-                  src={ASSETS.heroPremiumDark}
-                  alt="Signal Leaf Premium"
-                  themeAware
-                  className="max-h-[130px] w-auto object-contain rounded-xl opacity-90"
+            {/* Scrollable body */}
+            <div className="overflow-y-auto overscroll-contain flex-1" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+              {/* Hero with stardust ring */}
+              <div className="relative gradient-primary overflow-hidden">
+                {/* Stardust radial overlay */}
+                <div
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background: [
+                      "radial-gradient(ellipse 60% 50% at 50% 40%, hsl(163 30% 70% / 0.12) 0%, transparent 70%)",
+                      "radial-gradient(ellipse 40% 35% at 50% 45%, hsl(163 40% 80% / 0.08) 0%, transparent 60%)",
+                      "radial-gradient(circle at 30% 20%, hsl(200 40% 80% / 0.06) 0%, transparent 40%)",
+                      "radial-gradient(circle at 70% 30%, hsl(163 50% 90% / 0.05) 0%, transparent 35%)",
+                    ].join(", "),
+                  }}
                 />
+
+                {/* Hero image */}
+                <div className="relative flex items-center justify-center pt-6 pb-2 px-6 min-h-[140px]">
+                  <BrandImage
+                    src={ASSETS.heroPremiumDark}
+                    alt="Signal Leaf Premium"
+                    themeAware
+                    className="max-h-[130px] w-auto object-contain rounded-xl opacity-90"
+                  />
+                </div>
+
+                {/* Title block */}
+                <div className="relative text-center px-6 pb-6">
+                  <div className="w-12 h-12 rounded-2xl bg-primary-foreground/20 flex items-center justify-center mx-auto mb-3">
+                    <Sparkles className="w-6 h-6 text-primary-foreground" />
+                  </div>
+                  <h2 className="font-serif text-xl font-medium text-primary-foreground">
+                    Signal Leaf Premium
+                  </h2>
+                  <p className="text-sm text-primary-foreground/80 mt-1">
+                    Unlock the full picture of your experience
+                  </p>
+                  <p className="text-xs text-primary-foreground/60 mt-1.5 italic">
+                    Your private clarity engine — powered by your own patterns.
+                  </p>
+                </div>
               </div>
 
-              {/* Title block */}
-              <div className="relative text-center px-6 pb-6">
-                <div className="w-12 h-12 rounded-2xl bg-primary-foreground/20 flex items-center justify-center mx-auto mb-3">
-                  <Sparkles className="w-6 h-6 text-primary-foreground" />
-                </div>
-                <h2 className="font-serif text-xl font-medium text-primary-foreground">
-                  Signal Leaf Premium
-                </h2>
-                <p className="text-sm text-primary-foreground/80 mt-1">
-                  Unlock the full picture of your experience
-                </p>
-                <p className="text-xs text-primary-foreground/60 mt-1.5 italic">
-                  Your private clarity engine — powered by your own patterns.
-                </p>
+              {/* Benefits */}
+              <div className="px-6 py-5 space-y-3">
+                {PREMIUM_BULLETS.map((bullet) => (
+                  <div key={bullet} className="flex items-start gap-2.5">
+                    <Crown className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="text-sm text-foreground">{bullet}</span>
+                  </div>
+                ))}
               </div>
-            </div>
 
-            {/* Benefits */}
-            <div className="px-6 py-5 space-y-3">
-              {PREMIUM_BULLETS.map((bullet) => (
-                <div key={bullet} className="flex items-start gap-2.5">
-                  <Crown className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                  <span className="text-sm text-foreground">{bullet}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Actions */}
-            <div className="px-6 pb-6 space-y-2">
-              <Button className="w-full" size="lg" disabled>
-                Coming Soon
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full text-xs gap-1.5"
-                onClick={() => {
-                  toast({
-                    title: "Waitlist coming soon",
-                    description: "We'll let you know when Premium is available.",
-                  });
-                }}
-              >
-                <Bell className="w-3.5 h-3.5" />
-                Join the Premium waitlist
-              </Button>
+              {/* Actions */}
+              <div className="px-6 pb-10 space-y-2">
+                <Button className="w-full" size="lg" disabled>
+                  Coming Soon
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full text-xs gap-1.5"
+                  onClick={() => {
+                    toast({
+                      title: "Waitlist coming soon",
+                      description: "We'll let you know when Premium is available.",
+                    });
+                  }}
+                >
+                  <Bell className="w-3.5 h-3.5" />
+                  Join the Premium waitlist
+                </Button>
+              </div>
             </div>
           </motion.div>
         </motion.div>
