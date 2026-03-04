@@ -63,7 +63,7 @@ export default function Insights() {
             </motion.div>
           </header>
 
-          <div className="px-5 pb-28 space-y-5">
+          <div className="px-5 pb-32 space-y-6">
             {/* Section 1 — Recommendation */}
             <motion.section
               variants={sectionVariants}
@@ -149,7 +149,7 @@ export default function Insights() {
 
 function SectionHeader({ number, title }: { number: number; title: string }) {
   return (
-    <div className="flex items-center gap-2.5 mb-3">
+    <div className="flex items-center gap-2.5 mb-3 scroll-mt-24">
       <span className="w-6 h-6 rounded-full bg-primary/15 text-primary text-xs font-medium flex items-center justify-center shrink-0">
         {number}
       </span>
