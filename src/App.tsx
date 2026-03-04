@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import LogSession from "./pages/LogSession";
 import Strains from "./pages/Strains";
+import ProductLibrary from "./pages/ProductLibrary";
 import StrainDetail from "./pages/StrainDetail";
 import Learn from "./pages/Learn";
 import Insights from "./pages/Insights";
@@ -50,6 +51,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Strains />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/library"
+              element={
+                <ProtectedRoute>
+                  <ProductLibrary />
                 </ProtectedRoute>
               }
             />
