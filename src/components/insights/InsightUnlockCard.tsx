@@ -13,6 +13,10 @@ interface InsightUnlockCardProps {
   unit?: string;
   /** Show the empty-insights illustration above the message */
   showIllustration?: boolean;
+  /** Optional confidence percentage to display */
+  confidenceScore?: number;
+  /** Hint for improving confidence */
+  confidenceHint?: string;
 }
 
 export function InsightUnlockCard({
@@ -23,6 +27,8 @@ export function InsightUnlockCard({
   target,
   unit = "sessions",
   showIllustration = false,
+  confidenceScore,
+  confidenceHint,
 }: InsightUnlockCardProps) {
   const hasProgress = current != null && target != null && target > 0;
   const progress = hasProgress ? Math.min(current / target, 1) : 0;
@@ -78,6 +84,18 @@ export function InsightUnlockCard({
               <p className="text-[11px] text-muted-foreground">
                 {current} of {target} {unit} logged
               </p>
+            </div>
+          )}
+
+          {/* Confidence line */}
+          {confidenceScore != null && (
+            <div className="space-y-1 mt-1">
+              <p className="text-[11px] text-muted-foreground">
+                Confidence: {confidenceScore}%
+              </p>
+              {confidenceHint && (
+                <p className="text-[10px] text-muted-foreground/70">{confidenceHint}</p>
+              )}
             </div>
           )}
         </CardContent>

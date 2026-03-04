@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { ChevronRight, Trophy, AlertTriangle } from "lucide-react";
+import { ChevronRight, Trophy, AlertTriangle, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { computeStrainRankings } from "@/lib/bestForYou";
+import { computeConfidence } from "@/lib/confidenceEngine";
 
 export function BestForYouCard() {
   const { data: sessions, isLoading } = useSessionLogs();
@@ -16,6 +17,8 @@ export function BestForYouCard() {
     if (!sessions || sessions.length < 2) return [];
     return computeStrainRankings(sessions, null, null, 1).slice(0, 3);
   }, [sessions]);
+
+  const confidence = useMemo(() => computeConfidence(sessions ?? []), [sessions]);
 
   return (
     <motion.div
@@ -33,7 +36,17 @@ export function BestForYouCard() {
                 <p className="text-[11px] text-muted-foreground">Based on your sessions</p>
               </div>
             </div>
-            {top3.length > 0 && (
+            <div className="flex items-center gap-2">
+              {top3.length > 0 && (
+                <Badge className={`text-[9px] font-medium border-0 px-1.5 py-0 ${
+                  confidence.level === "High" ? "bg-primary/15 text-primary" :
+                  confidence.level === "Medium" ? "bg-accent/20 text-accent-foreground" :
+                  "bg-muted text-muted-foreground"
+                }`}>
+                  <Shield className="w-2.5 h-2.5 mr-0.5" strokeWidth={2} />
+                  {confidence.level}
+                </Badge>
+              )}
               <Link
                 to="/best"
                 className="text-xs text-primary font-medium flex items-center gap-0.5 hover:underline"
@@ -41,8 +54,15 @@ export function BestForYouCard() {
                 View all
                 <ChevronRight className="w-3 h-3" />
               </Link>
-            )}
+            </div>
           </div>
+
+          {/* Low confidence note */}
+          {confidence.level === "Low" && top3.length > 0 && (
+            <p className="text-[11px] text-muted-foreground mb-3 leading-relaxed">
+              Early signal — log a few more sessions for stronger recommendations.
+            </p>
+          )}
 
           {isLoading ? (
             <div className="space-y-2">

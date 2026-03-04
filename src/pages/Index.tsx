@@ -7,6 +7,7 @@ import { SignalLeafLogo } from "@/components/brand/SignalLeafLogo";
 import { TodaysGoalCard } from "@/components/home/TodaysGoalCard";
 import { PatternSnapshotCard } from "@/components/home/PatternSnapshotCard";
 import { ClarityScoreCard } from "@/components/home/ClarityScoreCard";
+import { ConfidenceMeterCard } from "@/components/home/ConfidenceMeterCard";
 import { QuickStatsCard } from "@/components/home/QuickStatsCard";
 import { BestForYouCard } from "@/components/home/BestForYouCard";
 import { RecentSession } from "@/components/home/RecentSession";
@@ -58,6 +59,9 @@ const Index = () => {
 
           {/* Card 3 — Clarity Score */}
           <ClarityScoreCard />
+
+          {/* Card 3b — Confidence Meter */}
+          <ConfidenceMeterCard />
 
           {/* Card — Best For You */}
           <BestForYouCard />
