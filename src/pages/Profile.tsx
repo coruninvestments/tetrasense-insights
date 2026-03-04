@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   User, LogOut, Mail, Calendar, Crown, ChevronRight,
-  Bell, Moon, Users, ArrowLeft, Sliders, AlertTriangle, Shield, Settings,
+  Bell, Moon, Sun, Users, ArrowLeft, Sliders, AlertTriangle, Shield, Settings, Monitor,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,7 @@ const sectionVariants = {
 
 export default function Profile() {
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const { user, signOut } = useAuth();
   const { data: profile, isLoading: profileLoading } = useProfile();
   const { data: stats, isLoading: statsLoading } = useSessionStats();
@@ -210,12 +212,33 @@ export default function Profile() {
 
             {activeSection === "settings" && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-                <Card className="p-4 flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">Dark Mode</p>
-                    <p className="text-xs text-muted-foreground">Toggle dark appearance</p>
+                <Card className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Theme</p>
+                      <p className="text-xs text-muted-foreground">Choose your appearance</p>
+                    </div>
                   </div>
-                  <Switch defaultChecked />
+                  <div className="flex gap-2">
+                    {([
+                      { value: "light", icon: Sun, label: "Light" },
+                      { value: "dark", icon: Moon, label: "Dark" },
+                      { value: "system", icon: Monitor, label: "System" },
+                    ] as const).map(({ value, icon: Icon, label }) => (
+                      <button
+                        key={value}
+                        onClick={() => setTheme(value)}
+                        className={`flex-1 flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors ${
+                          theme === value
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                        }`}
+                      >
+                        <Icon className="w-3.5 h-3.5" />
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                 </Card>
                 <Card className="p-4 flex items-center justify-between">
                   <div>
@@ -371,13 +394,16 @@ export default function Profile() {
                 </Card>
                 <Card className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Moon className="w-4 h-4 text-muted-foreground" />
+                    {theme === "dark" ? <Moon className="w-4 h-4 text-muted-foreground" /> : <Sun className="w-4 h-4 text-muted-foreground" />}
                     <div>
                       <p className="text-sm font-medium text-foreground">Dark Mode</p>
                       <p className="text-xs text-muted-foreground">Toggle dark appearance</p>
                     </div>
                   </div>
-                  <Switch defaultChecked />
+                  <Switch
+                    checked={theme === "dark"}
+                    onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+                  />
                 </Card>
 
                 {/* More settings link */}
