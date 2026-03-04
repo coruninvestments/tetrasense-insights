@@ -430,7 +430,7 @@ export default function Profile() {
 
           {/* Footer */}
           <div className="text-center pt-4">
-            <p className="text-xs text-muted-foreground">TetraSense v1.0.0</p>
+            <p className="text-xs text-muted-foreground">Signal Leaf v1.0.0</p>
             <p className="text-xs text-muted-foreground mt-1">Your data is private and secure</p>
           </div>
         </div>

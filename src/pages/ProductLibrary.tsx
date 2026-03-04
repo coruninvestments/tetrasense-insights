@@ -1,11 +1,12 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Search, ShieldCheck, Leaf, Beaker, BarChart3 } from "lucide-react";
+import { Search, ShieldCheck, Beaker, BarChart3, Leaf } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { SignalLeafLogo } from "@/components/brand/SignalLeafLogo";
 import { useStrains, formatPotencyRange } from "@/hooks/useStrains";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { usePublicBatchBrowse } from "@/hooks/usePublicBatchBrowse";
@@ -140,9 +141,7 @@ export default function ProductLibrary() {
         <header className="px-5 pt-12 pb-2 safe-top">
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center">
-                <Leaf className="w-5 h-5 text-primary" />
-              </div>
+              <SignalLeafLogo variant="icon" size="md" />
               <h1 className="font-serif text-2xl font-medium text-foreground">Product Library</h1>
             </div>
 

@@ -14,7 +14,7 @@ export function AchievementUnlockedModal({ achievementKey, onClose }: Props) {
   const def = achievementKey ? getAchievementDef(achievementKey) : null;
 
   const handleShare = () => {
-    const text = `🏆 I just unlocked "${def?.title}" on TetraSense! ${def?.description}`;
+    const text = `🏆 I just unlocked "${def?.title}" on Signal Leaf! ${def?.description}`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text);
       toast.success("Copied to clipboard!");

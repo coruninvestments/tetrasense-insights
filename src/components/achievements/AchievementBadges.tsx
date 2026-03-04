@@ -15,7 +15,7 @@ export function AchievementBadges() {
   const handleShare = (key: string) => {
     const def = getAchievementDef(key);
     if (!def) return;
-    const text = `🏆 I earned "${def.title}" on TetraSense! ${def.description}`;
+    const text = `🏆 I earned "${def.title}" on Signal Leaf! ${def.description}`;
     navigator.clipboard?.writeText(text);
     toast.success("Copied to clipboard!");
   };

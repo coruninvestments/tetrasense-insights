@@ -18,7 +18,7 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        // TetraSense specific variants
+        // Signal Leaf specific variants
         primary: "gradient-primary text-primary-foreground shadow-card hover:shadow-glow font-semibold",
         soft: "bg-primary/10 text-primary hover:bg-primary/15",
         muted: "bg-muted text-muted-foreground hover:bg-muted/80",

@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
-import { Plus, ChevronRight, Leaf } from "lucide-react";
+import { Plus, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { SignalLeafLogo } from "@/components/brand/SignalLeafLogo";
 import { TodaysGoalCard } from "@/components/home/TodaysGoalCard";
 import { PatternSnapshotCard } from "@/components/home/PatternSnapshotCard";
 import { QuickStatsCard } from "@/components/home/QuickStatsCard";
@@ -40,14 +41,7 @@ const Index = () => {
             transition={{ duration: 0.4 }}
             className="flex items-center justify-between"
           >
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
-                <Leaf className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <span className="font-serif text-lg font-medium text-foreground tracking-tight">
-                Signal Leaf
-              </span>
-            </div>
+            <SignalLeafLogo variant="full" size="md" />
             <p className="text-sm text-muted-foreground">{getGreeting()}</p>
           </motion.div>
         </header>

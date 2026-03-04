@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const STORAGE_KEY = "tetrasense_custom_effects";
+const STORAGE_KEY = "signalleaf_custom_effects";
 
 export interface CustomEffectDef {
   name: string;
