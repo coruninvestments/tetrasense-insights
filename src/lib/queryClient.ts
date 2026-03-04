@@ -4,7 +4,8 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      staleTime: 0,
+      staleTime: 5 * 60 * 1000, // 5 minutes — prevents excessive refetching
+      gcTime: 10 * 60 * 1000, // 10 minutes garbage collection
     },
   },
 });

@@ -1,4 +1,4 @@
-import { Home, BookOpen, FlaskConical, User, Plus, Compass, Leaf } from "lucide-react";
+import { Home, BookOpen, FlaskConical, User, Plus, Compass, Leaf, BarChart3 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 const navItems = [
   { icon: Home, label: "Home", path: "/" },
   { icon: Leaf, label: "Library", path: "/library" },
-  { icon: Compass, label: "Explore", path: "/explore" },
+  { icon: BarChart3, label: "Insights", path: "/insights" },
   { icon: User, label: "Profile", path: "/profile" },
 ];
 
