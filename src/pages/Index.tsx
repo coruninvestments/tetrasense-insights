@@ -8,6 +8,7 @@ import { TodaysGoalCard } from "@/components/home/TodaysGoalCard";
 import { PatternSnapshotCard } from "@/components/home/PatternSnapshotCard";
 import { ClarityScoreCard } from "@/components/home/ClarityScoreCard";
 import { QuickStatsCard } from "@/components/home/QuickStatsCard";
+import { BestForYouCard } from "@/components/home/BestForYouCard";
 import { RecentSession } from "@/components/home/RecentSession";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useRecentSessions } from "@/hooks/useSessionLogs";
@@ -57,6 +58,9 @@ const Index = () => {
 
           {/* Card 3 — Clarity Score */}
           <ClarityScoreCard />
+
+          {/* Card — Best For You */}
+          <BestForYouCard />
 
           {/* Card 4 — Recent Sessions */}
           <motion.div

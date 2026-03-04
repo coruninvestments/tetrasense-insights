@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Search, ShieldCheck, ShieldAlert, Clock, Beaker, BarChart3, Leaf } from "lucide-react";
+import { Search, ShieldCheck, ShieldAlert, Clock, Beaker, BarChart3, Leaf, Trophy } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import { useStrains, formatPotencyRange } from "@/hooks/useStrains";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { usePublicBatchBrowse } from "@/hooks/usePublicBatchBrowse";
 import { normalizeOutcome } from "@/lib/sessionOutcome";
+import { computeStrainRankings } from "@/lib/bestForYou";
 
 const TYPE_OPTIONS = ["Indica", "Sativa", "Hybrid"] as const;
 
@@ -50,6 +51,7 @@ export default function ProductLibrary() {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>(null);
   const [terpeneFilter, setTerpeneFilter] = useState<TerpeneFilter>(null);
   const [outcomeFilter, setOutcomeFilter] = useState<OutcomeFilter>(null);
+  const [sortMode, setSortMode] = useState<"default" | "best">("default");
 
   const { data: dbStrains, isLoading: strainsLoading } = useStrains(search, typeFilter);
   const { data: sessions } = useSessionLogs();
@@ -105,6 +107,15 @@ export default function ProductLibrary() {
 
   const strains = dbStrains && dbStrains.length > 0 ? dbStrains : FALLBACK_STRAINS;
 
+  // Compute Best For You rankings for sort mode
+  const bestForYouScores = useMemo(() => {
+    if (sortMode !== "best" || !sessions) return new Map<string, number>();
+    const rankings = computeStrainRankings(sessions, null, null, 1);
+    const map = new Map<string, number>();
+    rankings.forEach(r => map.set(r.strainName.toLowerCase(), r.score));
+    return map;
+  }, [sessions, sortMode]);
+
   // Apply local filters
   const filtered = useMemo(() => {
     let list = dbStrains && dbStrains.length > 0
@@ -133,8 +144,17 @@ export default function ProductLibrary() {
       });
     }
 
+    // Apply Best For You sort
+    if (sortMode === "best") {
+      list = [...list].sort((a, b) => {
+        const scoreA = bestForYouScores.get(a.name.toLowerCase()) ?? -1;
+        const scoreB = bestForYouScores.get(b.name.toLowerCase()) ?? -1;
+        return scoreB - scoreA;
+      });
+    }
+
     return list;
-  }, [strains, dbStrains, search, typeFilter, terpeneFilter, outcomeFilter, strainTerpenes, strainStats]);
+  }, [strains, dbStrains, search, typeFilter, terpeneFilter, outcomeFilter, strainTerpenes, strainStats, sortMode, bestForYouScores]);
 
   return (
     <AppLayout>
@@ -201,6 +221,28 @@ export default function ProductLibrary() {
                 size="sm"
               />
             ))}
+          </div>
+
+          {/* Sort toggle */}
+          <div className="flex gap-2 flex-wrap">
+            <span className="text-[11px] text-muted-foreground uppercase tracking-wide self-center mr-1">Sort</span>
+            <FilterChip
+              label="Default"
+              active={sortMode === "default"}
+              onClick={() => setSortMode("default")}
+              size="sm"
+            />
+            <button
+              onClick={() => setSortMode("best")}
+              className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition-all flex items-center gap-1 ${
+                sortMode === "best"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card border border-border text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Trophy className="w-3 h-3" />
+              Best for you
+            </button>
           </div>
         </div>
 
