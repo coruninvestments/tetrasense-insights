@@ -6,17 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useDecisionInsights } from "@/hooks/useDecisionInsights";
 import { logEvent } from "@/lib/analytics";
-
-const INTENTS = [
-  { id: "sleep", label: "Sleep", emoji: "🌙" },
-  { id: "relaxation", label: "Relaxation", emoji: "🧘" },
-  { id: "focus", label: "Focus", emoji: "🎯" },
-  { id: "creativity", label: "Creativity", emoji: "🎨" },
-  { id: "learning", label: "Learning", emoji: "🧠" },
-  { id: "pain_relief", label: "Pain Relief", emoji: "💆" },
-  { id: "social", label: "Social", emoji: "👥" },
-  { id: "recreation", label: "Recreation", emoji: "🎉" },
-] as const;
+import { GOALS } from "@/lib/goals";
 
 export function TodaysGoalCard() {
   const [selectedIntent, setSelectedIntent] = useState<string | null>(null);
@@ -71,23 +61,27 @@ export function TodaysGoalCard() {
 
           {/* Intent chips */}
           <div className="flex flex-wrap gap-2 mb-4">
-            {INTENTS.map((intent) => (
-              <button
-                key={intent.id}
-                onClick={() => {
-                  const next = selectedIntent === intent.id ? null : intent.id;
-                  setSelectedIntent(next);
-                  if (next) logEvent("used_todays_goal");
-                }}
-                className={`text-xs px-3 py-1.5 rounded-full transition-colors ${
-                  selectedIntent === intent.id
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {intent.emoji} {intent.label}
-              </button>
-            ))}
+            {GOALS.map((goal) => {
+              const Icon = goal.icon;
+              return (
+                <button
+                  key={goal.id}
+                  onClick={() => {
+                    const next = selectedIntent === goal.id ? null : goal.id;
+                    setSelectedIntent(next);
+                    if (next) logEvent("used_todays_goal");
+                  }}
+                  className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full transition-colors ${
+                    selectedIntent === goal.id
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-secondary text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
+                  {goal.label}
+                </button>
+              );
+            })}
           </div>
 
           <AnimatePresence mode="wait">
