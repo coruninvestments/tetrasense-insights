@@ -107,8 +107,8 @@ interface ContextSectionProps {
   onChange: (ctx: SessionContext) => void;
 }
 
-export function ContextSection({ value, onChange }: ContextSectionProps) {
-  const [open, setOpen] = useState(false);
+export function ContextSection({ value, onChange, defaultOpen = false }: ContextSectionProps & { defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
 
   const update = <K extends keyof SessionContext>(key: K, v: SessionContext[K]) => {
     onChange({ ...value, [key]: v });
