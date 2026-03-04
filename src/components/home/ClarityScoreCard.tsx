@@ -5,27 +5,25 @@ import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { normalizeOutcome } from "@/lib/sessionOutcome";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SignalPulse } from "@/components/motion/SignalPulse";
+import { ClarityRing } from "@/components/dashboard/ClarityRing";
 
 function computeClarityScore(sessions: any[]): number {
   if (!sessions || sessions.length === 0) return 0;
 
   const n = sessions.length;
 
-  // 1. Positive outcome rate (0–1)
   const positiveCount = sessions.filter(s => normalizeOutcome(s.outcome) === "positive").length;
   const positiveRate = positiveCount / n;
 
-  // 2. Dose consistency (inverse of std dev of dose_normalized_score, 0–1)
   const doses = sessions.map(s => s.dose_normalized_score).filter((d): d is number => d != null);
   let doseConsistency = 1;
   if (doses.length >= 2) {
     const mean = doses.reduce((a, b) => a + b, 0) / doses.length;
     const variance = doses.reduce((a, d) => a + (d - mean) ** 2, 0) / doses.length;
     const stdDev = Math.sqrt(variance);
-    doseConsistency = Math.max(0, 1 - stdDev / 5); // normalize: stdDev of 5 → 0
+    doseConsistency = Math.max(0, 1 - stdDev / 5);
   }
 
-  // 3. Effect stability (avg inverse stddev across effect sliders, 0–1)
   const effectKeys = ["effect_relaxation", "effect_focus", "effect_euphoria", "effect_anxiety", "effect_pain_relief", "effect_sleepiness"] as const;
   const effectStabilities: number[] = [];
   for (const key of effectKeys) {
@@ -41,10 +39,8 @@ function computeClarityScore(sessions: any[]): number {
     ? effectStabilities.reduce((a, b) => a + b, 0) / effectStabilities.length
     : 0.5;
 
-  // 4. Session volume factor (ramp up to 1 at 10 sessions)
   const volumeFactor = Math.min(1, n / 10);
 
-  // Weighted blend
   const raw = (positiveRate * 0.35 + doseConsistency * 0.2 + effectStability * 0.25 + volumeFactor * 0.2);
   return Math.round(raw * 100);
 }
@@ -63,12 +59,14 @@ export function ClarityScoreCard() {
   const label = getScoreLabel(score);
   const hasData = (sessions?.length ?? 0) > 0;
 
-  // Detect score change for active pulse
+  // Track previous score for directional animations
   const prevScoreRef = useRef(score);
+  const [prevScore, setPrevScore] = useState<number | undefined>(undefined);
   const [scoreChanged, setScoreChanged] = useState(false);
 
   useEffect(() => {
     if (prevScoreRef.current !== score && prevScoreRef.current !== 0) {
+      setPrevScore(prevScoreRef.current);
       setScoreChanged(true);
       const timer = setTimeout(() => setScoreChanged(false), 1200);
       prevScoreRef.current = score;
@@ -76,13 +74,6 @@ export function ClarityScoreCard() {
     }
     prevScoreRef.current = score;
   }, [score]);
-
-  // SVG circle params
-  const size = 100;
-  const strokeWidth = 7;
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (score / 100) * circumference;
 
   if (isLoading) {
     return (
@@ -104,44 +95,7 @@ export function ClarityScoreCard() {
             {/* Circular progress with Signal Pulse */}
             <div className="flex-shrink-0">
               <SignalPulse active={scoreChanged} intensity="low">
-                <div className="relative halo-focus">
-                  <svg width={size} height={size} className="-rotate-90">
-                    {/* Background track */}
-                    <circle
-                      cx={size / 2}
-                      cy={size / 2}
-                      r={radius}
-                      fill="none"
-                      stroke="hsl(var(--secondary))"
-                      strokeWidth={strokeWidth}
-                    />
-                    {/* Progress arc */}
-                    <motion.circle
-                      cx={size / 2}
-                      cy={size / 2}
-                      r={radius}
-                      fill="none"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth={strokeWidth}
-                      strokeLinecap="round"
-                      strokeDasharray={circumference}
-                      initial={{ strokeDashoffset: circumference }}
-                      animate={{ strokeDashoffset: offset }}
-                      transition={{ duration: 1.2, ease: "easeOut", delay: 0.4 }}
-                    />
-                  </svg>
-                  {/* Center text */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <motion.span
-                      className="text-2xl font-serif font-medium text-foreground leading-none"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.6 }}
-                    >
-                      {hasData ? `${score}%` : "—"}
-                    </motion.span>
-                  </div>
-                </div>
+                <ClarityRing score={score} prevScore={prevScore} size="md" />
               </SignalPulse>
             </div>
 
