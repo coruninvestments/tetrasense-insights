@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { BrandImage } from "@/components/brand/BrandImage";
+import { ASSETS } from "@/lib/assets";
 
 interface InsightUnlockCardProps {
   icon: LucideIcon;
@@ -9,6 +11,8 @@ interface InsightUnlockCardProps {
   current?: number;
   target?: number;
   unit?: string;
+  /** Show the empty-insights illustration above the message */
+  showIllustration?: boolean;
 }
 
 export function InsightUnlockCard({
@@ -18,6 +22,7 @@ export function InsightUnlockCard({
   current,
   target,
   unit = "sessions",
+  showIllustration = false,
 }: InsightUnlockCardProps) {
   const hasProgress = current != null && target != null && target > 0;
   const progress = hasProgress ? Math.min(current / target, 1) : 0;
@@ -30,6 +35,18 @@ export function InsightUnlockCard({
     >
       <Card variant="glass" className="overflow-hidden">
         <CardContent className="p-6 flex flex-col items-center text-center gap-3">
+          {/* Theme-aware illustration */}
+          {showIllustration && (
+            <div className="w-full max-h-[140px] flex items-center justify-center opacity-60 mb-1">
+              <BrandImage
+                src={ASSETS.emptyInsightsDark}
+                alt="Unlock insights"
+                themeAware
+                className="max-h-[140px] w-auto object-contain rounded-xl"
+              />
+            </div>
+          )}
+
           {/* Icon */}
           <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
             <Icon className="w-6 h-6 text-primary" />

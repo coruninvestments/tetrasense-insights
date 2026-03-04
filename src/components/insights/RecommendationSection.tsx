@@ -156,6 +156,7 @@ export function RecommendationSection() {
         subtitle="We'll find your ideal strain, method, and dose"
         current={sessionCount}
         target={3}
+        showIllustration
       />
     );
   }

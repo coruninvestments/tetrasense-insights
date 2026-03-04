@@ -225,6 +225,7 @@ export function DecisionInsightsSection() {
         subtitle="See which strains work best for each goal"
         current={sessionCount}
         target={3}
+        showIllustration
       />
     );
   }

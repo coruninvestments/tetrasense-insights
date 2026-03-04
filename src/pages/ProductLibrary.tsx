@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Search, ShieldCheck, ShieldAlert, Clock, Beaker, BarChart3, Leaf, Trophy } from "lucide-react";
+import { Search, ShieldCheck, ShieldAlert, Clock, Beaker, BarChart3, Leaf, Trophy, RotateCcw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,6 +13,9 @@ import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { usePublicBatchBrowse } from "@/hooks/usePublicBatchBrowse";
 import { normalizeOutcome } from "@/lib/sessionOutcome";
 import { computeStrainRankings } from "@/lib/bestForYou";
+import { BrandImage } from "@/components/brand/BrandImage";
+import { ASSETS } from "@/lib/assets";
+import { Button } from "@/components/ui/button";
 
 const TYPE_OPTIONS = ["Indica", "Sativa", "Hybrid"] as const;
 
@@ -52,6 +55,15 @@ export default function ProductLibrary() {
   const [terpeneFilter, setTerpeneFilter] = useState<TerpeneFilter>(null);
   const [outcomeFilter, setOutcomeFilter] = useState<OutcomeFilter>(null);
   const [sortMode, setSortMode] = useState<"default" | "best">("default");
+
+  const hasActiveFilters = !!(search || typeFilter || terpeneFilter || outcomeFilter);
+  const resetFilters = useCallback(() => {
+    setSearch("");
+    setTypeFilter(null);
+    setTerpeneFilter(null);
+    setOutcomeFilter(null);
+    setSortMode("default");
+  }, []);
 
   const { data: dbStrains, isLoading: strainsLoading } = useStrains(search, typeFilter);
   const { data: sessions } = useSessionLogs();
@@ -292,10 +304,27 @@ export default function ProductLibrary() {
               })}
             </div>
           ) : (
-            <div className="text-center py-16">
-              <Leaf className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center text-center py-12 gap-4"
+            >
+              <div className="w-full max-h-[160px] flex items-center justify-center opacity-50">
+                <BrandImage
+                  src={ASSETS.emptyLibraryDark}
+                  alt="No results"
+                  themeAware
+                  className="max-h-[160px] w-auto object-contain rounded-xl"
+                />
+              </div>
               <p className="text-sm text-muted-foreground">No products match your filters</p>
-            </div>
+              {hasActiveFilters && (
+                <Button variant="soft" size="sm" onClick={resetFilters}>
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  Reset filters
+                </Button>
+              )}
+            </motion.div>
           )}
         </div>
       </div>

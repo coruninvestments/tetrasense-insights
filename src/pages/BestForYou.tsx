@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { BrandImage } from "@/components/brand/BrandImage";
+import { ASSETS } from "@/lib/assets";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useSessionLogs, type SessionIntent } from "@/hooks/useSessionLogs";
@@ -151,12 +153,26 @@ export default function BestForYou() {
               <Skeleton key={i} className="h-24 rounded-xl" />
             ))
           ) : !hasEnoughData ? (
-            <EmptyState
-              title="Not enough data yet"
-              description="Log at least 2 sessions to see personalized rankings."
-              actionLabel="Log a session"
-              actionTo="/log"
-            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex flex-col items-center text-center gap-4"
+            >
+              <div className="w-full max-h-[140px] flex items-center justify-center opacity-50">
+                <BrandImage
+                  src={ASSETS.emptyInsightsDark}
+                  alt="Keep logging"
+                  themeAware
+                  className="max-h-[140px] w-auto object-contain rounded-xl"
+                />
+              </div>
+              <EmptyState
+                title="Not enough data yet"
+                description="Log at least 2 sessions to see personalized rankings."
+                actionLabel="Log a session"
+                actionTo="/log"
+              />
+            </motion.div>
           ) : rankings.length > 0 ? (
             rankings.map((strain, idx) => (
               <motion.div
