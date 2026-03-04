@@ -10,7 +10,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { toast } from "sonner";
 
 const THANK_YOU_TEMPLATES = [
-  (name: string) => `Thanks, ${name}. This genuinely helps us make TetraSense better for you.`,
+  (name: string) => `Thanks, ${name}. This genuinely helps us make Signal Leaf better for you.`,
   (name: string) => `Appreciate you, ${name}. We read every piece of feedback.`,
   (name: string) => `${name}, you're awesome. Your input shapes what we build next.`,
   (name: string) => `Heard you loud and clear, ${name}. Thanks for taking the time.`,

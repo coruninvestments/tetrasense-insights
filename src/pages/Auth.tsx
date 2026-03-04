@@ -86,7 +86,7 @@ const Auth = forwardRef<HTMLDivElement>(function Auth(_props, ref) {
             <Leaf className="w-6 h-6 text-primary-foreground" />
           </div>
           <h1 className="font-serif text-3xl font-medium text-foreground">
-            TetraSense
+            Signal Leaf
           </h1>
         </motion.div>
         <motion.p

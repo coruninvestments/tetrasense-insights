@@ -12,7 +12,7 @@ import { tryUnlock } from "@/lib/achievements";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
 import type { AchievementKey } from "@/lib/achievements";
 import { useQueryClient } from "@tanstack/react-query";
-import { Leaf } from "lucide-react";
+import { SignalLeafLogo } from "@/components/brand/SignalLeafLogo";
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -47,9 +47,7 @@ export default function Insights() {
               animate={{ opacity: 1, y: 0 }}
               className="flex items-center gap-3"
             >
-              <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center">
-                <Leaf className="w-5 h-5 text-primary" />
-              </div>
+              <SignalLeafLogo variant="icon" size="md" />
               <div>
                 <h1 className="font-serif text-2xl font-medium text-foreground">
                   Insights

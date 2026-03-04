@@ -105,7 +105,7 @@ export default function ResetPassword() {
           <div className="w-12 h-12 rounded-2xl gradient-primary flex items-center justify-center">
             <Leaf className="w-6 h-6 text-primary-foreground" />
           </div>
-          <h1 className="font-serif text-3xl font-medium text-foreground">TetraSense</h1>
+          <h1 className="font-serif text-3xl font-medium text-foreground">Signal Leaf</h1>
         </motion.div>
         <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="text-muted-foreground">
           Set your new password
