@@ -90,7 +90,7 @@ function PaywallModal({ open, onClose }: { open: boolean; onClose: () => void })
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+          className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-4"
         >
           {/* Backdrop */}
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={onClose} />
@@ -112,7 +112,7 @@ function PaywallModal({ open, onClose }: { open: boolean; onClose: () => void })
             </button>
 
             {/* Scrollable body */}
-            <div className="overflow-y-auto overscroll-contain flex-1" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
+            <div className="overflow-y-auto overscroll-contain flex-1" style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 80px)" }}>
               {/* Hero with stardust ring */}
               <div className="relative gradient-primary overflow-hidden">
                 {/* Stardust radial overlay */}
