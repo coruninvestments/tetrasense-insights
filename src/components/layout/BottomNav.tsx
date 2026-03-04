@@ -17,40 +17,45 @@ export function BottomNav() {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border safe-bottom">
-      <div className="relative max-w-lg mx-auto px-2 py-2">
-        <div className="flex items-end">
-          {/* Left group */}
-          <div className="flex-1 flex justify-around">
-            {leftItems.map((item) => (
-              <NavItem key={item.path} {...item} isActive={location.pathname === item.path} />
-            ))}
+    <nav className="fixed bottom-0 left-0 right-0 z-50 overflow-hidden">
+      {/* Contained glow backdrop — sits behind everything */}
+      <div className="absolute left-1/2 -translate-x-1/2 bottom-2 w-24 h-24 rounded-full bg-primary/10 blur-2xl pointer-events-none" />
+
+      <div className="relative bg-card/95 backdrop-blur-md border-t border-border safe-bottom">
+        <div className="relative max-w-lg mx-auto px-2 py-2">
+          <div className="flex items-end">
+            {/* Left group */}
+            <div className="flex-1 flex justify-around">
+              {leftItems.map((item) => (
+                <NavItem key={item.path} {...item} isActive={location.pathname === item.path} />
+              ))}
+            </div>
+
+            {/* Center spacer */}
+            <div className="w-16 shrink-0" />
+
+            {/* Right group */}
+            <div className="flex-1 flex justify-around">
+              {rightItems.map((item) => (
+                <NavItem key={item.path} {...item} isActive={location.pathname === item.path} />
+              ))}
+            </div>
           </div>
 
-          {/* Center spacer for the FAB */}
-          <div className="w-16 shrink-0" />
-
-          {/* Right group */}
-          <div className="flex-1 flex justify-around">
-            {rightItems.map((item) => (
-              <NavItem key={item.path} {...item} isActive={location.pathname === item.path} />
-            ))}
-          </div>
-        </div>
-
-        {/* Center Log FAB — absolutely centered */}
-        <Link
-          to="/log"
-          className="absolute left-1/2 -translate-x-1/2 -top-5 flex flex-col items-center"
-        >
-          <motion.div
-            whileTap={{ scale: 0.95 }}
-            className="gradient-primary w-14 h-14 rounded-full flex items-center justify-center shadow-glow"
+          {/* Center Log FAB */}
+          <Link
+            to="/log"
+            className="absolute left-1/2 -translate-x-1/2 -top-5 flex flex-col items-center"
           >
-            <Plus className="w-6 h-6 text-primary-foreground" />
-          </motion.div>
-          <span className="text-[10px] font-medium text-muted-foreground mt-1">Log</span>
-        </Link>
+            <motion.div
+              whileTap={{ scale: 0.95 }}
+              className="gradient-primary w-14 h-14 rounded-full flex items-center justify-center shadow-[0_0_22px_rgba(111,175,159,0.35)]"
+            >
+              <Plus className="w-6 h-6 text-primary-foreground" />
+            </motion.div>
+            <span className="text-[10px] font-medium text-muted-foreground mt-1">Log</span>
+          </Link>
+        </div>
       </div>
     </nav>
   );
