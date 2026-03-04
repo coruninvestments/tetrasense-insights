@@ -13,7 +13,8 @@ type AnalyticsEvent =
   | "viewed_confidence_meter"
   | "tapped_confidence_cta"
   | "streak_incremented"
-  | "viewed_streak_card";
+  | "viewed_streak_card"
+  | "blocked_client_write_products";
 
 export async function logEvent(eventName: AnalyticsEvent) {
   try {
