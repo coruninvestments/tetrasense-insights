@@ -6,6 +6,7 @@ import { useDecisionInsights } from "@/hooks/useDecisionInsights";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { normalizeOutcome } from "@/lib/sessionOutcome";
 import { useMemo } from "react";
+import { InsightUnlockCard } from "./InsightUnlockCard";
 
 const INTENT_LABELS: Record<string, string> = {
   sleep: "Sleep",
@@ -144,7 +145,20 @@ export function RecommendationSection() {
     return items.slice(0, 3);
   }, [data]);
 
-  if (isLoading || !data?.hasEnoughData) return null;
+  if (isLoading) return null;
+
+  if (!data?.hasEnoughData) {
+    const sessionCount = sessions?.length ?? 0;
+    return (
+      <InsightUnlockCard
+        icon={Sparkles}
+        title="Log 3 sessions to get personalized recommendations"
+        subtitle="We'll find your ideal strain, method, and dose"
+        current={sessionCount}
+        target={3}
+      />
+    );
+  }
 
   return (
     <div className="space-y-4">

@@ -4,6 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDecisionInsights, StrainOutcome, IntentBestWorst, MethodComparison } from "@/hooks/useDecisionInsights";
+import { useSessionLogs } from "@/hooks/useSessionLogs";
+import { InsightUnlockCard } from "./InsightUnlockCard";
 
 const INTENT_LABELS: Record<string, string> = {
   sleep: "😴 Sleep",
@@ -202,6 +204,8 @@ function WhatWorksSection({ bestMethod, methodComparisons }: { bestMethod: Metho
 
 export function DecisionInsightsSection() {
   const { data, isLoading } = useDecisionInsights();
+  const { data: sessions } = useSessionLogs();
+  const sessionCount = sessions?.length ?? 0;
 
   if (isLoading) {
     return (
@@ -215,14 +219,13 @@ export function DecisionInsightsSection() {
 
   if (!data || !data.hasEnoughData) {
     return (
-      <Card variant="glass">
-        <CardContent className="p-5 text-center">
-          <ThumbsUp className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">
-            Log at least 3 sessions to unlock decision insights.
-          </p>
-        </CardContent>
-      </Card>
+      <InsightUnlockCard
+        icon={Target}
+        title="Log 3 sessions to unlock decision insights"
+        subtitle="See which strains work best for each goal"
+        current={sessionCount}
+        target={3}
+      />
     );
   }
 
