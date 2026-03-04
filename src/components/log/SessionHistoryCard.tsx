@@ -8,9 +8,9 @@ interface Props {
 }
 
 const outcomeLabels: Record<string, string> = {
-  positive: "Positive 👍",
-  neutral: "Neutral 😐",
-  negative: "Not ideal 👎",
+  positive: "Positive",
+  neutral: "Neutral",
+  negative: "Not ideal",
 };
 
 export function SessionHistoryCard({ memory }: Props) {

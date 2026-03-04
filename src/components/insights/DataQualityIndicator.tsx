@@ -24,12 +24,11 @@ export function getDataQuality(totalSessions: number): DataQuality {
   return "strong";
 }
 
-// Tier thresholds for progress calculation
 const tierThresholds: Record<DataQuality, { start: number; target: number }> = {
   insufficient: { start: 0, target: 3 },
   early: { start: 3, target: 7 },
   good: { start: 7, target: 15 },
-  strong: { start: 15, target: 15 }, // Max tier
+  strong: { start: 15, target: 15 },
 };
 
 function getProgressInfo(totalSessions: number, quality: DataQuality) {
@@ -89,21 +88,17 @@ export function DataQualityIndicator({ totalSessions }: DataQualityIndicatorProp
   const { Icon, label, description, colorClass, bgClass } = config;
   const { sessionsRemaining, progressPercent, isMaxTier } = getProgressInfo(totalSessions, quality);
   
-  // Track previous tier for celebration effect, persisted in localStorage
   const STORAGE_KEY = "dataQuality:lastTier";
   const prevTierRef = useRef<DataQuality | null>(null);
   
   useEffect(() => {
-    // SSR safety guard
     if (typeof window === "undefined") return;
     
-    // Initialize from localStorage on first render
     if (prevTierRef.current === null) {
       const storedTier = localStorage.getItem(STORAGE_KEY) as DataQuality | null;
       if (storedTier && tierOrder.includes(storedTier)) {
         prevTierRef.current = storedTier;
       } else {
-        // No stored tier, initialize to current without celebrating
         prevTierRef.current = quality;
         localStorage.setItem(STORAGE_KEY, quality);
       }
@@ -113,16 +108,14 @@ export function DataQualityIndicator({ totalSessions }: DataQualityIndicatorProp
     const prevIndex = tierOrder.indexOf(prevTierRef.current);
     const currentIndex = tierOrder.indexOf(quality);
     
-    // Only celebrate if tier increased (not decreased)
     if (currentIndex > prevIndex) {
       toast({
-        title: `Tier Up: ${tierLabels[quality]} 🎉`,
+        title: `Tier Up: ${tierLabels[quality]}`,
         description: qualityConfig[quality].description,
         duration: 2500,
       });
     }
     
-    // Always persist current tier and update ref
     localStorage.setItem(STORAGE_KEY, quality);
     prevTierRef.current = quality;
   }, [quality]);
@@ -149,7 +142,6 @@ export function DataQualityIndicator({ totalSessions }: DataQualityIndicatorProp
         </div>
         <p className="text-xs text-muted-foreground">{description}</p>
         
-        {/* Progress to next tier */}
         <div className="mt-2 space-y-1">
           <p className="text-xs text-muted-foreground">
             {isMaxTier 

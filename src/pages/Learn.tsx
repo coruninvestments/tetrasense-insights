@@ -1,8 +1,9 @@
 import { motion } from "framer-motion";
-import { Book, Clock, ChevronRight } from "lucide-react";
+import { Book, Clock, ChevronRight, Dna, BarChart3, Moon, Wind } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { AppLayout } from "@/components/layout/AppLayout";
+import type { LucideIcon } from "lucide-react";
 
 const quickReads = [
   {
@@ -25,34 +26,34 @@ const quickReads = [
   },
 ];
 
-const deepGuides = [
+const deepGuides: { id: string; title: string; description: string; readTime: string; icon: LucideIcon }[] = [
   {
     id: "1",
     title: "Complete Guide to Cannabinoids",
     description: "Everything you need to know about THC, CBD, CBN, and more",
     readTime: "12 min",
-    image: "🧬",
+    icon: Dna,
   },
   {
     id: "2",
     title: "Dosing for Beginners",
     description: "How to find your optimal dose and avoid overconsumption",
     readTime: "8 min",
-    image: "📊",
+    icon: BarChart3,
   },
   {
     id: "3",
     title: "Cannabis & Sleep",
     description: "How cannabis affects sleep quality and what strains work best",
     readTime: "10 min",
-    image: "🌙",
+    icon: Moon,
   },
   {
     id: "4",
     title: "Methods of Consumption",
     description: "Pros and cons of smoking, vaping, edibles, and more",
     readTime: "7 min",
-    image: "💨",
+    icon: Wind,
   },
 ];
 
@@ -113,7 +114,7 @@ export default function Learn() {
                           <span className="text-xs text-muted-foreground">
                             {article.category}
                           </span>
-                          <span className="text-muted-foreground">•</span>
+                          <span className="text-muted-foreground">·</span>
                           <span className="text-xs text-muted-foreground flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             {article.readTime}
@@ -135,36 +136,41 @@ export default function Learn() {
             </h2>
 
             <div className="grid gap-4">
-              {deepGuides.map((guide, index) => (
-                <motion.div
-                  key={guide.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 + index * 0.1 }}
-                >
-                  <Link to={`/learn/guide/${guide.id}`}>
-                    <Card variant="elevated" className="overflow-hidden">
-                      <div className="p-5">
-                        <div className="flex items-start gap-4">
-                          <span className="text-4xl">{guide.image}</span>
-                          <div className="flex-1">
-                            <h3 className="font-serif text-lg font-medium text-foreground mb-1">
-                              {guide.title}
-                            </h3>
-                            <p className="text-sm text-muted-foreground mb-2">
-                              {guide.description}
-                            </p>
-                            <span className="text-xs text-muted-foreground flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {guide.readTime} read
-                            </span>
+              {deepGuides.map((guide, index) => {
+                const Icon = guide.icon;
+                return (
+                  <motion.div
+                    key={guide.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 + index * 0.1 }}
+                  >
+                    <Link to={`/learn/guide/${guide.id}`}>
+                      <Card variant="elevated" className="overflow-hidden">
+                        <div className="p-5">
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                              <Icon className="h-6 w-6 text-primary" strokeWidth={2} />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="font-serif text-lg font-medium text-foreground mb-1">
+                                {guide.title}
+                              </h3>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                {guide.description}
+                              </p>
+                              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {guide.readTime} read
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </Card>
-                  </Link>
-                </motion.div>
-              ))}
+                      </Card>
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </div>
           </section>
         </div>

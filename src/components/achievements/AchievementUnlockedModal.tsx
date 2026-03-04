@@ -1,7 +1,7 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { Share2 } from "lucide-react";
+import { Share2, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { getAchievementDef, type AchievementKey } from "@/lib/achievements";
 
@@ -14,7 +14,7 @@ export function AchievementUnlockedModal({ achievementKey, onClose }: Props) {
   const def = achievementKey ? getAchievementDef(achievementKey) : null;
 
   const handleShare = () => {
-    const text = `🏆 I just unlocked "${def?.title}" on Signal Leaf! ${def?.description}`;
+    const text = `I just unlocked "${def?.title}" on Signal Leaf! ${def?.description}`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(text);
       toast.success("Copied to clipboard!");
@@ -33,7 +33,9 @@ export function AchievementUnlockedModal({ achievementKey, onClose }: Props) {
               transition={{ type: "spring", damping: 15, stiffness: 200 }}
               className="flex flex-col items-center gap-3"
             >
-              <span className="text-5xl stardust inline-block">{def.emoji}</span>
+              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center stardust">
+                {(() => { const Icon = def.icon; return <Icon className="h-7 w-7 text-primary" strokeWidth={2} />; })()}
+              </div>
               <p className="text-xs uppercase tracking-widest text-muted-foreground font-semibold">
                 Achievement Unlocked
               </p>

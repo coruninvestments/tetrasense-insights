@@ -1,13 +1,14 @@
 import { Slider } from "@/components/ui/slider";
+import type { LucideIcon } from "lucide-react";
 
 interface EffectSliderProps {
   label: string;
-  emoji: string;
+  icon: LucideIcon;
   value: number;
   onChange: (value: number) => void;
 }
 
-export function EffectSlider({ label, emoji, value, onChange }: EffectSliderProps) {
+export function EffectSlider({ label, icon: Icon, value, onChange }: EffectSliderProps) {
   const getIntensityLabel = (val: number) => {
     if (val === 0) return "None";
     if (val <= 3) return "Low";
@@ -20,7 +21,7 @@ export function EffectSlider({ label, emoji, value, onChange }: EffectSliderProp
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-lg">{emoji}</span>
+          <Icon className="h-4 w-4 shrink-0 text-muted-foreground" strokeWidth={2} />
           <span className="text-sm font-medium text-foreground">{label}</span>
         </div>
         <div className="flex items-center gap-2">

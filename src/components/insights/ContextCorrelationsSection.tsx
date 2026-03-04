@@ -1,14 +1,25 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { AlertTriangle, MapPin } from "lucide-react";
+import { AlertTriangle, MapPin, Coffee } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSessionLogs, type SessionLog } from "@/hooks/useSessionLogs";
 import { normalizeOutcome } from "@/lib/sessionOutcome";
 import { InsightUnlockCard } from "./InsightUnlockCard";
+import { getContextIcon, CAFFEINE_ICON } from "@/lib/context";
+import type { LucideIcon } from "lucide-react";
+import {
+  TIME_OPTIONS,
+  SETTING_OPTIONS,
+  STOMACH_OPTIONS,
+  HYDRATION_OPTIONS,
+  SLEEP_OPTIONS,
+  MOOD_OPTIONS,
+  STRESS_OPTIONS,
+} from "@/lib/context";
 
 interface ContextCorrelation {
   label: string;
-  emoji: string;
+  icon: LucideIcon;
   negativeRate: number;
   sampleSize: number;
 }
@@ -16,74 +27,34 @@ interface ContextCorrelation {
 const CONTEXT_FIELDS: {
   key: keyof SessionLog;
   label: string;
-  values: { id: string; label: string; emoji: string }[];
+  values: { id: string; label: string; icon: LucideIcon }[];
 }[] = [
-  {
-    key: "time_of_day",
-    label: "Time of day",
-    values: [
-      { id: "morning", label: "Morning", emoji: "🌅" },
-      { id: "afternoon", label: "Afternoon", emoji: "☀️" },
-      { id: "evening", label: "Evening", emoji: "🌆" },
-      { id: "night", label: "Night", emoji: "🌙" },
-    ],
-  },
-  {
-    key: "setting",
-    label: "Setting",
-    values: [
-      { id: "home", label: "Home", emoji: "🏠" },
-      { id: "outdoors", label: "Outdoors", emoji: "🌳" },
-      { id: "social", label: "Social", emoji: "👥" },
-      { id: "alone", label: "Alone", emoji: "🧘" },
-      { id: "public", label: "Public", emoji: "🏙️" },
-    ],
-  },
+  { key: "time_of_day", label: "Time of day", values: TIME_OPTIONS },
+  { key: "setting", label: "Setting", values: SETTING_OPTIONS },
   {
     key: "stomach",
     label: "Stomach",
-    values: [
-      { id: "empty", label: "Empty stomach", emoji: "🍽️" },
-      { id: "light", label: "Light meal", emoji: "🥗" },
-      { id: "normal", label: "Normal meal", emoji: "🍽️" },
-      { id: "heavy", label: "Full stomach", emoji: "🍔" },
-    ],
+    values: STOMACH_OPTIONS.map((o) => ({ ...o, label: o.id === "empty" ? "Empty stomach" : o.id === "light" ? "Light meal" : o.id === "normal" ? "Normal meal" : "Full stomach" })),
   },
   {
     key: "hydration",
     label: "Hydration",
-    values: [
-      { id: "low", label: "Low hydration", emoji: "🏜️" },
-      { id: "ok", label: "OK hydration", emoji: "💧" },
-      { id: "high", label: "Well hydrated", emoji: "🌊" },
-    ],
+    values: HYDRATION_OPTIONS.map((o) => ({ ...o, label: o.id === "low" ? "Low hydration" : o.id === "ok" ? "OK hydration" : "Well hydrated" })),
   },
   {
     key: "sleep_quality",
     label: "Sleep quality",
-    values: [
-      { id: "poor", label: "Poor sleep", emoji: "😴" },
-      { id: "ok", label: "OK sleep", emoji: "😐" },
-      { id: "good", label: "Good sleep", emoji: "😊" },
-    ],
+    values: SLEEP_OPTIONS.map((o) => ({ ...o, label: o.id === "poor" ? "Poor sleep" : o.id === "ok" ? "OK sleep" : "Good sleep" })),
   },
   {
     key: "mood_before",
     label: "Mood before",
-    values: [
-      { id: "low", label: "Low mood", emoji: "😔" },
-      { id: "neutral", label: "Neutral mood", emoji: "😐" },
-      { id: "good", label: "Good mood", emoji: "😊" },
-    ],
+    values: MOOD_OPTIONS.map((o) => ({ ...o, label: o.id === "low" ? "Low mood" : o.id === "neutral" ? "Neutral mood" : "Good mood" })),
   },
   {
     key: "stress_before",
     label: "Stress",
-    values: [
-      { id: "low", label: "Low stress", emoji: "😌" },
-      { id: "medium", label: "Medium stress", emoji: "😐" },
-      { id: "high", label: "High stress", emoji: "😤" },
-    ],
+    values: STRESS_OPTIONS.map((o) => ({ ...o, label: o.id === "low" ? "Low stress" : o.id === "medium" ? "Medium stress" : "High stress" })),
   },
 ];
 
@@ -99,7 +70,7 @@ function computeCorrelations(sessions: SessionLog[]): ContextCorrelation[] {
       if (negRate >= 0.4) {
         results.push({
           label: val.label,
-          emoji: val.emoji,
+          icon: val.icon,
           negativeRate: negRate,
           sampleSize: matching.length,
         });
@@ -115,7 +86,7 @@ function computeCorrelations(sessions: SessionLog[]): ContextCorrelation[] {
     if (negRate >= 0.4) {
       results.push({
         label: "Had caffeine",
-        emoji: "☕",
+        icon: CAFFEINE_ICON,
         negativeRate: negRate,
         sampleSize: caffeineSessions.length,
       });
@@ -165,17 +136,20 @@ export function ContextCorrelationsSection() {
             </span>
           </div>
           <div className="space-y-2">
-            {correlations.map((c) => (
-              <div key={c.label} className="flex items-center justify-between py-1.5">
-                <span className="text-sm text-foreground">
-                  <span className="mr-1.5">{c.emoji}</span>
-                  {c.label}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {Math.round(c.negativeRate * 100)}% negative · {c.sampleSize} sessions
-                </span>
-              </div>
-            ))}
+            {correlations.map((c) => {
+              const Icon = c.icon;
+              return (
+                <div key={c.label} className="flex items-center justify-between py-1.5">
+                  <span className="text-sm text-foreground flex items-center gap-1.5">
+                    <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" strokeWidth={2} />
+                    {c.label}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {Math.round(c.negativeRate * 100)}% negative · {c.sampleSize} sessions
+                  </span>
+                </div>
+              );
+            })}
           </div>
           <p className="text-[11px] text-muted-foreground mt-3">
             Patterns from your session history — not medical advice

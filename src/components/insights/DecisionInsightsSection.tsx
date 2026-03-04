@@ -8,14 +8,14 @@ import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { InsightUnlockCard } from "./InsightUnlockCard";
 
 const INTENT_LABELS: Record<string, string> = {
-  sleep: "😴 Sleep",
-  relaxation: "🧘 Relaxation",
-  creativity: "🎨 Creativity",
-  focus: "🎯 Focus",
-  pain_relief: "💊 Pain Relief",
-  social: "🎉 Social",
-  recreation: "🎮 Recreation",
-  learning: "🧠 Learning",
+  sleep: "Sleep",
+  relaxation: "Relaxation",
+  creativity: "Creativity",
+  focus: "Focus",
+  pain_relief: "Pain Relief",
+  social: "Social",
+  recreation: "Recreation",
+  learning: "Learning",
 };
 
 type ConfidenceLevel = "low" | "medium" | "high";

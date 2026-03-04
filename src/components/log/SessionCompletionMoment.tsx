@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import { Check, ChevronDown, Sparkles, TrendingUp, AlertTriangle, Lightbulb } from "lucide-react";
+import { Check, ChevronDown, Sparkles, TrendingUp, AlertTriangle, Lightbulb, ThumbsUp, Meh, ThumbsDown, Coffee, Moon, UtensilsCrossed } from "lucide-react";
 import { HelpTip } from "@/components/guide/HelpTip";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffectDrivers } from "@/hooks/useEffectDrivers";
+import type { LucideIcon } from "lucide-react";
 
 type OutcomeChoice = "positive" | "neutral" | "negative";
 
@@ -27,10 +28,10 @@ interface Props {
   };
 }
 
-const outcomeOptions: { id: OutcomeChoice; emoji: string; label: string }[] = [
-  { id: "positive", emoji: "👍", label: "Worked well" },
-  { id: "neutral", emoji: "😐", label: "Neutral" },
-  { id: "negative", emoji: "👎", label: "Not ideal" },
+const outcomeOptions: { id: OutcomeChoice; icon: LucideIcon; label: string }[] = [
+  { id: "positive", icon: ThumbsUp, label: "Worked well" },
+  { id: "neutral", icon: Meh, label: "Neutral" },
+  { id: "negative", icon: ThumbsDown, label: "Not ideal" },
 ];
 
 type PatternSignal = {
@@ -45,9 +46,8 @@ function detectPatternSignal(
   intent: string,
   method?: string
 ): PatternSignal | null {
-  const past = sessions.filter((s) => s.id); // all past sessions (current excluded by caller)
+  const past = sessions.filter((s) => s.id);
 
-  // Check strain + intent combo
   const matchingSessions = past.filter(
     (s) =>
       s.strain_name_text.toLowerCase() === strainName.toLowerCase() &&
@@ -76,7 +76,6 @@ function detectPatternSignal(
     }
   }
 
-  // Check strain overall (any intent)
   const strainSessions = past.filter(
     (s) => s.strain_name_text.toLowerCase() === strainName.toLowerCase()
   );
@@ -92,7 +91,6 @@ function detectPatternSignal(
     }
   }
 
-  // Check method pattern
   if (method) {
     const methodSessions = past.filter((s) => s.method === method && s.intent === intent);
     if (methodSessions.length >= 3) {
@@ -106,9 +104,8 @@ function detectPatternSignal(
     }
   }
 
-  // Fallback: general encouragement
   if (past.length < 3) {
-    return null; // not enough data, skip pattern feedback
+    return null;
   }
 
   return null;
@@ -124,7 +121,7 @@ function getSmartFeedback(
   if (sessionCount >= 5) {
     return "You're building consistency — insights improve over time.";
   }
-  return "Each session helps Tetra understand you better.";
+  return "Each session helps Signal Leaf understand you better.";
 }
 
 export function SessionCompletionMoment({ sessionId, strainName, intent, method, doseLevel, sessionContext }: Props) {
@@ -146,27 +143,24 @@ export function SessionCompletionMoment({ sessionId, strainName, intent, method,
   const patternSignal = useMemo(() => detectPatternSignal(pastSessions, strainName, intent, method), [pastSessions, strainName, intent, method]);
   const feedback = getSmartFeedback(sessions, sessions.length);
 
-  // Context-aware tips based on effect drivers
   const contextTips = useMemo(() => {
-    const tips: { emoji: string; message: string }[] = [];
+    const tips: { icon: LucideIcon; message: string }[] = [];
     const anxietyIsNegDriver = driverData.negativeDrivers.some((d) => d.key === "effect_anxiety");
     if (!anxietyIsNegDriver) return tips;
 
     if (sessionContext?.caffeine) {
-      tips.push({ emoji: "☕", message: "Caffeine + cannabis can increase anxiety for some people — consider lowering caffeine." });
+      tips.push({ icon: Coffee, message: "Caffeine + cannabis can increase anxiety for some people — consider lowering caffeine." });
     }
     if (sessionContext?.stomach === "empty") {
-      tips.push({ emoji: "🍽️", message: "Empty stomach can intensify effects — try a light meal next time." });
+      tips.push({ icon: UtensilsCrossed, message: "Empty stomach can intensify effects — try a light meal next time." });
     }
     if (sessionContext?.sleep_quality === "poor") {
-      tips.push({ emoji: "😴", message: "Poor sleep often increases sensitivity — consider a lower dose." });
+      tips.push({ icon: Moon, message: "Poor sleep often increases sensitivity — consider a lower dose." });
     }
     return tips;
   }, [driverData, sessionContext]);
 
-  // Compare to previous session with same strain+intent
   const comparison = useMemo(() => {
-    // Exclude current session (most recent) and find previous matching one
     const previous = sessions
       .filter((s) => s.id !== sessionId)
       .find(
@@ -255,7 +249,7 @@ export function SessionCompletionMoment({ sessionId, strainName, intent, method,
         transition={{ delay: 0.25 }}
         className="text-sm text-muted-foreground mb-8"
       >
-        Your data helps Tetra learn what works for you.
+        Your data helps Signal Leaf learn what works for you.
       </motion.p>
 
       {/* Quick Outcome Rating */}
@@ -269,27 +263,30 @@ export function SessionCompletionMoment({ sessionId, strainName, intent, method,
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             How was it?
           </p>
-          <HelpTip id="completion_outcome" title="Outcome Rating" description="This helps Tetra learn what works for you over time." />
+          <HelpTip id="completion_outcome" title="Outcome Rating" description="This helps Signal Leaf learn what works for you over time." />
         </div>
         <div className="grid grid-cols-3 gap-2">
-          {outcomeOptions.map((opt) => (
-            <button
-              key={opt.id}
-              type="button"
-              disabled={savingOutcome}
-              onClick={() => handleOutcomeSelect(opt.id)}
-              className={`flex flex-col items-center gap-1.5 p-3 rounded-xl text-sm font-medium transition-all ${
-                selectedOutcome === opt.id
-                  ? "ring-2 ring-primary bg-primary/5 scale-[1.02]"
-                  : "bg-secondary hover:bg-secondary/80"
-              }`}
-            >
-              <span className="text-2xl">{opt.emoji}</span>
-              <span className="text-xs text-center leading-tight text-muted-foreground">
-                {opt.label}
-              </span>
-            </button>
-          ))}
+          {outcomeOptions.map((opt) => {
+            const Icon = opt.icon;
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                disabled={savingOutcome}
+                onClick={() => handleOutcomeSelect(opt.id)}
+                className={`flex flex-col items-center gap-1.5 p-3 rounded-xl text-sm font-medium transition-all ${
+                  selectedOutcome === opt.id
+                    ? "ring-2 ring-primary bg-primary/5 scale-[1.02]"
+                    : "bg-secondary hover:bg-secondary/80"
+                }`}
+              >
+                <Icon className="h-6 w-6 text-muted-foreground" strokeWidth={2} />
+                <span className="text-xs text-center leading-tight text-muted-foreground">
+                  {opt.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </motion.div>
 
@@ -384,7 +381,9 @@ export function SessionCompletionMoment({ sessionId, strainName, intent, method,
                 </Button>
               )}
               {noteSaved && (
-                <p className="text-xs text-primary">Note saved ✓</p>
+                <p className="text-xs text-primary flex items-center gap-1">
+                  <Check className="h-3 w-3" /> Note saved
+                </p>
               )}
             </div>
           </CollapsibleContent>
@@ -479,12 +478,15 @@ export function SessionCompletionMoment({ sessionId, strainName, intent, method,
               Context tip
             </p>
           </div>
-          {contextTips.map((tip, i) => (
-            <p key={i} className="text-xs text-muted-foreground leading-relaxed">
-              <span className="mr-1">{tip.emoji}</span>
-              {tip.message}
-            </p>
-          ))}
+          {contextTips.map((tip, i) => {
+            const TipIcon = tip.icon;
+            return (
+              <p key={i} className="text-xs text-muted-foreground leading-relaxed flex items-start gap-1.5">
+                <TipIcon className="h-3.5 w-3.5 shrink-0 mt-0.5" strokeWidth={2} />
+                {tip.message}
+              </p>
+            );
+          })}
         </motion.div>
       )}
 

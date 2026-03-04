@@ -197,9 +197,9 @@ function StrainCard({ stat, showIntent }: { stat: any; showIntent: boolean }) {
               )}
             </div>
             <div className="flex justify-between text-[10px] text-muted-foreground">
-              <span>👍 {stat.outcome_positive_pct}%</span>
-              <span>😐 {stat.outcome_neutral_pct ?? 0}%</span>
-              <span>👎 {stat.outcome_avoid_pct ?? 0}%</span>
+              <span>+ {stat.outcome_positive_pct}%</span>
+              <span>~ {stat.outcome_neutral_pct ?? 0}%</span>
+              <span>- {stat.outcome_avoid_pct ?? 0}%</span>
             </div>
           </div>
         )}

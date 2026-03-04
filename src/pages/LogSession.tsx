@@ -19,39 +19,13 @@ import { useActiveBatch } from "@/hooks/useActiveBatch";
 import { useSessionMemory } from "@/hooks/useSessionMemory";
 import { computeSessionOutcomeForPreview } from "@/lib/sessionOutcome";
 import { toast } from "sonner";
+import { GOALS } from "@/lib/goals";
+import { METHODS } from "@/lib/methods";
+import { EFFECTS } from "@/lib/effects";
 
 type Step = "product" | "intent" | "dose" | "effects" | "context" | "done";
 
 const steps: Step[] = ["product", "intent", "dose", "effects", "context", "done"];
-
-const intents: { id: SessionIntent; label: string; emoji: string }[] = [
-  { id: "sleep", label: "Sleep", emoji: "🌙" },
-  { id: "focus", label: "Focus", emoji: "🎯" },
-  { id: "relaxation", label: "Relax", emoji: "🧘" },
-  { id: "creativity", label: "Creativity", emoji: "🎨" },
-  { id: "pain_relief", label: "Pain", emoji: "💆" },
-  { id: "social", label: "Social", emoji: "👥" },
-  { id: "recreation", label: "Recreation", emoji: "🎉" },
-  { id: "learning", label: "Learning", emoji: "🧠" },
-];
-
-const methods: { id: SessionMethod; label: string; emoji: string }[] = [
-  { id: "smoke", label: "Smoke", emoji: "🚬" },
-  { id: "vape", label: "Vape", emoji: "💨" },
-  { id: "edible", label: "Edible", emoji: "🍪" },
-  { id: "tincture", label: "Tincture", emoji: "💧" },
-  { id: "topical", label: "Topical", emoji: "🧴" },
-  { id: "other", label: "Other", emoji: "✨" },
-];
-
-const effectsConfig = [
-  { key: "relaxation" as const, label: "Relaxation", emoji: "😌" },
-  { key: "focus" as const, label: "Focus", emoji: "🎯" },
-  { key: "sleepiness" as const, label: "Energy", emoji: "⚡" },
-  { key: "anxiety" as const, label: "Anxiety", emoji: "😰" },
-  { key: "pain_relief" as const, label: "Pain Relief", emoji: "🩹" },
-  { key: "euphoria" as const, label: "Mood", emoji: "😊" },
-];
 
 const doseUnits = ["hit", "puff", "bowl", "dab", "g", "mg", "other"] as const;
 
@@ -334,20 +308,23 @@ export default function LogSession() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  {intents.map((intent) => (
-                    <button
-                      key={intent.id}
-                      onClick={() => setSelectedIntent(intent.id)}
-                      className={`flex flex-col items-start gap-1 p-4 rounded-xl border text-left transition-all duration-200 ${
-                        selectedIntent === intent.id
-                          ? "border-primary bg-primary/10 shadow-glow"
-                          : "border-border bg-card hover:border-primary/30"
-                      }`}
-                    >
-                      <span className="text-2xl">{intent.emoji}</span>
-                      <span className="text-sm font-medium text-foreground">{intent.label}</span>
-                    </button>
-                  ))}
+                  {GOALS.map((goal) => {
+                    const Icon = goal.icon;
+                    return (
+                      <button
+                        key={goal.id}
+                        onClick={() => setSelectedIntent(goal.id)}
+                        className={`flex flex-col items-start gap-2 p-4 rounded-xl border text-left transition-all duration-200 ${
+                          selectedIntent === goal.id
+                            ? "border-primary bg-primary/10 shadow-glow"
+                            : "border-border bg-card hover:border-primary/30"
+                        }`}
+                      >
+                        <Icon className="h-5 w-5 shrink-0 text-muted-foreground" strokeWidth={2} />
+                        <span className="text-sm font-medium text-foreground">{goal.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
 
                 <Button
@@ -380,20 +357,23 @@ export default function LogSession() {
                     Method
                   </p>
                   <div className="grid grid-cols-3 gap-2">
-                    {methods.map((m) => (
-                      <button
-                        key={m.id}
-                        onClick={() => setSelectedMethod(m.id)}
-                        className={`flex flex-col items-center gap-1 p-3 rounded-xl border text-center transition-all duration-200 ${
-                          selectedMethod === m.id
-                            ? "border-primary bg-primary/10"
-                            : "border-border bg-card/50 hover:border-primary/30"
-                        }`}
-                      >
-                        <span className="text-xl">{m.emoji}</span>
-                        <span className="text-[11px] font-medium text-foreground">{m.label}</span>
-                      </button>
-                    ))}
+                    {METHODS.map((m) => {
+                      const Icon = m.icon;
+                      return (
+                        <button
+                          key={m.id}
+                          onClick={() => setSelectedMethod(m.id)}
+                          className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border text-center transition-all duration-200 ${
+                            selectedMethod === m.id
+                              ? "border-primary bg-primary/10"
+                              : "border-border bg-card/50 hover:border-primary/30"
+                          }`}
+                        >
+                          <Icon className="h-5 w-5 shrink-0 text-muted-foreground" strokeWidth={2} />
+                          <span className="text-[11px] font-medium text-foreground">{m.label}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </Card>
 
@@ -448,19 +428,42 @@ export default function LogSession() {
                       </button>
                     ))}
                   </div>
+
                   {doseUnit && (
-                    <Input
-                      type="number"
-                      step="0.5"
-                      min="0"
-                      value={doseUnit === "mg" ? (doseCount || doseAmountMg) : doseCount}
-                      onChange={(e) => {
-                        setDoseCount(e.target.value);
-                        if (doseUnit === "mg") setDoseAmountMg(e.target.value);
-                      }}
-                      placeholder={doseUnit === "mg" ? "e.g., 10" : "e.g., 2"}
-                      className="w-32"
-                    />
+                    <div className="flex gap-3">
+                      <div className="flex-1">
+                        <label className="text-xs text-muted-foreground mb-1 block">
+                          {doseUnit === "mg" ? "Amount (mg)" : `How many ${doseUnit}s?`}
+                        </label>
+                        <Input
+                          type="number"
+                          inputMode="decimal"
+                          value={doseUnit === "mg" ? doseAmountMg : doseCount}
+                          onChange={(e) =>
+                            doseUnit === "mg"
+                              ? setDoseAmountMg(e.target.value)
+                              : setDoseCount(e.target.value)
+                          }
+                          placeholder="e.g. 2"
+                          className="h-10"
+                        />
+                      </div>
+                      {doseUnit !== "mg" && (
+                        <div className="flex-1">
+                          <label className="text-xs text-muted-foreground mb-1 block">
+                            mg (optional)
+                          </label>
+                          <Input
+                            type="number"
+                            inputMode="decimal"
+                            value={doseAmountMg}
+                            onChange={(e) => setDoseAmountMg(e.target.value)}
+                            placeholder="e.g. 10"
+                            className="h-10"
+                          />
+                        </div>
+                      )}
+                    </div>
                   )}
                 </Card>
 
@@ -481,21 +484,21 @@ export default function LogSession() {
               <div className="space-y-6">
                 <div>
                   <h2 className="font-serif text-2xl font-medium text-foreground mb-1">
-                    How does it feel?
+                    How do you feel?
                   </h2>
                   <p className="text-sm text-muted-foreground">
-                    Rate each effect from 0–10
+                    Rate each effect from 0 to 10
                   </p>
                 </div>
 
                 <Card className="p-5 space-y-6">
-                  {effectsConfig.map((effect) => (
+                  {EFFECTS.map((effect) => (
                     <EffectSlider
                       key={effect.key}
                       label={effect.label}
-                      emoji={effect.emoji}
-                      value={effects[effect.key]}
-                      onChange={(value) => updateEffect(effect.key, value)}
+                      icon={effect.icon}
+                      value={effects[effect.key as keyof EffectSliders]}
+                      onChange={(value) => updateEffect(effect.key as keyof EffectSliders, value)}
                     />
                   ))}
                 </Card>
@@ -516,28 +519,31 @@ export default function LogSession() {
               <div className="space-y-6">
                 <div>
                   <h2 className="font-serif text-2xl font-medium text-foreground mb-1">
-                    Add context
+                    Set the scene
                   </h2>
                   <p className="text-sm text-muted-foreground">
-                    Optional — helps identify patterns over time
+                    Context helps identify what works best
                   </p>
                 </div>
 
-                <Card className="p-5">
-                  <ContextSection value={context} onChange={setContext} defaultOpen />
-                </Card>
-
-                {/* Notes */}
-                <Card className="p-5 space-y-3">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Notes <span className="font-normal">(optional)</span>
-                  </p>
-                  <textarea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Anything else worth noting..."
-                    className="w-full h-20 px-4 py-3 rounded-xl bg-secondary border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                <Card className="p-5 space-y-5">
+                  <ContextSection
+                    value={context}
+                    onChange={setContext}
+                    defaultOpen
                   />
+
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground block mb-2">
+                      Notes (optional)
+                    </label>
+                    <textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="Anything you want to remember..."
+                      className="w-full h-20 px-4 py-3 rounded-xl bg-secondary border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                    />
+                  </div>
                 </Card>
 
                 <Button
@@ -547,18 +553,18 @@ export default function LogSession() {
                   disabled={saving}
                   onClick={goNext}
                 >
-                  {saving ? "Saving..." : "Save Session"} <Check className="w-4 h-4 ml-1" />
+                  {saving ? "Saving…" : "Save Session"}
                 </Button>
               </div>
             )}
 
-            {/* ─── Step 6: Completion ─── */}
+            {/* ─── Step 6: Done ─── */}
             {step === "done" && (
               <SessionCompletionMoment
                 sessionId={createSession.data?.id}
                 strainName={strainText}
-                intent={selectedIntent as string}
-                method={selectedMethod as string}
+                intent={selectedIntent}
+                method={selectedMethod || undefined}
                 doseLevel={doseLevel}
                 sessionContext={{
                   caffeine: context.caffeine,

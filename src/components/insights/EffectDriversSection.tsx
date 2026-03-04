@@ -9,10 +9,11 @@ import { InsightUnlockCard } from "./InsightUnlockCard";
 function DriverRow({ driver, variant }: { driver: EffectDriver; variant: "positive" | "negative" }) {
   const avgValue = variant === "positive" ? driver.avgPositive : driver.avgNegative;
   const diffAbs = Math.abs(driver.difference);
+  const Icon = driver.icon;
 
   return (
     <div className="flex items-center gap-3 py-2">
-      <span className="text-lg shrink-0">{driver.emoji}</span>
+      <Icon className="h-4 w-4 shrink-0 text-muted-foreground" strokeWidth={2} />
       <div className="flex-1 min-w-0">
         <span className="text-sm font-medium text-foreground">{driver.label}</span>
       </div>

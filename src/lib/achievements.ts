@@ -1,4 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Star,
+  Sprout,
+  TreePine,
+  Trees,
+  Search,
+  type LucideIcon,
+} from "lucide-react";
 
 export type AchievementKey =
   | "founding_user"
@@ -11,17 +19,17 @@ export interface AchievementDef {
   key: AchievementKey;
   title: string;
   description: string;
-  emoji: string;
+  icon: LucideIcon;
   tooltip?: string;
   featured?: boolean;
 }
 
 export const ACHIEVEMENT_DEFS: AchievementDef[] = [
-  { key: "founding_user", title: "Founding User", description: "One of the first 50 members", emoji: "⭐", tooltip: "Early supporter — helped shape the app from the beginning", featured: true },
-  { key: "first_session", title: "First Light", description: "Logged your first session", emoji: "🌱" },
-  { key: "three_sessions", title: "Getting the Hang", description: "Logged 3 sessions", emoji: "🌿" },
-  { key: "five_sessions", title: "Seasoned Logger", description: "Logged 5 sessions", emoji: "🌳" },
-  { key: "first_insight_view", title: "Data Explorer", description: "Viewed your insights for the first time", emoji: "🔍" },
+  { key: "founding_user", title: "Founding User", description: "One of the first 50 members", icon: Star, tooltip: "Early supporter — helped shape the app from the beginning", featured: true },
+  { key: "first_session", title: "First Light", description: "Logged your first session", icon: Sprout },
+  { key: "three_sessions", title: "Getting the Hang", description: "Logged 3 sessions", icon: TreePine },
+  { key: "five_sessions", title: "Seasoned Logger", description: "Logged 5 sessions", icon: Trees },
+  { key: "first_insight_view", title: "Data Explorer", description: "Viewed your insights for the first time", icon: Search },
 ];
 
 export function getAchievementDef(key: string): AchievementDef | undefined {
