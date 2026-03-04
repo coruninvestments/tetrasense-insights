@@ -5,48 +5,96 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap');
 
 @layer base {
+  /* ── Light Mode — Calm Ivory ── */
   :root {
-    /* Signal Leaf Design System — Deep Forest */
+    --background: 40 20% 93%;
+    --foreground: 150 17% 15%;
 
-    /* Background — Deep Forest */
-    --background: 150 17% 15%;
-    --foreground: 40 18% 94%;
+    --card: 40 18% 96%;
+    --card-foreground: 150 17% 15%;
 
-    /* Card surfaces — Soft Slate */
-    --card: 206 20% 28%;
-    --card-foreground: 40 18% 94%;
+    --popover: 40 18% 96%;
+    --popover-foreground: 150 17% 15%;
 
-    --popover: 206 20% 28%;
-    --popover-foreground: 40 18% 94%;
+    --primary: 163 26% 44%;
+    --primary-foreground: 40 20% 97%;
 
-    /* Primary — Teal accent */
-    --primary: 163 26% 56%;
-    --primary-foreground: 150 17% 12%;
+    --secondary: 150 10% 88%;
+    --secondary-foreground: 150 17% 20%;
 
-    /* Secondary — Muted forest */
-    --secondary: 150 14% 20%;
-    --secondary-foreground: 40 18% 85%;
+    --muted: 150 8% 90%;
+    --muted-foreground: 200 12% 35%;
 
-    /* Muted */
-    --muted: 150 12% 22%;
-    --muted-foreground: 40 10% 65%;
+    --accent: 163 14% 90%;
+    --accent-foreground: 163 26% 35%;
 
-    /* Accent */
-    --accent: 163 20% 22%;
-    --accent-foreground: 163 26% 70%;
+    --destructive: 0 55% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    /* Destructive */
-    --destructive: 0 55% 55%;
-    --destructive-foreground: 40 18% 94%;
-
-    /* Borders and inputs */
-    --border: 206 15% 32%;
-    --input: 206 15% 32%;
-    --ring: 163 26% 56%;
+    --border: 200 12% 82%;
+    --input: 200 12% 82%;
+    --ring: 163 26% 44%;
 
     --radius: 1rem;
 
-    /* Custom tokens */
+    --success: 163 40% 42%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 150 17% 12%;
+
+    --info: 200 45% 45%;
+    --info-foreground: 0 0% 100%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(163 26% 44%) 0%, hsl(163 30% 36%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(40 18% 96%) 0%, hsl(40 16% 94%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(40 20% 95%) 0%, hsl(40 20% 93%) 100%);
+
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.06);
+    --shadow-md: 0 4px 16px -2px hsl(0 0% 0% / 0.08);
+    --shadow-lg: 0 12px 32px -8px hsl(0 0% 0% / 0.12);
+    --shadow-glow: 0 0 24px -4px hsl(163 26% 44% / 0.2);
+
+    --sidebar-background: 40 18% 96%;
+    --sidebar-foreground: 150 17% 20%;
+    --sidebar-primary: 163 26% 44%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 150 10% 90%;
+    --sidebar-accent-foreground: 150 17% 20%;
+    --sidebar-border: 200 12% 82%;
+    --sidebar-ring: 163 26% 44%;
+  }
+
+  /* ── Dark Mode — Deep Forest ── */
+  .dark {
+    --background: 150 20% 5%;
+    --foreground: 40 18% 94%;
+
+    --card: 150 17% 15%;
+    --card-foreground: 40 18% 94%;
+
+    --popover: 150 17% 15%;
+    --popover-foreground: 40 18% 94%;
+
+    --primary: 163 26% 56%;
+    --primary-foreground: 150 17% 12%;
+
+    --secondary: 150 14% 20%;
+    --secondary-foreground: 40 18% 85%;
+
+    --muted: 150 12% 22%;
+    --muted-foreground: 150 8% 65%;
+
+    --accent: 163 20% 22%;
+    --accent-foreground: 163 26% 70%;
+
+    --destructive: 0 55% 55%;
+    --destructive-foreground: 40 18% 94%;
+
+    --border: 150 12% 25%;
+    --input: 150 12% 25%;
+    --ring: 163 26% 56%;
+
     --success: 163 40% 50%;
     --success-foreground: 150 17% 12%;
 
@@ -56,25 +104,22 @@
     --info: 200 45% 50%;
     --info-foreground: 150 17% 12%;
 
-    /* Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(163 26% 56%) 0%, hsl(163 30% 45%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(206 20% 28%) 0%, hsl(206 18% 25%) 100%);
-    --gradient-hero: linear-gradient(180deg, hsl(150 20% 13%) 0%, hsl(150 17% 15%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(150 17% 15%) 0%, hsl(150 15% 13%) 100%);
+    --gradient-hero: linear-gradient(180deg, hsl(150 20% 4%) 0%, hsl(150 20% 5%) 100%);
 
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.15);
-    --shadow-md: 0 4px 16px -2px hsl(0 0% 0% / 0.25);
-    --shadow-lg: 0 12px 32px -8px hsl(0 0% 0% / 0.35);
+    --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.2);
+    --shadow-md: 0 4px 16px -2px hsl(0 0% 0% / 0.35);
+    --shadow-lg: 0 12px 32px -8px hsl(0 0% 0% / 0.45);
     --shadow-glow: 0 0 24px -4px hsl(163 26% 56% / 0.3);
 
-    /* Sidebar */
-    --sidebar-background: 150 17% 13%;
+    --sidebar-background: 150 20% 4%;
     --sidebar-foreground: 40 18% 85%;
     --sidebar-primary: 163 26% 56%;
     --sidebar-primary-foreground: 150 17% 12%;
     --sidebar-accent: 150 14% 20%;
     --sidebar-accent-foreground: 40 18% 85%;
-    --sidebar-border: 206 15% 32%;
+    --sidebar-border: 150 12% 25%;
     --sidebar-ring: 163 26% 56%;
   }
 }
