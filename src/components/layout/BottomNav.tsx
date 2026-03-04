@@ -1,12 +1,14 @@
-import { Home, BookOpen, FlaskConical, User, Plus, Compass, Leaf, BarChart3, Trophy } from "lucide-react";
+import { Home, User, Plus, Leaf, BarChart3 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-const navItems = [
+const leftItems = [
   { icon: Home, label: "Home", path: "/" },
   { icon: Leaf, label: "Library", path: "/library" },
-  { icon: Trophy, label: "Best", path: "/best" },
+];
+
+const rightItems = [
   { icon: BarChart3, label: "Insights", path: "/insights" },
   { icon: User, label: "Profile", path: "/profile" },
 ];
@@ -16,19 +18,30 @@ export function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-t border-border safe-bottom">
-      <div className="flex items-center justify-around px-2 py-2 max-w-lg mx-auto">
-        {navItems.slice(0, 2).map((item) => (
-          <NavItem
-            key={item.path}
-            {...item}
-            isActive={location.pathname === item.path}
-          />
-        ))}
+      <div className="relative max-w-lg mx-auto px-2 py-2">
+        <div className="flex items-end">
+          {/* Left group */}
+          <div className="flex-1 flex justify-around">
+            {leftItems.map((item) => (
+              <NavItem key={item.path} {...item} isActive={location.pathname === item.path} />
+            ))}
+          </div>
 
-        {/* Center Log Button */}
+          {/* Center spacer for the FAB */}
+          <div className="w-16 shrink-0" />
+
+          {/* Right group */}
+          <div className="flex-1 flex justify-around">
+            {rightItems.map((item) => (
+              <NavItem key={item.path} {...item} isActive={location.pathname === item.path} />
+            ))}
+          </div>
+        </div>
+
+        {/* Center Log FAB — absolutely centered */}
         <Link
           to="/log"
-          className="relative -mt-6 flex flex-col items-center"
+          className="absolute left-1/2 -translate-x-1/2 -top-5 flex flex-col items-center"
         >
           <motion.div
             whileTap={{ scale: 0.95 }}
@@ -36,18 +49,8 @@ export function BottomNav() {
           >
             <Plus className="w-6 h-6 text-primary-foreground" />
           </motion.div>
-          <span className="text-[10px] font-medium text-muted-foreground mt-1">
-            Log
-          </span>
+          <span className="text-[10px] font-medium text-muted-foreground mt-1">Log</span>
         </Link>
-
-        {navItems.slice(2).map((item) => (
-          <NavItem
-            key={item.path}
-            {...item}
-            isActive={location.pathname === item.path}
-          />
-        ))}
       </div>
     </nav>
   );
@@ -69,10 +72,7 @@ function NavItem({ icon: Icon, label, path, isActive }: NavItemProps) {
         isActive ? "text-primary" : "text-muted-foreground"
       )}
     >
-      <motion.div
-        whileTap={{ scale: 0.9 }}
-        className="relative"
-      >
+      <motion.div whileTap={{ scale: 0.9 }} className="relative">
         <Icon className="w-5 h-5" />
         {isActive && (
           <motion.div
