@@ -1,15 +1,16 @@
 import { ReactNode, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, Crown, Sparkles, X } from "lucide-react";
+import { Lock, Crown, Sparkles, X, Bell } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useSubscription } from "@/hooks/useSubscription";
+import { BrandImage } from "@/components/brand/BrandImage";
+import { ASSETS } from "@/lib/assets";
+import { toast } from "@/hooks/use-toast";
 
 interface PaywallGateProps {
   children: ReactNode;
-  /** Short label shown on the lock overlay, e.g. "Pattern Timeline" */
   feature?: string;
-  /** If true, render inline blur overlay instead of blocking entirely */
   mode?: "block" | "blur";
 }
 
@@ -36,7 +37,6 @@ export function PaywallGate({ children, feature, mode = "blur" }: PaywallGatePro
     );
   }
 
-  // Blur mode — show content behind blur with a lock overlay
   return (
     <>
       <div className="relative">
@@ -106,22 +106,51 @@ function PaywallModal({ open, onClose }: { open: boolean; onClose: () => void })
             {/* Close */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+              className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-secondary/80 backdrop-blur-sm flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
 
-            {/* Header */}
-            <div className="gradient-primary px-6 pt-8 pb-6 text-center">
-              <div className="w-14 h-14 rounded-2xl bg-primary-foreground/20 flex items-center justify-center mx-auto mb-3">
-                <Sparkles className="w-7 h-7 text-primary-foreground" />
+            {/* Hero with stardust ring */}
+            <div className="relative gradient-primary overflow-hidden">
+              {/* Stardust radial overlay */}
+              <div
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: [
+                    "radial-gradient(ellipse 60% 50% at 50% 40%, hsl(163 30% 70% / 0.12) 0%, transparent 70%)",
+                    "radial-gradient(ellipse 40% 35% at 50% 45%, hsl(163 40% 80% / 0.08) 0%, transparent 60%)",
+                    "radial-gradient(circle at 30% 20%, hsl(200 40% 80% / 0.06) 0%, transparent 40%)",
+                    "radial-gradient(circle at 70% 30%, hsl(163 50% 90% / 0.05) 0%, transparent 35%)",
+                  ].join(", "),
+                }}
+              />
+
+              {/* Hero image */}
+              <div className="relative flex items-center justify-center pt-6 pb-2 px-6 min-h-[140px]">
+                <BrandImage
+                  src={ASSETS.heroPremiumDark}
+                  alt="Signal Leaf Premium"
+                  themeAware
+                  className="max-h-[130px] w-auto object-contain rounded-xl opacity-90"
+                />
               </div>
-              <h2 className="font-serif text-xl font-medium text-primary-foreground">
-                Signal Leaf Premium
-              </h2>
-              <p className="text-sm text-primary-foreground/80 mt-1">
-                Unlock the full picture of your experience
-              </p>
+
+              {/* Title block */}
+              <div className="relative text-center px-6 pb-6">
+                <div className="w-12 h-12 rounded-2xl bg-primary-foreground/20 flex items-center justify-center mx-auto mb-3">
+                  <Sparkles className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <h2 className="font-serif text-xl font-medium text-primary-foreground">
+                  Signal Leaf Premium
+                </h2>
+                <p className="text-sm text-primary-foreground/80 mt-1">
+                  Unlock the full picture of your experience
+                </p>
+                <p className="text-xs text-primary-foreground/60 mt-1.5 italic">
+                  Your private clarity engine — powered by your own patterns.
+                </p>
+              </div>
             </div>
 
             {/* Benefits */}
@@ -140,14 +169,18 @@ function PaywallModal({ open, onClose }: { open: boolean; onClose: () => void })
                 Coming Soon
               </Button>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
-                className="w-full text-xs text-muted-foreground"
+                className="w-full text-xs gap-1.5"
                 onClick={() => {
-                  window.location.href = "mailto:hello@signalleaf.app?subject=Beta%20Access%20Request";
+                  toast({
+                    title: "Waitlist coming soon",
+                    description: "We'll let you know when Premium is available.",
+                  });
                 }}
               >
-                Join beta · Request early access
+                <Bell className="w-3.5 h-3.5" />
+                Join the Premium waitlist
               </Button>
             </div>
           </motion.div>
