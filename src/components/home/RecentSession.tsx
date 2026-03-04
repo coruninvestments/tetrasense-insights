@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import type { SessionOutcome } from "@/lib/sessionOutcome";
 
 interface RecentSessionProps {
+  id: string;
   intent: string;
   strain: string;
   outcome: SessionOutcome;
@@ -23,7 +24,7 @@ const outcomeLabels = {
   negative: "Poor",
 };
 
-export function RecentSession({ intent, strain, outcome, timeAgo, delay = 0 }: RecentSessionProps) {
+export function RecentSession({ id, intent, strain, outcome, timeAgo, delay = 0 }: RecentSessionProps) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}
@@ -31,7 +32,7 @@ export function RecentSession({ intent, strain, outcome, timeAgo, delay = 0 }: R
       transition={{ duration: 0.3, delay }}
     >
       <Link
-        to="/insights"
+        to={`/session/${id}`}
         className="flex items-center gap-4 p-4 rounded-xl bg-card hover:bg-secondary/50 transition-colors group"
       >
         <div className="flex-1 min-w-0">

@@ -92,9 +92,10 @@ const Index = () => {
                       <Skeleton className="h-16 rounded-xl" />
                     </>
                   ) : recentSessions && recentSessions.length > 0 ? (
-                    recentSessions.map((session, index) => (
+                    recentSessions.map((session) => (
                       <RecentSession
                         key={session.id}
+                        id={session.id}
                         intent={session.intent}
                         strain={session.strain_name_text}
                         outcome={normalizeOutcome(session.outcome)}

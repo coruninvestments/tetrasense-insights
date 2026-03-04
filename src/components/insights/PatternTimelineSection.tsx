@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
@@ -95,6 +96,7 @@ function generateTrendSummaries(sessions: any[]): string[] {
 
 export function PatternTimelineSection() {
   const { data: sessions, isLoading } = useSessionLogs();
+  const navigate = useNavigate();
   const [intentFilter, setIntentFilter] = useState<IntentFilter>(null);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>(null);
   const [doseFilter, setDoseFilter] = useState<DoseFilter>(null);
@@ -113,6 +115,7 @@ export function PatternTimelineSection() {
     return filtered
       .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
       .map((s, i) => ({
+        id: s.id,
         index: i,
         date: new Date(s.created_at).getTime(),
         dateLabel: format(new Date(s.created_at), "MMM d"),
@@ -120,10 +123,13 @@ export function PatternTimelineSection() {
         strain: s.strain_name_text,
         doseLevel: s.dose_level ?? "—",
         outcome: normalizeOutcome(s.outcome),
-        // Y-axis: map outcome to value for visual spread
         outcomeVal: normalizeOutcome(s.outcome) === "positive" ? 3 : normalizeOutcome(s.outcome) === "neutral" ? 2 : 1,
       }));
   }, [filtered]);
+
+  const handleDotClick = useCallback((data: any) => {
+    if (data?.id) navigate(`/session/${data.id}`);
+  }, [navigate]);
 
   const trends = useMemo(() => generateTrendSummaries(filtered), [filtered]);
 
@@ -229,7 +235,7 @@ export function PatternTimelineSection() {
                     width={30}
                   />
                   <RechartsTooltip content={<CustomTooltipContent />} />
-                  <Scatter data={chartData} fill="hsl(var(--primary))">
+                  <Scatter data={chartData} fill="hsl(var(--primary))" cursor="pointer" onClick={handleDotClick}>
                     {chartData.map((entry, idx) => (
                       <Cell key={idx} fill={outcomeColor[entry.outcome] ?? outcomeColor.neutral} />
                     ))}

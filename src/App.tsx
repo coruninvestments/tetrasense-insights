@@ -21,6 +21,7 @@ import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import AdminCoa from "./pages/AdminCoa";
 import BestForYou from "./pages/BestForYou";
+import SessionDetail from "./pages/SessionDetail";
 
 const App = () => (
   <ThemeProvider>
@@ -126,6 +127,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AdminCoa />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/session/:id"
+              element={
+                <ProtectedRoute>
+                  <SessionDetail />
                 </ProtectedRoute>
               }
             />
