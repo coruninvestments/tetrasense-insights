@@ -86,6 +86,7 @@
 
   html {
     scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
@@ -96,6 +97,16 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Fraunces', Georgia, serif;
     @apply font-medium tracking-tight;
+  }
+
+  /* Smooth focus transitions */
+  *:focus-visible {
+    @apply transition-shadow duration-200;
+  }
+
+  /* Interactive element press feedback */
+  button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
   }
 }
 

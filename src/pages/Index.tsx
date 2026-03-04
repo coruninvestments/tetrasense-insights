@@ -9,6 +9,7 @@ import { PatternSnapshotCard } from "@/components/home/PatternSnapshotCard";
 import { ClarityScoreCard } from "@/components/home/ClarityScoreCard";
 import { QuickStatsCard } from "@/components/home/QuickStatsCard";
 import { RecentSession } from "@/components/home/RecentSession";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { useRecentSessions } from "@/hooks/useSessionLogs";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -98,17 +99,12 @@ const Index = () => {
                       />
                     ))
                   ) : (
-                    <div className="text-center py-6">
-                      <p className="text-muted-foreground text-sm">
-                        No sessions logged yet
-                      </p>
-                      <Link to="/log">
-                        <Button variant="soft" size="sm" className="mt-3">
-                          <Plus className="w-4 h-4" />
-                          Log your first session
-                        </Button>
-                      </Link>
-                    </div>
+                    <EmptyState
+                      title="No sessions yet"
+                      description="No sessions logged yet. Start your first session to unlock insights about your experience."
+                      actionLabel="Log your first session"
+                      actionTo="/log"
+                    />
                   )}
                 </div>
               </CardContent>
