@@ -41,9 +41,9 @@ export default function Insights() {
   return (
     <>
       <AppLayout>
-        <div className="min-h-screen bg-background">
+        <div className="min-h-dvh bg-background overflow-x-hidden">
           {/* Header */}
-          <header className="px-5 pt-12 pb-4 safe-top">
+          <header className="px-5 pb-4" style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 48px)" }}>
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}

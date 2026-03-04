@@ -39,13 +39,14 @@ export function PaywallGate({ children, feature, mode = "blur" }: PaywallGatePro
 
   return (
     <>
-      <div className="relative">
-        <div className="pointer-events-none select-none blur-[6px] opacity-60">
+      <div className="relative isolate">
+        <div className="pointer-events-none select-none blur-[6px] opacity-60" aria-hidden="true">
           {children}
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/30 backdrop-blur-[2px] rounded-xl cursor-pointer transition-colors hover:bg-background/40"
+          aria-label={feature ? `Upgrade to unlock ${feature}` : "Upgrade to Premium"}
+          className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 bg-background/30 backdrop-blur-[2px] rounded-xl cursor-pointer transition-colors hover:bg-background/40 pointer-events-auto"
         >
           <div className="w-10 h-10 rounded-full bg-primary/15 flex items-center justify-center">
             <Lock className="w-5 h-5 text-primary" />
