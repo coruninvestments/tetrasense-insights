@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160" fill="none">
+  <!-- Dark theme: empty insights — signal pulse with stars -->
+  <!-- Background subtle glow -->
+  <circle cx="120" cy="80" r="60" fill="#6FAF9F" opacity="0.04"/>
+  <circle cx="120" cy="80" r="40" fill="#6FAF9F" opacity="0.06"/>
+
+  <!-- Signal wave / pulse line -->
+  <path d="M30 100 Q55 100 65 80 Q75 60 85 80 Q95 100 105 80 Q115 60 125 80 Q135 100 145 80 Q155 60 165 80 Q175 100 210 100"
+    stroke="#6FAF9F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+
+  <!-- Outer ring -->
+  <circle cx="120" cy="72" r="32" stroke="#6FAF9F" stroke-width="1" opacity="0.2" stroke-dasharray="4 6"/>
+
+  <!-- Inner ring -->
+  <circle cx="120" cy="72" r="18" stroke="#6FAF9F" stroke-width="0.8" opacity="0.3"/>
+
+  <!-- Center dot -->
+  <circle cx="120" cy="72" r="3" fill="#6FAF9F" opacity="0.5"/>
+
+  <!-- Star motifs -->
+  <g opacity="0.35" fill="#6FAF9F">
+    <circle cx="60" cy="40" r="1.5"/>
+    <circle cx="180" cy="50" r="1"/>
+    <circle cx="45" cy="65" r="1"/>
+    <circle cx="195" cy="75" r="1.5"/>
+    <circle cx="90" cy="35" r="0.8"/>
+    <circle cx="155" cy="38" r="1.2"/>
+  </g>
+
+  <!-- Small sparkle crosses -->
+  <g stroke="#F2EFE8" stroke-width="0.8" stroke-linecap="round" opacity="0.2">
+    <line x1="68" y1="45" x2="68" y2="51"/>
+    <line x1="65" y1="48" x2="71" y2="48"/>
+    <line x1="172" y1="55" x2="172" y2="61"/>
+    <line x1="169" y1="58" x2="175" y2="58"/>
+  </g>
+
+  <!-- Leaf silhouette (subtle brand echo) -->
+  <path d="M118 52 C118 52 112 60 112 68 C112 74 115 77 120 77 C125 77 128 74 128 68 C128 60 122 52 122 52 Q120 49 118 52Z"
+    stroke="#6FAF9F" stroke-width="0.8" fill="none" opacity="0.25"/>
+  <line x1="120" y1="56" x2="120" y2="74" stroke="#6FAF9F" stroke-width="0.5" opacity="0.2"/>
+</svg>
