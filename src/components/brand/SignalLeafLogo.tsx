@@ -1,5 +1,6 @@
 import { Leaf } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ASSETS } from "@/lib/assets";
 
 type LogoVariant = "full" | "icon";
 type LogoSize = "sm" | "md" | "lg" | "xl";
@@ -27,26 +28,20 @@ export function SignalLeafLogo({
 }: SignalLeafLogoProps) {
   const config = sizeConfig[size];
 
-  // Theme classes
   const iconBg =
     theme === "light"
       ? "bg-primary-foreground/20"
-      : theme === "dark"
-      ? "gradient-primary"
       : "gradient-primary";
 
-  const iconColor =
-    theme === "light" ? "text-primary-foreground" : "text-primary-foreground";
+  const iconColor = "text-primary-foreground";
 
   const textColor =
     theme === "light" ? "text-primary-foreground" : "text-foreground";
 
-  const svgSrc = variant === "full" ? "/brand/signal-leaf-logo.svg" : "/brand/signal-leaf-icon.svg";
-
   const LogoIcon = (
     <div className={cn(config.icon, iconBg, "flex items-center justify-center flex-shrink-0 overflow-hidden")}>
       <img
-        src="/brand/signal-leaf-icon.svg"
+        src={ASSETS.logoIcon}
         alt="Signal Leaf"
         className={cn(config.iconSize, "object-contain")}
         onError={(e) => {
