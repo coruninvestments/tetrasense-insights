@@ -7,6 +7,7 @@ import { DecisionInsightsSection } from "@/components/insights/DecisionInsightsS
 import { EffectDriversSection } from "@/components/insights/EffectDriversSection";
 import { ContextCorrelationsSection } from "@/components/insights/ContextCorrelationsSection";
 import { DoseInsightsSection } from "@/components/insights/DoseInsightsSection";
+import { PatternTimelineSection } from "@/components/insights/PatternTimelineSection";
 import { logEvent } from "@/lib/analytics";
 import { tryUnlock } from "@/lib/achievements";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
@@ -115,6 +116,17 @@ export default function Insights() {
             >
               <SectionHeader number={6} title="Context Risks" />
               <ContextCorrelationsSection />
+            </motion.section>
+
+            {/* Section 7 — Pattern Timeline */}
+            <motion.section
+              variants={sectionVariants}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.3 }}
+            >
+              <SectionHeader number={7} title="Pattern Timeline" />
+              <PatternTimelineSection />
             </motion.section>
 
             {/* Disclaimer */}
