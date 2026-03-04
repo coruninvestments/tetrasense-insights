@@ -125,7 +125,7 @@ export function useAttachCoa() {
   });
 }
 
-/** Create a private draft batch (also creates the product if needed) */
+/** Create a private draft batch via server-side endpoint (products table is read-only on client) */
 export function useCreateDraftBatch() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -134,42 +134,26 @@ export function useCreateDraftBatch() {
     mutationFn: async (input: CreateDraftBatchInput) => {
       if (!user) throw new Error("Not authenticated");
 
-      // Upsert product
-      const { data: product, error: pErr } = await supabase
-        .from("products")
-        .insert({
-          product_name: input.product_name.trim(),
-          brand_name: input.brand_name?.trim() || null,
-          strain_id: input.strain_id || null,
-          form: input.form || null,
-        } as any)
-        .select()
-        .single();
-      if (pErr) throw pErr;
+      const { data, error } = await supabase.functions.invoke("create-draft-batch", {
+        body: {
+          product_name: input.product_name,
+          brand_name: input.brand_name,
+          strain_id: input.strain_id,
+          form: input.form,
+          batch_code: input.batch_code,
+          tested_at: input.tested_at,
+          lab_name: input.lab_name,
+          coa_url: input.coa_url,
+          coa_file_path: input.coa_file_path,
+          lab_panel_common: input.lab_panel_common,
+          lab_panel_custom: input.lab_panel_custom,
+        },
+      });
 
-      // Create batch
-      const { data: batch, error: bErr } = await supabase
-        .from("product_batches")
-        .insert({
-          product_id: (product as any).id,
-          batch_code: input.batch_code?.trim() || null,
-          tested_at: input.tested_at || null,
-          lab_name: input.lab_name?.trim() || null,
-          coa_url: input.coa_url?.trim() || null,
-          coa_file_path: input.coa_file_path || null,
-          coa_status: (input.coa_url || input.coa_file_path) ? "pending" : "unverified",
-          lab_panel_common: input.lab_panel_common || null,
-          lab_panel_custom: input.lab_panel_custom?.length
-            ? (input.lab_panel_custom as unknown as Record<string, unknown>[])
-            : null,
-          created_by_user_id: user.id,
-          is_public_library: false,
-        } as any)
-        .select()
-        .single();
-      if (bErr) throw bErr;
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
 
-      return { product: product as any, batch: batch as unknown as ProductBatch };
+      return { product: data.product, batch: data.batch as ProductBatch };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["public-batches"] });
