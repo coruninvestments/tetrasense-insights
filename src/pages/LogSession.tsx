@@ -1,9 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Check, ChevronRight, ChevronDown } from "lucide-react";
-import { HelpTip } from "@/components/guide/HelpTip";
-import { useProfile } from "@/hooks/useProfile";
-import { useActiveBatch } from "@/hooks/useActiveBatch";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,29 +10,29 @@ import { EffectSlider } from "@/components/log/EffectSlider";
 import { StrainPicker } from "@/components/log/StrainPicker";
 import { BatchChooser } from "@/components/log/BatchChooser";
 import { ActiveBatchCard } from "@/components/log/ActiveBatchCard";
-import { PhysicalEffectsSection, type PhysicalEffects } from "@/components/log/PhysicalEffectsSection";
-import { CustomEffectsSection } from "@/components/log/CustomEffectsSection";
-import { DurationSection, type DurationBucket } from "@/components/log/DurationSection";
-import { BodyMindSlider } from "@/components/log/BodyMindSlider";
-import { OverallExperienceSection } from "@/components/log/OverallExperienceSection";
 import { SessionCompletionMoment } from "@/components/log/SessionCompletionMoment";
 import { ContextSection, emptyContext, type SessionContext } from "@/components/log/ContextSection";
 import { SessionHistoryCard } from "@/components/log/SessionHistoryCard";
 import { useCreateSessionLog, SessionIntent, SessionMethod, DoseLevel, EffectSliders } from "@/hooks/useSessionLogs";
-import { useCustomEffects } from "@/hooks/useCustomEffects";
+import { useProfile } from "@/hooks/useProfile";
+import { useActiveBatch } from "@/hooks/useActiveBatch";
 import { useSessionMemory } from "@/hooks/useSessionMemory";
 import { computeSessionOutcomeForPreview } from "@/lib/sessionOutcome";
 import { toast } from "sonner";
 
+type Step = "product" | "intent" | "dose" | "effects" | "context" | "done";
+
+const steps: Step[] = ["product", "intent", "dose", "effects", "context", "done"];
+
 const intents: { id: SessionIntent; label: string; emoji: string }[] = [
   { id: "sleep", label: "Sleep", emoji: "🌙" },
-  { id: "relaxation", label: "Relaxation", emoji: "🧘" },
   { id: "focus", label: "Focus", emoji: "🎯" },
+  { id: "relaxation", label: "Relax", emoji: "🧘" },
   { id: "creativity", label: "Creativity", emoji: "🎨" },
-  { id: "learning", label: "Learning", emoji: "🧠" },
-  { id: "pain_relief", label: "Pain Relief", emoji: "💆" },
+  { id: "pain_relief", label: "Pain", emoji: "💆" },
   { id: "social", label: "Social", emoji: "👥" },
   { id: "recreation", label: "Recreation", emoji: "🎉" },
+  { id: "learning", label: "Learning", emoji: "🧠" },
 ];
 
 const methods: { id: SessionMethod; label: string; emoji: string }[] = [
@@ -47,76 +44,85 @@ const methods: { id: SessionMethod; label: string; emoji: string }[] = [
   { id: "other", label: "Other", emoji: "✨" },
 ];
 
-const mentalEffectsConfig = [
-  { key: "sleepiness" as const, label: "Sleepiness", emoji: "😴" },
+const effectsConfig = [
   { key: "relaxation" as const, label: "Relaxation", emoji: "😌" },
-  { key: "anxiety" as const, label: "Anxiety", emoji: "😰" },
   { key: "focus" as const, label: "Focus", emoji: "🎯" },
+  { key: "sleepiness" as const, label: "Energy", emoji: "⚡" },
+  { key: "anxiety" as const, label: "Anxiety", emoji: "😰" },
   { key: "pain_relief" as const, label: "Pain Relief", emoji: "🩹" },
-  { key: "euphoria" as const, label: "Euphoria", emoji: "🤩" },
+  { key: "euphoria" as const, label: "Mood", emoji: "😊" },
 ];
 
-type Step = "intent" | "strain" | "method" | "dose" | "effects" | "done";
+const doseUnits = ["hit", "puff", "bowl", "dab", "g", "mg", "other"] as const;
+
+const doseLevels: { id: DoseLevel; label: string; desc: string }[] = [
+  { id: "low", label: "Low", desc: "Microdose / low tolerance" },
+  { id: "medium", label: "Medium", desc: "Standard session" },
+  { id: "high", label: "High", desc: "Above usual intake" },
+];
+
+const slideVariants = {
+  enter: { opacity: 0, y: 24 },
+  center: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -16 },
+};
 
 export default function LogSession() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const createSession = useCreateSessionLog();
-  const { customEffects: customEffectDefs, addCustomEffect } = useCustomEffects();
   const { data: profile } = useProfile();
   const { activeBatch, setActiveBatch, clearActiveBatch } = useActiveBatch();
-  const isQuickLog = profile?.quick_log_enabled ?? true;
+
+  const [step, setStep] = useState<Step>("product");
   const [activeBatchUsed, setActiveBatchUsed] = useState(false);
-  const [step, setStep] = useState<Step>("intent");
-  const [selectedIntent, setSelectedIntent] = useState<SessionIntent | "">(
-    (searchParams.get("intent") as SessionIntent) || ""
-  );
+
+  // Product
   const [strainText, setStrainText] = useState(searchParams.get("strain") || "");
   const [selectedStrainId, setSelectedStrainId] = useState<string | null>(null);
   const [canonicalStrainId, setCanonicalStrainId] = useState<string | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
   const [coaAttached, setCoaAttached] = useState(false);
+
+  // Intent
+  const [selectedIntent, setSelectedIntent] = useState<SessionIntent | "">(
+    (searchParams.get("intent") as SessionIntent) || ""
+  );
+
+  // Dose
   const [selectedMethod, setSelectedMethod] = useState<SessionMethod | "">(
     (searchParams.get("method") as SessionMethod) || ""
   );
   const [doseLevel, setDoseLevel] = useState<DoseLevel>("medium");
-  const [doseAmountMg, setDoseAmountMg] = useState<string>("");
   const [doseUnit, setDoseUnit] = useState<string | null>(null);
-  const [doseCount, setDoseCount] = useState<string>("");
+  const [doseCount, setDoseCount] = useState("");
+  const [doseAmountMg, setDoseAmountMg] = useState("");
+
+  // Effects
   const [effects, setEffects] = useState<EffectSliders>({
     sleepiness: 0, relaxation: 0, anxiety: 0, focus: 0, pain_relief: 0, euphoria: 0,
   });
-  const [physicalEffects, setPhysicalEffects] = useState<PhysicalEffects>({
-    dry_mouth: 0, dry_eyes: 0, throat_irritation: 0, body_heaviness: 0,
-  });
-  const [customEffectValues, setCustomEffectValues] = useState<{ name: string; value: number }[]>([]);
-  const [durationBucket, setDurationBucket] = useState<DurationBucket | "">("");
-  const [bodyMind, setBodyMind] = useState(5);
-  const [outcomePreference, setOutcomePreference] = useState<"use_again" | "neutral" | "avoid" | "">("");
-  const [notes, setNotes] = useState("");
-  const [saving, setSaving] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
+
+  // Context
   const [context, setContext] = useState<SessionContext>(emptyContext);
+  const [notes, setNotes] = useState("");
+
+  // Flow state
+  const [saving, setSaving] = useState(false);
+
   const { data: memory } = useSessionMemory(
     selectedIntent || undefined,
     strainText || undefined
   );
-  const steps: Step[] = ["intent", "strain", "method", "dose", "effects", "done"];
-  const currentStepIndex = steps.indexOf(step);
-  const progress = ((currentStepIndex + 1) / steps.length) * 100;
 
-  const doseLevels: { id: DoseLevel; label: string; description: string }[] = [
-    { id: "low", label: "Low", description: "Microdose or low tolerance" },
-    { id: "medium", label: "Medium", description: "Standard session" },
-    { id: "high", label: "High", description: "Above usual intake" },
-  ];
+  const currentIndex = steps.indexOf(step);
+  const progress = step === "done" ? 100 : ((currentIndex) / (steps.length - 1)) * 100;
 
   const handleStrainSelect = (name: string, id: string | null, canonicalId?: string | null) => {
     setStrainText(name);
     setSelectedStrainId(id);
     setCanonicalStrainId(canonicalId || null);
-    // Clear batch when strain changes
     if (canonicalId !== canonicalStrainId) {
       setSelectedProductId(null);
       setSelectedBatchId(null);
@@ -134,12 +140,19 @@ export default function LogSession() {
     setEffects(prev => ({ ...prev, [key]: value }));
   };
 
-  const updatePhysicalEffect = (key: keyof PhysicalEffects, value: number) => {
-    setPhysicalEffects(prev => ({ ...prev, [key]: value }));
+  const canAdvance = (): boolean => {
+    switch (step) {
+      case "product": return !!strainText;
+      case "intent": return !!selectedIntent;
+      case "dose": return !!selectedMethod;
+      case "effects": return true;
+      case "context": return true;
+      default: return false;
+    }
   };
 
   const goNext = async () => {
-    if (step === "effects") {
+    if (step === "context") {
       setSaving(true);
       try {
         await createSession.mutateAsync({
@@ -148,15 +161,12 @@ export default function LogSession() {
           strain_name_text: strainText,
           method: selectedMethod as SessionMethod,
           dose_level: doseLevel,
-          dose_amount_mg: doseUnit === "mg" ? (doseCount ? parseFloat(doseCount) : (doseAmountMg ? parseFloat(doseAmountMg) : null)) : (doseAmountMg ? parseFloat(doseAmountMg) : null),
+          dose_amount_mg: doseUnit === "mg"
+            ? (doseCount ? parseFloat(doseCount) : (doseAmountMg ? parseFloat(doseAmountMg) : null))
+            : (doseAmountMg ? parseFloat(doseAmountMg) : null),
           dose_unit: doseUnit || undefined,
           dose_count: doseCount ? parseFloat(doseCount) : undefined,
           effects,
-          physicalEffects,
-          durationBucket: durationBucket || undefined,
-          bodyMind,
-          outcomePreference: outcomePreference || undefined,
-          customEffects: customEffectValues.filter(e => e.value > 0),
           notes: notes || undefined,
           outcome: computeSessionOutcomeForPreview(effects),
           canonical_strain_id: canonicalStrainId,
@@ -172,19 +182,18 @@ export default function LogSession() {
           mood_before: context.mood_before,
           stress_before: context.stress_before,
         });
-        // Auto-set active batch if a product was selected
         if (canonicalStrainId && selectedProductId) {
           setActiveBatch(canonicalStrainId, selectedProductId, selectedBatchId);
         }
         setStep("done");
-        toast.success("Session logged successfully!");
+        toast.success("Session logged!");
       } catch (error: any) {
         toast.error(error.message || "Failed to save session");
       } finally {
         setSaving(false);
       }
     } else {
-      const nextIndex = currentStepIndex + 1;
+      const nextIndex = currentIndex + 1;
       if (nextIndex < steps.length) {
         setStep(steps[nextIndex]);
       }
@@ -192,58 +201,69 @@ export default function LogSession() {
   };
 
   const goBack = () => {
-    if (step === "method" && activeBatchUsed) {
-      // Go back to intent (skip strain)
-      setStep("intent");
-    } else if (currentStepIndex > 0) {
-      setStep(steps[currentStepIndex - 1]);
+    if (currentIndex > 0) {
+      setStep(steps[currentIndex - 1]);
     } else {
       navigate(-1);
     }
+  };
+
+  // Step labels for header
+  const stepLabels: Record<Step, string> = {
+    product: "Product",
+    intent: "Intent",
+    dose: "Dose",
+    effects: "Effects",
+    context: "Context",
+    done: "Complete",
   };
 
   return (
     <AppLayout showNav={false}>
       <div className="min-h-screen bg-background">
         {/* Header */}
-        <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border safe-top">
-          <div className="flex items-center gap-4 px-5 py-4">
+        <header className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm safe-top">
+          <div className="flex items-center gap-3 px-5 py-4">
             <button
               onClick={goBack}
-              className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center"
+              className="w-9 h-9 rounded-full bg-secondary/60 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4" />
             </button>
             <div className="flex-1">
               <p className="text-sm font-medium text-foreground">Log Session</p>
-              <p className="text-xs text-muted-foreground">
-                Step {currentStepIndex + 1} of {steps.length - 1}
-              </p>
+              {step !== "done" && (
+                <p className="text-[11px] text-muted-foreground">
+                  Step {currentIndex + 1} of {steps.length - 1} — {stepLabels[step]}
+                </p>
+              )}
             </div>
           </div>
-          <div className="h-1 bg-secondary">
+          {/* Progress bar */}
+          <div className="h-0.5 bg-secondary/40">
             <motion.div
-              className="h-full gradient-primary"
+              className="h-full bg-primary"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
             />
           </div>
         </header>
 
+        {/* Steps */}
         <AnimatePresence mode="wait">
           <motion.div
             key={step}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
             className="px-5 py-6"
           >
-            {/* Intent Step */}
-            {step === "intent" && (
-              <div>
-                {/* Active Batch Card */}
+            {/* ─── Step 1: Product ─── */}
+            {step === "product" && (
+              <div className="space-y-6">
                 {activeBatch && !activeBatchUsed && (
                   <ActiveBatchCard
                     batch={activeBatch}
@@ -255,295 +275,284 @@ export default function LogSession() {
                       setCoaAttached(false);
                       setActiveBatchUsed(true);
                     }}
-                    onChange={() => {
-                      setActiveBatchUsed(false);
-                    }}
-                    onClear={() => {
-                      clearActiveBatch();
-                    }}
+                    onChange={() => setActiveBatchUsed(false)}
+                    onClear={() => clearActiveBatch()}
                   />
                 )}
 
-                {activeBatchUsed && (
-                  <div className="mb-4 px-3 py-2 rounded-lg bg-primary/5 border border-primary/20 text-xs text-muted-foreground">
-                    Using <span className="font-medium text-foreground">{activeBatch?.strainName}</span> — select your intent to continue
-                  </div>
-                )}
-
-                <div className="flex items-center gap-2">
-                  <h2 className="font-serif text-2xl font-medium text-foreground mb-2">
-                    What's your intention?
+                <div>
+                  <h2 className="font-serif text-2xl font-medium text-foreground mb-1">
+                    What are you using?
                   </h2>
-                  <HelpTip
-                    id="log_intent"
-                    title="Why set an intention?"
-                    description="Your intention helps personalize your insights and contributes to anonymous community data on the Explore page. It's the foundation for understanding what works best for you."
-                  />
+                  <p className="text-sm text-muted-foreground">
+                    Search our library or enter a strain name
+                  </p>
                 </div>
-                <p className="text-muted-foreground mb-6">
-                  Select your primary goal for this session
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  {intents.map((intent) => (
-                    <Card
-                      key={intent.id}
-                      variant="interactive"
-                      className={`p-4 ${selectedIntent === intent.id ? "ring-2 ring-primary bg-primary/5" : ""}`}
-                      onClick={() => setSelectedIntent(intent.id)}
-                    >
-                      <span className="text-2xl mb-2 block">{intent.emoji}</span>
-                      <span className="text-sm font-medium">{intent.label}</span>
-                    </Card>
-                  ))}
-                </div>
-                <div className="mt-8">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="w-full"
-                    disabled={!selectedIntent}
-                    onClick={() => {
-                      if (activeBatchUsed) {
-                        // Skip strain step, go to method
-                        setStep("method");
-                      } else {
-                        goNext();
-                      }
-                    }}
-                  >
-                    Continue <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
 
-            {/* Strain / Product Step */}
-            {step === "strain" && (
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="font-serif text-2xl font-medium text-foreground mb-2">Strain / Product</h2>
-                  <HelpTip
-                    id="log_strain"
-                    title="Strains, Products & Batches"
-                    description="Selecting a strain from our verified library links your session to community data. Choosing a specific batch with a COA (Certificate of Analysis) adds lab-verified precision to your tracking."
+                <Card className="p-5 space-y-4">
+                  <StrainPicker
+                    value={strainText}
+                    selectedStrainId={selectedStrainId}
+                    canonicalStrainId={canonicalStrainId}
+                    onSelect={handleStrainSelect}
                   />
-                </div>
-                <p className="text-muted-foreground mb-6">Search our library or enter a personal strain name</p>
-                <StrainPicker
-                  value={strainText}
-                  selectedStrainId={selectedStrainId}
-                  canonicalStrainId={canonicalStrainId}
-                  onSelect={handleStrainSelect}
-                />
 
-                {/* Batch chooser — only shown for canonical strains */}
-                {canonicalStrainId && (
-                  <div className="mt-6">
+                  {canonicalStrainId && (
                     <BatchChooser
                       canonicalStrainId={canonicalStrainId}
                       selectedBatchId={selectedBatchId}
                       selectedProductId={selectedProductId}
                       onSelect={handleBatchSelect}
                     />
-                  </div>
-                )}
+                  )}
+                </Card>
 
-                {/* Session History Card */}
                 {strainText && <SessionHistoryCard memory={memory} />}
 
-                <div className="mt-8">
-                  <Button variant="primary" size="lg" className="w-full" disabled={!strainText} onClick={goNext}>
-                    Continue <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="w-full"
+                  disabled={!canAdvance()}
+                  onClick={goNext}
+                >
+                  Continue <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
               </div>
             )}
 
-            {/* Method Step */}
-            {step === "method" && (
-              <div>
-                <h2 className="font-serif text-2xl font-medium text-foreground mb-2">How did you consume?</h2>
-                <p className="text-muted-foreground mb-6">Select your consumption method</p>
+            {/* ─── Step 2: Intent ─── */}
+            {step === "intent" && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="font-serif text-2xl font-medium text-foreground mb-1">
+                    What's your intention?
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Select your primary goal for this session
+                  </p>
+                </div>
+
                 <div className="grid grid-cols-2 gap-3">
-                  {methods.map((method) => (
-                    <Card
-                      key={method.id}
-                      variant="interactive"
-                      className={`p-4 ${selectedMethod === method.id ? "ring-2 ring-primary bg-primary/5" : ""}`}
-                      onClick={() => setSelectedMethod(method.id)}
+                  {intents.map((intent) => (
+                    <button
+                      key={intent.id}
+                      onClick={() => setSelectedIntent(intent.id)}
+                      className={`flex flex-col items-start gap-1 p-4 rounded-xl border text-left transition-all duration-200 ${
+                        selectedIntent === intent.id
+                          ? "border-primary bg-primary/10 shadow-glow"
+                          : "border-border bg-card hover:border-primary/30"
+                      }`}
                     >
-                      <span className="text-2xl mb-2 block">{method.emoji}</span>
-                      <span className="text-sm font-medium">{method.label}</span>
-                    </Card>
+                      <span className="text-2xl">{intent.emoji}</span>
+                      <span className="text-sm font-medium text-foreground">{intent.label}</span>
+                    </button>
                   ))}
                 </div>
-                <div className="mt-8">
-                  <Button variant="primary" size="lg" className="w-full" disabled={!selectedMethod} onClick={goNext}>
-                    Continue <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
+
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="w-full"
+                  disabled={!canAdvance()}
+                  onClick={goNext}
+                >
+                  Continue <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
               </div>
             )}
 
-            {/* Dose Step */}
+            {/* ─── Step 3: Dose ─── */}
             {step === "dose" && (
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="font-serif text-2xl font-medium text-foreground mb-2">How much?</h2>
-                  <HelpTip
-                    id="log_dose"
-                    title="Dose Level vs. Exact mg"
-                    description="The dose level (Low/Medium/High) is a quick estimate relative to your tolerance. The optional mg field lets you track exact amounts for more precise insights over time."
-                  />
+              <div className="space-y-6">
+                <div>
+                  <h2 className="font-serif text-2xl font-medium text-foreground mb-1">
+                    How are you consuming?
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Method, level, and amount
+                  </p>
                 </div>
-                <p className="text-muted-foreground mb-6">Estimate your dose level</p>
-                <div className="space-y-3">
-                  {doseLevels.map((level) => (
-                    <Card
-                      key={level.id}
-                      variant="interactive"
-                      className={`p-4 flex items-center justify-between ${doseLevel === level.id ? "ring-2 ring-primary bg-primary/5" : ""}`}
-                      onClick={() => setDoseLevel(level.id)}
-                    >
-                      <div>
-                        <span className="font-medium block">{level.label}</span>
-                        <span className="text-xs text-muted-foreground">{level.description}</span>
-                      </div>
-                      {doseLevel === level.id && <Check className="w-5 h-5 text-primary" />}
-                    </Card>
-                  ))}
-                </div>
-                <div className="mt-6 space-y-4">
-                  <div>
-                    <label className="text-sm text-muted-foreground mb-2 block">Dose unit (optional)</label>
-                    <div className="flex flex-wrap gap-2">
-                      {(["hit", "puff", "bowl", "dab", "g", "mg", "other"] as const).map((unit) => (
-                        <button
-                          key={unit}
-                          type="button"
-                          onClick={() => {
-                            setDoseUnit(doseUnit === unit ? null : unit);
-                            // If switching away from mg, clear synced values
-                            if (unit === "mg" && doseUnit !== "mg" && doseAmountMg) {
-                              setDoseCount(doseAmountMg);
-                            }
-                          }}
-                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                            doseUnit === unit
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-secondary text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          {unit}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
 
-                  {doseUnit && (
-                    <div>
-                      <label className="text-sm text-muted-foreground mb-2 block">
-                        Amount{doseUnit === "mg" ? " (mg)" : ` (${doseUnit}s)`}
-                      </label>
-                      <Input
-                        type="number"
-                        step="0.5"
-                        min="0"
-                        value={doseUnit === "mg" ? (doseCount || doseAmountMg) : doseCount}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setDoseCount(val);
-                          if (doseUnit === "mg") {
-                            setDoseAmountMg(val);
+                {/* Method selector */}
+                <Card className="p-5 space-y-3">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Method
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {methods.map((m) => (
+                      <button
+                        key={m.id}
+                        onClick={() => setSelectedMethod(m.id)}
+                        className={`flex flex-col items-center gap-1 p-3 rounded-xl border text-center transition-all duration-200 ${
+                          selectedMethod === m.id
+                            ? "border-primary bg-primary/10"
+                            : "border-border bg-card/50 hover:border-primary/30"
+                        }`}
+                      >
+                        <span className="text-xl">{m.emoji}</span>
+                        <span className="text-[11px] font-medium text-foreground">{m.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </Card>
+
+                {/* Dose level */}
+                <Card className="p-5 space-y-3">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Dose Level
+                  </p>
+                  <div className="space-y-2">
+                    {doseLevels.map((level) => (
+                      <button
+                        key={level.id}
+                        onClick={() => setDoseLevel(level.id)}
+                        className={`w-full flex items-center justify-between p-3.5 rounded-xl border transition-all duration-200 ${
+                          doseLevel === level.id
+                            ? "border-primary bg-primary/10"
+                            : "border-border bg-card/50 hover:border-primary/30"
+                        }`}
+                      >
+                        <div className="text-left">
+                          <span className="text-sm font-medium text-foreground block">{level.label}</span>
+                          <span className="text-[11px] text-muted-foreground">{level.desc}</span>
+                        </div>
+                        {doseLevel === level.id && <Check className="w-4 h-4 text-primary" />}
+                      </button>
+                    ))}
+                  </div>
+                </Card>
+
+                {/* Dose unit & count */}
+                <Card className="p-5 space-y-4">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Amount <span className="font-normal">(optional)</span>
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {doseUnits.map((unit) => (
+                      <button
+                        key={unit}
+                        onClick={() => {
+                          setDoseUnit(doseUnit === unit ? null : unit);
+                          if (unit === "mg" && doseUnit !== "mg" && doseAmountMg) {
+                            setDoseCount(doseAmountMg);
                           }
                         }}
-                        placeholder={doseUnit === "mg" ? "e.g., 10" : "e.g., 2"}
-                        className="w-32"
-                      />
-                    </div>
-                  )}
-
-                  {!doseUnit && (
-                    <div>
-                      <label className="text-sm text-muted-foreground mb-2 block">Dose amount in mg (optional)</label>
-                      <div className="flex items-center gap-2">
-                        <Input type="number" value={doseAmountMg} onChange={(e) => setDoseAmountMg(e.target.value)} placeholder="e.g., 10" className="flex-1" />
-                        <span className="text-sm text-muted-foreground">mg</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="mt-8">
-                  <Button variant="primary" size="lg" className="w-full" onClick={goNext}>
-                    Continue <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            {/* Effects Step */}
-            {step === "effects" && (
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="font-serif text-2xl font-medium text-foreground mb-2">Rate your experience</h2>
-                  <HelpTip
-                    id="log_effects"
-                    title="How effects shape your insights"
-                    description="Your effect ratings are used to calculate your overall session outcome and build personal patterns over time. The more consistently you rate, the more accurate your insights become."
-                  />
-                </div>
-                <p className="text-muted-foreground mb-6">Slide to rate each effect from 0–10</p>
-                <div className="space-y-8">
-                  <div>
-                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Mental & Functional Effects</h3>
-                    <div className="space-y-5">
-                      {mentalEffectsConfig.map((effect) => (
-                        <EffectSlider key={effect.key} label={effect.label} emoji={effect.emoji} value={effects[effect.key]} onChange={(value) => updateEffect(effect.key, value)} />
-                      ))}
-                    </div>
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                          doseUnit === unit
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-secondary text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {unit}
+                      </button>
+                    ))}
                   </div>
-                  {/* Advanced sections - collapsible in quick log mode */}
-                  {(!isQuickLog || showDetails) && (
-                    <>
-                      <PhysicalEffectsSection effects={physicalEffects} onChange={updatePhysicalEffect} />
-                      <CustomEffectsSection definitions={customEffectDefs} values={customEffectValues} onValuesChange={setCustomEffectValues} onAddEffect={addCustomEffect} />
-                      <DurationSection value={durationBucket} onChange={setDurationBucket} />
-                      <BodyMindSlider value={bodyMind} onChange={setBodyMind} />
-                    </>
-                  )}
-
-                  {isQuickLog && !showDetails && (
-                    <Button
-                      variant="ghost"
-                      className="w-full text-muted-foreground"
-                      onClick={() => setShowDetails(true)}
-                    >
-                      <ChevronDown className="w-4 h-4 mr-2" />
-                      Add details (physical effects, duration, body/mind)
-                    </Button>
-                  )}
-
-                  <OverallExperienceSection value={outcomePreference} onChange={setOutcomePreference} />
-                  <ContextSection value={context} onChange={setContext} />
-                  <div>
-                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Notes (Optional)</h3>
-                    <textarea
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      placeholder="Any additional thoughts about this session..."
-                      className="w-full h-24 px-4 py-3 rounded-xl bg-secondary border-0 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                  {doseUnit && (
+                    <Input
+                      type="number"
+                      step="0.5"
+                      min="0"
+                      value={doseUnit === "mg" ? (doseCount || doseAmountMg) : doseCount}
+                      onChange={(e) => {
+                        setDoseCount(e.target.value);
+                        if (doseUnit === "mg") setDoseAmountMg(e.target.value);
+                      }}
+                      placeholder={doseUnit === "mg" ? "e.g., 10" : "e.g., 2"}
+                      className="w-32"
                     />
-                  </div>
-                </div>
-                <div className="mt-8 pb-6">
-                  <Button variant="primary" size="lg" className="w-full" disabled={saving} onClick={goNext}>
-                    {saving ? "Saving..." : "Save Session"} <Check className="w-4 h-4" />
-                  </Button>
-                </div>
+                  )}
+                </Card>
+
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="w-full"
+                  disabled={!canAdvance()}
+                  onClick={goNext}
+                >
+                  Continue <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
               </div>
             )}
 
-            {/* Done Step */}
+            {/* ─── Step 4: Effects ─── */}
+            {step === "effects" && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="font-serif text-2xl font-medium text-foreground mb-1">
+                    How does it feel?
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Rate each effect from 0–10
+                  </p>
+                </div>
+
+                <Card className="p-5 space-y-6">
+                  {effectsConfig.map((effect) => (
+                    <EffectSlider
+                      key={effect.key}
+                      label={effect.label}
+                      emoji={effect.emoji}
+                      value={effects[effect.key]}
+                      onChange={(value) => updateEffect(effect.key, value)}
+                    />
+                  ))}
+                </Card>
+
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="w-full"
+                  onClick={goNext}
+                >
+                  Continue <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
+            )}
+
+            {/* ─── Step 5: Context ─── */}
+            {step === "context" && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="font-serif text-2xl font-medium text-foreground mb-1">
+                    Add context
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Optional — helps identify patterns over time
+                  </p>
+                </div>
+
+                <Card className="p-5">
+                  <ContextSection value={context} onChange={setContext} defaultOpen />
+                </Card>
+
+                {/* Notes */}
+                <Card className="p-5 space-y-3">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Notes <span className="font-normal">(optional)</span>
+                  </p>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Anything else worth noting..."
+                    className="w-full h-20 px-4 py-3 rounded-xl bg-secondary border-0 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                  />
+                </Card>
+
+                <Button
+                  variant="primary"
+                  size="lg"
+                  className="w-full"
+                  disabled={saving}
+                  onClick={goNext}
+                >
+                  {saving ? "Saving..." : "Save Session"} <Check className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
+            )}
+
+            {/* ─── Step 6: Completion ─── */}
             {step === "done" && (
               <SessionCompletionMoment
                 sessionId={createSession.data?.id}
