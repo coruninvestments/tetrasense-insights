@@ -1,29 +1,51 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
-
 <defs>
-<radialGradient id="premiumHaloLight" cx="50%" cy="50%" r="50%">
-<stop offset="0%" stop-color="#6FAF9F" stop-opacity="0.35"/>
-<stop offset="70%" stop-color="#6FAF9F" stop-opacity="0.15"/>
-<stop offset="100%" stop-color="#6FAF9F" stop-opacity="0"/>
-</radialGradient>
+  <radialGradient id="phl-halo" cx="50%" cy="48%" r="38%">
+    <stop offset="0%" stop-color="#6FAF9F" stop-opacity="0.2"/>
+    <stop offset="50%" stop-color="#6FAF9F" stop-opacity="0.08"/>
+    <stop offset="100%" stop-color="#6FAF9F" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="phl-leaf1" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#5a8a6e"/>
+    <stop offset="100%" stop-color="#3d6b52"/>
+  </linearGradient>
+  <linearGradient id="phl-leaf2" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#3d6b52"/>
+    <stop offset="100%" stop-color="#2a5040"/>
+  </linearGradient>
 </defs>
 
 <rect width="600" height="400" fill="#F2EFE8"/>
 
-<circle cx="300" cy="200" r="140" fill="url(#premiumHaloLight)"/>
+<circle cx="300" cy="192" r="150" fill="url(#phl-halo)"/>
 
-<circle cx="300" cy="200" r="110"
-stroke="#3D6B5E"
-stroke-width="2"
-fill="none"
-opacity="0.8"/>
+<circle cx="300" cy="192" r="120" stroke="#3D6B5E" stroke-width="0.8" fill="none" opacity="0.25"/>
+<circle cx="300" cy="192" r="85" stroke="#3D6B5E" stroke-width="0.6" fill="none" opacity="0.18"/>
 
-<circle cx="300" cy="200" r="70"
-stroke="#3D6B5E"
-stroke-width="1"
-fill="none"
-opacity="0.5"/>
+<!-- Leaf -->
+<path d="M300 148 C300 148, 288 168, 276 180 C268 188, 262 196, 262 210 C262 224, 272 236, 286 236 C290 236, 294 235, 297 233 L300 231 Z"
+      fill="url(#phl-leaf1)" opacity="0.75"/>
+<path d="M300 148 C300 148, 312 168, 324 180 C332 188, 338 196, 338 210 C338 224, 328 236, 314 236 C310 236, 306 235, 303 233 L300 231 Z"
+      fill="url(#phl-leaf2)" opacity="0.75"/>
 
-<circle cx="300" cy="200" r="4" fill="#3D6B5E"/>
+<!-- Signal arcs -->
+<path d="M282 208 C286 204, 292 201, 300 201 C308 201, 314 204, 318 208"
+      stroke="#3D6B5E" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.55"/>
+<path d="M276 216 C282 210, 290 206, 300 206 C310 206, 318 210, 324 216"
+      stroke="#3D6B5E" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.4"/>
+<path d="M270 224 C278 216, 288 212, 300 212 C312 212, 322 216, 330 224"
+      stroke="#3D6B5E" stroke-width="0.8" stroke-linecap="round" fill="none" opacity="0.25"/>
 
+<!-- Constellation -->
+<circle cx="200" cy="120" r="1.2" fill="#3D6B5E" opacity="0.35"/>
+<circle cx="400" cy="110" r="1.4" fill="#3D6B5E" opacity="0.3"/>
+<circle cx="420" cy="280" r="1.0" fill="#3D6B5E" opacity="0.25"/>
+<circle cx="180" cy="270" r="1.3" fill="#3D6B5E" opacity="0.3"/>
+<circle cx="230" cy="90" r="0.8" fill="#3D6B5E" opacity="0.25"/>
+<circle cx="370" cy="85" r="0.9" fill="#3D6B5E" opacity="0.2"/>
+<circle cx="350" cy="310" r="0.9" fill="#3D6B5E" opacity="0.2"/>
+<circle cx="250" cy="320" r="1.0" fill="#3D6B5E" opacity="0.18"/>
+
+<line x1="200" y1="120" x2="230" y2="90" stroke="#3D6B5E" stroke-width="0.4" opacity="0.12"/>
+<line x1="400" y1="110" x2="370" y2="85" stroke="#3D6B5E" stroke-width="0.4" opacity="0.12"/>
 </svg>

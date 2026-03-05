@@ -1,36 +1,48 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
-
 <defs>
-<radialGradient id="haloLibLight" cx="50%" cy="50%" r="50%">
-<stop offset="0%" stop-color="#6FAF9F" stop-opacity="0.25"/>
-<stop offset="70%" stop-color="#6FAF9F" stop-opacity="0.08"/>
-<stop offset="100%" stop-color="#6FAF9F" stop-opacity="0"/>
-</radialGradient>
+  <radialGradient id="ell-halo" cx="50%" cy="48%" r="36%">
+    <stop offset="0%" stop-color="#6FAF9F" stop-opacity="0.16"/>
+    <stop offset="60%" stop-color="#6FAF9F" stop-opacity="0.05"/>
+    <stop offset="100%" stop-color="#6FAF9F" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="ell-leaf1" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#5a8a6e"/>
+    <stop offset="100%" stop-color="#3d6b52"/>
+  </linearGradient>
+  <linearGradient id="ell-leaf2" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#3d6b52"/>
+    <stop offset="100%" stop-color="#2a5040"/>
+  </linearGradient>
 </defs>
 
 <rect width="600" height="400" fill="#F2EFE8"/>
 
-<circle cx="300" cy="200" r="110" fill="url(#haloLibLight)"/>
+<circle cx="300" cy="195" r="120" fill="url(#ell-halo)"/>
 
-<circle cx="300" cy="200" r="90"
-stroke="#3D6B5E"
-stroke-width="1.5"
-fill="none"
-opacity="0.6"/>
+<circle cx="300" cy="195" r="100" stroke="#3D6B5E" stroke-width="0.7" fill="none" opacity="0.2"/>
 
-<rect x="270" y="160" width="60" height="80"
-stroke="#3D6B5E"
-stroke-width="1.5"
-fill="none"/>
+<rect x="268" y="158" width="64" height="80" rx="8" ry="8"
+      stroke="#3D6B5E" stroke-width="0.8" fill="none" opacity="0.18"/>
 
-<line x1="270" y1="185" x2="330" y2="185"
-stroke="#3D6B5E"
-stroke-width="1"
-opacity="0.6"/>
+<path d="M300 168 C300 168, 295 176, 291 181 C288 184, 286 187, 286 192 C286 198, 290 202, 296 202 C297.5 202, 299 201.5, 300 201 L300 200 Z"
+      fill="url(#ell-leaf1)" opacity="0.6"/>
+<path d="M300 168 C300 168, 305 176, 309 181 C312 184, 314 187, 314 192 C314 198, 310 202, 304 202 C302.5 202, 301 201.5, 300 201 L300 200 Z"
+      fill="url(#ell-leaf2)" opacity="0.6"/>
 
-<line x1="270" y1="205" x2="330" y2="205"
-stroke="#3D6B5E"
-stroke-width="1"
-opacity="0.6"/>
+<path d="M293 193 C295 191, 297 190, 300 190 C303 190, 305 191, 307 193"
+      stroke="#3D6B5E" stroke-width="0.8" stroke-linecap="round" fill="none" opacity="0.4"/>
+<path d="M290 197 C293 194, 296 193, 300 193 C304 193, 307 194, 310 197"
+      stroke="#3D6B5E" stroke-width="0.6" stroke-linecap="round" fill="none" opacity="0.28"/>
 
+<line x1="278" y1="212" x2="322" y2="212" stroke="#3D6B5E" stroke-width="0.6" opacity="0.12"/>
+<line x1="278" y1="220" x2="315" y2="220" stroke="#3D6B5E" stroke-width="0.6" opacity="0.1"/>
+<line x1="278" y1="228" x2="308" y2="228" stroke="#3D6B5E" stroke-width="0.6" opacity="0.08"/>
+
+<circle cx="195" cy="130" r="1.2" fill="#3D6B5E" opacity="0.25"/>
+<circle cx="405" cy="125" r="1.0" fill="#3D6B5E" opacity="0.22"/>
+<circle cx="430" cy="265" r="1.1" fill="#3D6B5E" opacity="0.18"/>
+<circle cx="170" cy="260" r="1.3" fill="#3D6B5E" opacity="0.18"/>
+
+<line x1="195" y1="130" x2="220" y2="100" stroke="#3D6B5E" stroke-width="0.4" opacity="0.08"/>
+<line x1="405" y1="125" x2="380" y2="95" stroke="#3D6B5E" stroke-width="0.4" opacity="0.08"/>
 </svg>
