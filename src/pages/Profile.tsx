@@ -385,6 +385,9 @@ export default function Profile() {
             <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.08 }}>
               <h2 className="font-serif text-lg font-medium text-foreground mb-3">Your Profile</h2>
               <ConnoisseurProfileCard />
+              <div className="mt-3">
+                <ExportReportButton />
+              </div>
             </motion.section>
 
             {/* Section 1 — Achievements */}
