@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, TrendingUp, AlertTriangle, Share2, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { computeConnoisseurProfile, type ConnoisseurConfidence } from "@/lib/connoisseurProfile";
-import { useMemo } from "react";
-import { toast } from "sonner";
+import { computeConfidence } from "@/lib/confidenceEngine";
+import { computeTerpenePreferences } from "@/lib/terpenePreferences";
+import { ShareProfileModal } from "./ShareProfileModal";
+import type { ShareProfileData } from "@/lib/shareProfile";
 
 const CONFIDENCE_CONFIG: Record<ConnoisseurConfidence, { label: string; className: string }> = {
   forming: {
