@@ -91,6 +91,17 @@ export default function Insights() {
               <DecisionInsightsSection />
             </motion.section>
 
+            {/* Section 3 — Cannabis Genome */}
+            <motion.section
+              variants={sectionVariants}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.12 }}
+            >
+              <SectionHeader number={3} title="Your Cannabis Genome" />
+              <CannabisGenomeCard />
+            </motion.section>
+
             {/* Section 4 — Dose Insights */}
             <motion.section
               variants={sectionVariants}
