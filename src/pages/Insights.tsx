@@ -10,6 +10,7 @@ import { DoseInsightsSection } from "@/components/insights/DoseInsightsSection";
 import { PatternTimelineSection } from "@/components/insights/PatternTimelineSection";
 import { TerpenePreferenceCard } from "@/components/insights/TerpenePreferenceCard";
 import { DeepInsightCard } from "@/components/insights/DeepInsightCard";
+import { CannabisGenomeCard } from "@/components/insights/CannabisGenomeCard";
 import { generateDeepInsights } from "@/lib/deepInsights";
 import { logEvent } from "@/lib/analytics";
 import { tryUnlock } from "@/lib/achievements";
@@ -88,6 +89,17 @@ export default function Insights() {
             >
               <SectionHeader number={2} title="Best Matches & Avoid List" />
               <DecisionInsightsSection />
+            </motion.section>
+
+            {/* Section 3 — Cannabis Genome */}
+            <motion.section
+              variants={sectionVariants}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.12 }}
+            >
+              <SectionHeader number={3} title="Your Cannabis Genome" />
+              <CannabisGenomeCard />
             </motion.section>
 
             {/* Section 4 — Dose Insights */}
