@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Search, ShieldCheck, ShieldAlert, Clock, Beaker, BarChart3, Leaf, Trophy, RotateCcw } from "lucide-react";
+import { Search, ShieldCheck, ShieldAlert, Clock, Beaker, BarChart3, Leaf, Trophy, RotateCcw, GitCompareArrows } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,6 +18,7 @@ import { BrandImage } from "@/components/brand/BrandImage";
 import { ASSETS } from "@/lib/assets";
 import { Button } from "@/components/ui/button";
 import { QualityScorePill } from "@/components/product/QualityScore";
+import { CompareProductsDrawer, CompareSelectionBar, type CompareProduct } from "@/components/product/CompareProductsDrawer";
 
 const TYPE_OPTIONS = ["Indica", "Sativa", "Hybrid"] as const;
 
@@ -57,7 +58,9 @@ export default function ProductLibrary() {
   const [terpeneFilter, setTerpeneFilter] = useState<TerpeneFilter>(null);
   const [outcomeFilter, setOutcomeFilter] = useState<OutcomeFilter>(null);
   const [sortMode, setSortMode] = useState<"default" | "best">("default");
-
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareSelections, setCompareSelections] = useState<CompareProduct[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
   const hasActiveFilters = !!(search || typeFilter || terpeneFilter || outcomeFilter);
   const resetFilters = useCallback(() => {
     setSearch("");
@@ -87,6 +90,39 @@ export default function ProductLibrary() {
     map.forEach((v, k) => {
       result.set(k, { count: v.total, positiveRate: v.total > 0 ? Math.round((v.pos / v.total) * 100) : 0 });
     });
+    return result;
+  }, [sessions]);
+
+  // Compute per-strain anxiety avg and aroma/flavor tags
+  const strainAnxiety = useMemo(() => {
+    if (!sessions) return new Map<string, number>();
+    const map = new Map<string, { sum: number; count: number }>();
+    for (const s of sessions) {
+      const key = s.strain_name_text?.toLowerCase();
+      if (!key || s.effect_anxiety == null) continue;
+      const entry = map.get(key) ?? { sum: 0, count: 0 };
+      entry.sum += s.effect_anxiety;
+      entry.count++;
+      map.set(key, entry);
+    }
+    const result = new Map<string, number>();
+    map.forEach((v, k) => result.set(k, v.count > 0 ? v.sum / v.count : 0));
+    return result;
+  }, [sessions]);
+
+  const strainAromaFlavors = useMemo(() => {
+    if (!sessions) return new Map<string, string[]>();
+    const map = new Map<string, Set<string>>();
+    for (const s of sessions) {
+      const key = s.strain_name_text?.toLowerCase();
+      if (!key) continue;
+      const set = map.get(key) ?? new Set<string>();
+      (s.aroma_tags ?? []).forEach(t => set.add(t));
+      (s.flavor_tags ?? []).forEach(t => set.add(t));
+      map.set(key, set);
+    }
+    const result = new Map<string, string[]>();
+    map.forEach((v, k) => { if (v.size > 0) result.set(k, [...v].slice(0, 6)); });
     return result;
   }, [sessions]);
 
@@ -200,16 +236,29 @@ export default function ProductLibrary() {
               <h1 className="font-serif text-2xl font-medium text-foreground">Product Library</h1>
             </div>
 
-            {/* Search */}
-            <div className="relative mb-4">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                type="text"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Search strains or products…"
-                className="w-full h-11 pl-11 pr-4 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow"
-              />
+            {/* Compare toggle */}
+            <div className="flex items-center gap-2 mb-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Search strains or products…"
+                  className="w-full h-11 pl-11 pr-4 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow"
+                />
+              </div>
+              <Button
+                variant={compareMode ? "default" : "outline"}
+                size="icon"
+                className="h-11 w-11 shrink-0 rounded-xl"
+                onClick={() => {
+                  setCompareMode(!compareMode);
+                  setCompareSelections([]);
+                }}
+              >
+                <GitCompareArrows className="w-4 h-4" />
+              </Button>
             </div>
           </motion.div>
         </header>
@@ -300,6 +349,35 @@ export default function ProductLibrary() {
                 const terps = strainTerpenes.get(strain.name.toLowerCase());
                 const coaStatus = strainCoaStatus.get(strain.name.toLowerCase()) ?? null;
                 const quality = strainQuality.get(strain.name.toLowerCase()) ?? null;
+                const isSelected = compareSelections.some(s => s.id === strain.id);
+
+                const handleClick = (e: React.MouseEvent) => {
+                  if (!compareMode) return; // let Link handle it
+                  e.preventDefault();
+                  if (isSelected) {
+                    setCompareSelections(prev => prev.filter(s => s.id !== strain.id));
+                  } else if (compareSelections.length < 2) {
+                    setCompareSelections(prev => [
+                      ...prev,
+                      {
+                        id: strain.id,
+                        name: strain.name,
+                        type: strain.type,
+                        description: strain.description ?? undefined,
+                        thcMin: strain.thc_min ?? undefined,
+                        thcMax: strain.thc_max ?? undefined,
+                        cbdMin: (strain as any).cbd_min ?? undefined,
+                        cbdMax: (strain as any).cbd_max ?? undefined,
+                        terpenes: terps,
+                        sessionCount: stats?.count,
+                        positiveRate: stats?.positiveRate,
+                        avgAnxiety: strainAnxiety.get(strain.name.toLowerCase()),
+                        quality,
+                        aromaFlavors: strainAromaFlavors.get(strain.name.toLowerCase()),
+                      },
+                    ]);
+                  }
+                };
 
                 return (
                   <motion.div
@@ -307,21 +385,40 @@ export default function ProductLibrary() {
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: Math.min(idx * 0.03, 0.3) }}
+                    onClick={handleClick}
+                    className={compareMode ? "cursor-pointer" : ""}
                   >
-                    <Link to={`/strains/${strain.id}`}>
-                      <ProductCard
-                        name={strain.name}
-                        type={strain.type}
-                        description={strain.description ?? undefined}
-                        thcMin={strain.thc_min ?? undefined}
-                        thcMax={strain.thc_max ?? undefined}
-                        coaStatus={coaStatus}
-                        terpenes={terps}
-                        sessionCount={stats?.count}
-                        positiveRate={stats?.positiveRate}
-                        quality={quality}
-                      />
-                    </Link>
+                    <div className={`rounded-xl transition-all ${compareMode && isSelected ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""}`}>
+                      {compareMode ? (
+                        <ProductCard
+                          name={strain.name}
+                          type={strain.type}
+                          description={strain.description ?? undefined}
+                          thcMin={strain.thc_min ?? undefined}
+                          thcMax={strain.thc_max ?? undefined}
+                          coaStatus={coaStatus}
+                          terpenes={terps}
+                          sessionCount={stats?.count}
+                          positiveRate={stats?.positiveRate}
+                          quality={quality}
+                        />
+                      ) : (
+                        <Link to={`/strains/${strain.id}`}>
+                          <ProductCard
+                            name={strain.name}
+                            type={strain.type}
+                            description={strain.description ?? undefined}
+                            thcMin={strain.thc_min ?? undefined}
+                            thcMax={strain.thc_max ?? undefined}
+                            coaStatus={coaStatus}
+                            terpenes={terps}
+                            sessionCount={stats?.count}
+                            positiveRate={stats?.positiveRate}
+                            quality={quality}
+                          />
+                        </Link>
+                      )}
+                    </div>
                   </motion.div>
                 );
               })}
@@ -350,6 +447,25 @@ export default function ProductLibrary() {
             </motion.div>
           )}
         </div>
+
+        {/* Compare mode UI */}
+        {compareMode && (
+          <CompareSelectionBar
+            selections={compareSelections}
+            onClear={() => {
+              setCompareSelections([]);
+              setCompareMode(false);
+            }}
+            onCompare={() => setCompareOpen(true)}
+          />
+        )}
+
+        <CompareProductsDrawer
+          open={compareOpen}
+          onOpenChange={setCompareOpen}
+          productA={compareSelections[0] ?? null}
+          productB={compareSelections[1] ?? null}
+        />
       </div>
     </AppLayout>
   );
