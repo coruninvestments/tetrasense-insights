@@ -31,6 +31,7 @@ import { AchievementBadges } from "@/components/achievements/AchievementBadges";
 import { ConnoisseurProfileCard } from "@/components/profile/ConnoisseurProfileCard";
 import { TerpenePreferenceCard } from "@/components/insights/TerpenePreferenceCard";
 import { LearningPathCard } from "@/components/learning/LearningPathCard";
+import { ExportReportButton } from "@/components/profile/ExportReportButton";
 import { PaywallModal } from "@/components/premium/PaywallGate";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
 import type { AchievementKey } from "@/lib/achievements";
@@ -384,6 +385,9 @@ export default function Profile() {
             <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.08 }}>
               <h2 className="font-serif text-lg font-medium text-foreground mb-3">Your Profile</h2>
               <ConnoisseurProfileCard />
+              <div className="mt-3">
+                <ExportReportButton />
+              </div>
             </motion.section>
 
             {/* Section 1 — Achievements */}
