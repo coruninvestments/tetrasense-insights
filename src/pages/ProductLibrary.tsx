@@ -12,10 +12,12 @@ import { useStrains, formatPotencyRange } from "@/hooks/useStrains";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { usePublicBatchBrowse } from "@/hooks/usePublicBatchBrowse";
 import { normalizeOutcome } from "@/lib/sessionOutcome";
+import { bestQualityForBatches, type QualityResult } from "@/lib/productQuality";
 import { computeStrainRankings } from "@/lib/bestForYou";
 import { BrandImage } from "@/components/brand/BrandImage";
 import { ASSETS } from "@/lib/assets";
 import { Button } from "@/components/ui/button";
+import { QualityScorePill } from "@/components/product/QualityScore";
 
 const TYPE_OPTIONS = ["Indica", "Sativa", "Hybrid"] as const;
 
@@ -115,6 +117,25 @@ export default function ProductLibrary() {
       }
     }
     return map;
+  }, [verifiedBatches]);
+
+  // Quality scores per strain from verified batches
+  const strainQuality = useMemo(() => {
+    if (!verifiedBatches) return new Map<string, QualityResult>();
+    const grouped = new Map<string, any[]>();
+    for (const b of verifiedBatches as any[]) {
+      const name = (b.strain_name || b.product_name || "").toLowerCase();
+      if (!name) continue;
+      const arr = grouped.get(name) ?? [];
+      arr.push(b);
+      grouped.set(name, arr);
+    }
+    const result = new Map<string, QualityResult>();
+    grouped.forEach((batches, name) => {
+      const q = bestQualityForBatches(batches);
+      if (q) result.set(name, q);
+    });
+    return result;
   }, [verifiedBatches]);
 
   const strains = dbStrains && dbStrains.length > 0 ? dbStrains : FALLBACK_STRAINS;
@@ -278,6 +299,7 @@ export default function ProductLibrary() {
                 const stats = strainStats.get(strain.name.toLowerCase());
                 const terps = strainTerpenes.get(strain.name.toLowerCase());
                 const coaStatus = strainCoaStatus.get(strain.name.toLowerCase()) ?? null;
+                const quality = strainQuality.get(strain.name.toLowerCase()) ?? null;
 
                 return (
                   <motion.div
@@ -297,6 +319,7 @@ export default function ProductLibrary() {
                         terpenes={terps}
                         sessionCount={stats?.count}
                         positiveRate={stats?.positiveRate}
+                        quality={quality}
                       />
                     </Link>
                   </motion.div>
@@ -371,6 +394,7 @@ function ProductCard({
   terpenes,
   sessionCount,
   positiveRate,
+  quality,
 }: {
   name: string;
   type: string;
@@ -381,6 +405,7 @@ function ProductCard({
   terpenes?: string[];
   sessionCount?: number;
   positiveRate?: number;
+  quality?: QualityResult | null;
 }) {
   const typeLower = type.toLowerCase();
   const typeStyle =
@@ -404,6 +429,7 @@ function ProductCard({
                 {type}
               </Badge>
               {coaStatus && <CoaBadgeWithTooltip status={coaStatus} />}
+              {quality && <QualityScorePill result={quality} />}
             </div>
           </div>
           {thcLabel && (

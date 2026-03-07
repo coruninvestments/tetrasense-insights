@@ -1,10 +1,14 @@
+import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Users, Shield, TrendingUp } from "lucide-react";
+import { ArrowLeft, Users, Shield, TrendingUp, Award } from "lucide-react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useStrain, formatPotencyRange } from "@/hooks/useStrains";
 import { useStrainCommunityStats, hasEnoughData, hasAggregateData, MIN_SESSIONS_FOR_DISPLAY } from "@/hooks/useStrainCommunityStats";
+import { usePublicBatchesByStrain } from "@/hooks/useProductBatches";
+import { bestQualityForBatches } from "@/lib/productQuality";
+import { QualityScoreBreakdown } from "@/components/product/QualityScore";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -38,6 +42,12 @@ export default function StrainDetail() {
   const navigate = useNavigate();
   const { data: strain, isLoading: strainLoading } = useStrain(id || "");
   const { data: communityStats, isLoading: statsLoading } = useStrainCommunityStats(id || "");
+  const { data: strainBatches } = usePublicBatchesByStrain(id || null);
+
+  const qualityResult = useMemo(() => {
+    if (!strainBatches?.length) return null;
+    return bestQualityForBatches(strainBatches as any[]);
+  }, [strainBatches]);
 
   if (strainLoading) {
     return (
@@ -158,6 +168,23 @@ export default function StrainDetail() {
                     </span>
                   ))}
                 </div>
+              </Card>
+            </motion.div>
+          )}
+
+          {/* Product Quality Score */}
+          {qualityResult && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.22 }}
+            >
+              <Card className="p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Award className="w-5 h-5 text-primary" />
+                  <h3 className="font-medium text-foreground">Product Quality</h3>
+                </div>
+                <QualityScoreBreakdown result={qualityResult} />
               </Card>
             </motion.div>
           )}
