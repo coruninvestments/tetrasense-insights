@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Check, ChevronRight, ChevronDown } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import { SessionCompletionMoment } from "@/components/log/SessionCompletionMomen
 import { ContextSection, emptyContext, type SessionContext } from "@/components/log/ContextSection";
 import { SensorySection, emptySensory, type SensoryData } from "@/components/log/SensorySection";
 import { SessionHistoryCard } from "@/components/log/SessionHistoryCard";
+import { OutcomePredictionCard } from "@/components/log/OutcomePredictionCard";
 import { useCreateSessionLog, SessionIntent, SessionMethod, DoseLevel, EffectSliders } from "@/hooks/useSessionLogs";
 import { useProfile } from "@/hooks/useProfile";
 import { useActiveBatch } from "@/hooks/useActiveBatch";
@@ -48,6 +50,7 @@ export default function LogSession() {
   const createSession = useCreateSessionLog();
   const { data: profile } = useProfile();
   const { activeBatch, setActiveBatch, clearActiveBatch } = useActiveBatch();
+  const { data: allSessions } = useSessionLogs();
 
   const [step, setStep] = useState<Step>("product");
   const [activeBatchUsed, setActiveBatchUsed] = useState(false);
@@ -591,6 +594,29 @@ export default function LogSession() {
                     />
                   </div>
                 </Card>
+
+                {/* Outcome Prediction */}
+                {allSessions && allSessions.length >= 3 && selectedIntent && selectedMethod && (
+                  <OutcomePredictionCard
+                    input={{
+                      strainName: strainText,
+                      strainId: selectedStrainId,
+                      canonicalStrainId: canonicalStrainId,
+                      intent: selectedIntent,
+                      method: selectedMethod,
+                      doseLevel: doseLevel,
+                      doseUnit: doseUnit,
+                      doseCount: doseCount ? parseFloat(doseCount) : null,
+                      timeOfDay: context.time_of_day,
+                      sleepQuality: context.sleep_quality,
+                      caffeine: context.caffeine,
+                      moodBefore: context.mood_before,
+                      stressBefore: context.stress_before,
+                      stomach: context.stomach,
+                    }}
+                    sessions={allSessions}
+                  />
+                )}
 
                 <Button
                   variant="primary"

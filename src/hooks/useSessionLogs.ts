@@ -41,6 +41,7 @@ export interface SessionLog {
   local_time: string | null;
   intent: string;
   strain_id: string | null;
+  canonical_strain_id: string | null;
   strain_name_text: string;
   strain_type: string | null;
   method: string;
