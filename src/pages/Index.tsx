@@ -15,6 +15,7 @@ import { RecentSession } from "@/components/home/RecentSession";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ConnoisseurProfileCard } from "@/components/profile/ConnoisseurProfileCard";
 import { LearningPathCard } from "@/components/learning/LearningPathCard";
+import { WeeklyReportCard } from "@/components/insights/WeeklyReportCard";
 import { useRecentSessions } from "@/hooks/useSessionLogs";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -68,6 +69,9 @@ const Index = () => {
 
           {/* Streak Card */}
           <StreakCard />
+
+          {/* Weekly Report */}
+          <WeeklyReportCard />
 
           {/* Card — Best For You */}
           <BestForYouCard />
