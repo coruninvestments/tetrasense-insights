@@ -31,6 +31,7 @@ import { AchievementBadges } from "@/components/achievements/AchievementBadges";
 import { ConnoisseurProfileCard } from "@/components/profile/ConnoisseurProfileCard";
 import { TerpenePreferenceCard } from "@/components/insights/TerpenePreferenceCard";
 import { LearningPathCard } from "@/components/learning/LearningPathCard";
+import { ExportReportButton } from "@/components/profile/ExportReportButton";
 import { PaywallModal } from "@/components/premium/PaywallGate";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
 import type { AchievementKey } from "@/lib/achievements";
