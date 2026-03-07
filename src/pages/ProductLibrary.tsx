@@ -429,6 +429,7 @@ function ProductCard({
                 {type}
               </Badge>
               {coaStatus && <CoaBadgeWithTooltip status={coaStatus} />}
+              {quality && <QualityScorePill result={quality} />}
             </div>
           </div>
           {thcLabel && (
