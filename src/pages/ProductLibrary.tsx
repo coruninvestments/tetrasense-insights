@@ -394,6 +394,7 @@ function ProductCard({
   terpenes,
   sessionCount,
   positiveRate,
+  quality,
 }: {
   name: string;
   type: string;
@@ -404,6 +405,7 @@ function ProductCard({
   terpenes?: string[];
   sessionCount?: number;
   positiveRate?: number;
+  quality?: QualityResult | null;
 }) {
   const typeLower = type.toLowerCase();
   const typeStyle =
