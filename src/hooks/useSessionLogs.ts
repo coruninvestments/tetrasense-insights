@@ -83,6 +83,9 @@ export interface SessionLog {
   inhale_quality: string | null;
   aftertaste: string | null;
   sensory_enjoyment: number | null;
+  product_id: string | null;
+  batch_id: string | null;
+  coa_attached: boolean;
 }
 
 export interface CreateSessionLogInput {
