@@ -14,6 +14,7 @@ import { BestForYouCard } from "@/components/home/BestForYouCard";
 import { RecentSession } from "@/components/home/RecentSession";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ConnoisseurProfileCard } from "@/components/profile/ConnoisseurProfileCard";
+import { LearningPathCard } from "@/components/learning/LearningPathCard";
 import { useRecentSessions } from "@/hooks/useSessionLogs";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -73,6 +74,9 @@ const Index = () => {
 
           {/* Card — Connoisseur Profile */}
           <ConnoisseurProfileCard />
+
+          {/* Card — Learning Path */}
+          <LearningPathCard />
 
           {/* Card 4 — Recent Sessions */}
           <motion.div
