@@ -30,6 +30,7 @@ import { FeedbackSection } from "@/components/profile/FeedbackSection";
 import { AchievementBadges } from "@/components/achievements/AchievementBadges";
 import { ConnoisseurProfileCard } from "@/components/profile/ConnoisseurProfileCard";
 import { TerpenePreferenceCard } from "@/components/insights/TerpenePreferenceCard";
+import { LearningPathCard } from "@/components/learning/LearningPathCard";
 import { PaywallModal } from "@/components/premium/PaywallGate";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
 import type { AchievementKey } from "@/lib/achievements";
@@ -394,6 +395,12 @@ export default function Profile() {
             <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.13 }}>
               <h2 className="font-serif text-lg font-medium text-foreground mb-3">Terpene Profile</h2>
               <TerpenePreferenceCard />
+            </motion.section>
+
+            {/* Section 1c — Learning Path */}
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.14 }}>
+              <h2 className="font-serif text-lg font-medium text-foreground mb-3">Learning</h2>
+              <LearningPathCard />
             </motion.section>
 
             {/* Section 2 — Feedback */}

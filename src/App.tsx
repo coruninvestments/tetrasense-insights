@@ -22,6 +22,7 @@ import ResetPassword from "./pages/ResetPassword";
 import AdminCoa from "./pages/AdminCoa";
 import BestForYou from "./pages/BestForYou";
 import SessionDetail from "./pages/SessionDetail";
+import ConnoisseurLearning from "./pages/ConnoisseurLearning";
 
 const App = () => (
   <ThemeProvider>
@@ -87,6 +88,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Learn />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/learn/connoisseur"
+              element={
+                <ProtectedRoute>
+                  <ConnoisseurLearning />
                 </ProtectedRoute>
               }
             />
