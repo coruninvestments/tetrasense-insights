@@ -12,10 +12,12 @@ import { useStrains, formatPotencyRange } from "@/hooks/useStrains";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { usePublicBatchBrowse } from "@/hooks/usePublicBatchBrowse";
 import { normalizeOutcome } from "@/lib/sessionOutcome";
+import { bestQualityForBatches, type QualityResult } from "@/lib/productQuality";
 import { computeStrainRankings } from "@/lib/bestForYou";
 import { BrandImage } from "@/components/brand/BrandImage";
 import { ASSETS } from "@/lib/assets";
 import { Button } from "@/components/ui/button";
+import { QualityScorePill } from "@/components/product/QualityScore";
 
 const TYPE_OPTIONS = ["Indica", "Sativa", "Hybrid"] as const;
 
