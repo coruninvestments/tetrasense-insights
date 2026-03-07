@@ -155,13 +155,13 @@ export function ConnoisseurProfileCard() {
             </div>
           )}
 
-          {/* Share placeholder */}
+          {/* Share button */}
           {!isForming && (
             <Button
               variant="outline"
               size="sm"
               className="w-full text-xs"
-              onClick={() => toast.info("Profile sharing coming soon")}
+              onClick={() => setShareOpen(true)}
             >
               <Share2 className="w-3.5 h-3.5 mr-1.5" />
               Share Profile
@@ -169,6 +169,15 @@ export function ConnoisseurProfileCard() {
           )}
         </CardContent>
       </Card>
+
+      {/* Share modal */}
+      {shareData && (
+        <ShareProfileModal
+          open={shareOpen}
+          onOpenChange={setShareOpen}
+          data={shareData}
+        />
+      )}
     </motion.div>
   );
 }
