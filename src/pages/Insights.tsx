@@ -40,6 +40,7 @@ export default function Insights() {
   }, []);
 
   const sessionCount = sessions?.length ?? 0;
+  const deepReports = sessions ? generateDeepInsights(sessions) : null;
 
   return (
     <>
