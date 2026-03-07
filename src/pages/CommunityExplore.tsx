@@ -316,6 +316,22 @@ export default function CommunityExplore() {
           </span>
         </div>
 
+        {/* Community Insights link */}
+        <Link to="/community-insights">
+          <Card className="p-3 hover:shadow-elevated transition-shadow cursor-pointer">
+            <CardContent className="p-0 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <TrendingUp className="w-4 h-4 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground">Community Insights</p>
+                <p className="text-[11px] text-muted-foreground">Charts, rankings & trend analysis</p>
+              </div>
+              <span className="text-xs text-primary font-medium shrink-0">View →</span>
+            </CardContent>
+          </Card>
+        </Link>
+
         {/* Tabs: Strains vs Batches */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="w-full">
