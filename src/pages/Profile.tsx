@@ -28,6 +28,7 @@ import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { DISCLAIMER_LINES } from "@/utils/onboarding";
 import { FeedbackSection } from "@/components/profile/FeedbackSection";
 import { AchievementBadges } from "@/components/achievements/AchievementBadges";
+import { ConnoisseurProfileCard } from "@/components/profile/ConnoisseurProfileCard";
 import { PaywallModal } from "@/components/premium/PaywallGate";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
 import type { AchievementKey } from "@/lib/achievements";
@@ -377,8 +378,14 @@ export default function Profile() {
               </motion.div>
             )}
 
+            {/* Section 0 — Connoisseur Profile */}
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.08 }}>
+              <h2 className="font-serif text-lg font-medium text-foreground mb-3">Your Profile</h2>
+              <ConnoisseurProfileCard />
+            </motion.section>
+
             {/* Section 1 — Achievements */}
-            <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.1 }}>
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.12 }}>
               <AchievementBadges />
             </motion.section>
 

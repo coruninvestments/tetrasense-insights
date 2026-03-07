@@ -13,6 +13,7 @@ import { StreakCard } from "@/components/dashboard/StreakCard";
 import { BestForYouCard } from "@/components/home/BestForYouCard";
 import { RecentSession } from "@/components/home/RecentSession";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { ConnoisseurProfileCard } from "@/components/profile/ConnoisseurProfileCard";
 import { useRecentSessions } from "@/hooks/useSessionLogs";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -69,6 +70,9 @@ const Index = () => {
 
           {/* Card — Best For You */}
           <BestForYouCard />
+
+          {/* Card — Connoisseur Profile */}
+          <ConnoisseurProfileCard />
 
           {/* Card 4 — Recent Sessions */}
           <motion.div
