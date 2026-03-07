@@ -240,13 +240,25 @@ export default function ProductLibrary() {
             <div className="flex items-center gap-2 mb-4">
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                type="text"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                placeholder="Search strains or products…"
-                className="w-full h-11 pl-11 pr-4 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow"
-              />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  placeholder="Search strains or products…"
+                  className="w-full h-11 pl-11 pr-4 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow"
+                />
+              </div>
+              <Button
+                variant={compareMode ? "default" : "outline"}
+                size="icon"
+                className="h-11 w-11 shrink-0 rounded-xl"
+                onClick={() => {
+                  setCompareMode(!compareMode);
+                  setCompareSelections([]);
+                }}
+              >
+                <GitCompareArrows className="w-4 h-4" />
+              </Button>
             </div>
           </motion.div>
         </header>
