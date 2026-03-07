@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Check, ChevronRight, ChevronDown } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import { SessionCompletionMoment } from "@/components/log/SessionCompletionMomen
 import { ContextSection, emptyContext, type SessionContext } from "@/components/log/ContextSection";
 import { SensorySection, emptySensory, type SensoryData } from "@/components/log/SensorySection";
 import { SessionHistoryCard } from "@/components/log/SessionHistoryCard";
+import { OutcomePredictionCard } from "@/components/log/OutcomePredictionCard";
 import { useCreateSessionLog, SessionIntent, SessionMethod, DoseLevel, EffectSliders } from "@/hooks/useSessionLogs";
 import { useProfile } from "@/hooks/useProfile";
 import { useActiveBatch } from "@/hooks/useActiveBatch";
