@@ -147,6 +147,29 @@ export default function Insights() {
               <TerpenePreferenceCard />
             </motion.section>
 
+            {/* Section 9 — Deep Insight Reports (Premium) */}
+            <motion.section
+              variants={sectionVariants}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.4 }}
+            >
+              <SectionHeader number={9} title="Deep Insight Reports" />
+              <PaywallGate feature="Deep Insight Reports">
+                <div className="space-y-3">
+                  {deepReports ? (
+                    deepReports.map((report, i) => (
+                      <DeepInsightCard key={report.id} report={report} index={i} />
+                    ))
+                  ) : (
+                    <p className="text-xs text-muted-foreground text-center py-4">
+                      Log at least 5 sessions to unlock deep analysis.
+                    </p>
+                  )}
+                </div>
+              </PaywallGate>
+            </motion.section>
+
             {/* Disclaimer */}
             <p className="text-[11px] text-muted-foreground text-center pt-2 px-4">
               All insights are based on your personal session data. These are observations, not medical advice.
