@@ -94,6 +94,9 @@ export function CompareProductsDrawer({ open, onOpenChange, productA, productB }
 
   if (!productA || !productB) return null;
 
+  const qA = qualityBadge(productA.quality);
+  const qB = qualityBadge(productB.quality);
+
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[85vh]">
