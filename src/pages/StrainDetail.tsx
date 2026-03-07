@@ -1,10 +1,14 @@
+import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Users, Shield, TrendingUp } from "lucide-react";
+import { ArrowLeft, Users, Shield, TrendingUp, Award } from "lucide-react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useStrain, formatPotencyRange } from "@/hooks/useStrains";
 import { useStrainCommunityStats, hasEnoughData, hasAggregateData, MIN_SESSIONS_FOR_DISPLAY } from "@/hooks/useStrainCommunityStats";
+import { usePublicBatchesByStrain } from "@/hooks/useProductBatches";
+import { bestQualityForBatches } from "@/lib/productQuality";
+import { QualityScoreBreakdown } from "@/components/product/QualityScore";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
