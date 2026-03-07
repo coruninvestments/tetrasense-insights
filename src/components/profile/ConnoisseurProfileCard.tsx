@@ -33,11 +33,37 @@ const CONFIDENCE_CONFIG: Record<ConnoisseurConfidence, { label: string; classNam
 
 export function ConnoisseurProfileCard() {
   const { data: sessions, isLoading } = useSessionLogs();
+  const [shareOpen, setShareOpen] = useState(false);
 
   const profile = useMemo(() => {
     if (!sessions || sessions.length === 0) return null;
     return computeConnoisseurProfile(sessions);
   }, [sessions]);
+
+  const shareData = useMemo((): ShareProfileData | null => {
+    if (!profile || !sessions || profile.confidence === "forming") return null;
+    const confidence = computeConfidence(sessions);
+    const terpPrefs = computeTerpenePreferences(sessions);
+    const topTerpene = terpPrefs.preferred.length > 0 ? terpPrefs.preferred[0].name : null;
+
+    // Determine best dose from positive sessions
+    const positives = sessions.filter(s => s.outcome === "positive");
+    const doseCounts: Record<string, number> = {};
+    for (const s of positives) {
+      const lvl = s.dose_level ?? "medium";
+      doseCounts[lvl] = (doseCounts[lvl] ?? 0) + 1;
+    }
+    const bestDose = Object.entries(doseCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "Medium";
+
+    return {
+      profileName: profile.profileName,
+      subtitle: profile.subtitle,
+      clarityScore: confidence.confidenceScore,
+      topTerpene,
+      bestDoseRange: bestDose.charAt(0).toUpperCase() + bestDose.slice(1),
+      sessionCount: profile.sessionCount,
+    };
+  }, [profile, sessions]);
 
   if (isLoading) {
     return (
