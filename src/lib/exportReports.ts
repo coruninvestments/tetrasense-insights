@@ -60,7 +60,7 @@ function escapeCSV(val: unknown): string {
 export function generateCSV(data: ExportData): Blob {
   const header = CSV_COLUMNS.map((c) => c.label).join(",");
   const rows = data.sessions.map((s) =>
-    CSV_COLUMNS.map((c) => escapeCSV((s as Record<string, unknown>)[c.key])).join(","),
+    CSV_COLUMNS.map((c) => escapeCSV((s as unknown as Record<string, unknown>)[c.key])).join(","),
   );
   const content = [header, ...rows].join("\n");
   return new Blob([content], { type: "text/csv;charset=utf-8" });
