@@ -69,24 +69,22 @@ function NoData() {
 }
 
 export function CompareProductsDrawer({ open, onOpenChange, productA, productB }: Props) {
-  if (!productA || !productB) return null;
-
   const comparisons = useMemo(() => {
+    if (!productA || !productB) return { betterPositive: null, betterAnxiety: null, betterQuality: null };
     const a = productA;
     const b = productB;
 
-    // Determine better values
-    const betterPositive =
+    const betterPositive: "a" | "b" | null =
       a.positiveRate != null && b.positiveRate != null
         ? a.positiveRate > b.positiveRate ? "a" : a.positiveRate < b.positiveRate ? "b" : null
         : null;
 
-    const betterAnxiety =
+    const betterAnxiety: "a" | "b" | null =
       a.avgAnxiety != null && b.avgAnxiety != null
         ? a.avgAnxiety < b.avgAnxiety ? "a" : a.avgAnxiety > b.avgAnxiety ? "b" : null
         : null;
 
-    const betterQuality =
+    const betterQuality: "a" | "b" | null =
       a.quality && b.quality && a.quality.level !== "unknown" && b.quality.level !== "unknown"
         ? a.quality.qualityScore > b.quality.qualityScore ? "a" : a.quality.qualityScore < b.quality.qualityScore ? "b" : null
         : null;
@@ -94,8 +92,7 @@ export function CompareProductsDrawer({ open, onOpenChange, productA, productB }
     return { betterPositive, betterAnxiety, betterQuality };
   }, [productA, productB]);
 
-  const qA = qualityBadge(productA.quality);
-  const qB = qualityBadge(productB.quality);
+  if (!productA || !productB) return null;
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
