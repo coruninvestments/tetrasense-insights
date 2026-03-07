@@ -367,6 +367,8 @@ export type Database = {
       }
       session_logs: {
         Row: {
+          aftertaste: string | null
+          aroma_tags: string[] | null
           batch_id: string | null
           caffeine: boolean
           canonical_strain_id: string | null
@@ -393,8 +395,10 @@ export type Database = {
           effect_sleepiness: number | null
           effect_throat_irritation: number | null
           effects: string[] | null
+          flavor_tags: string[] | null
           hydration: string | null
           id: string
+          inhale_quality: string | null
           intent: string
           intent_match_score: number | null
           local_time: string | null
@@ -404,6 +408,7 @@ export type Database = {
           outcome: string | null
           outcome_preference: string | null
           product_id: string | null
+          sensory_enjoyment: number | null
           setting: string | null
           sleep_quality: string | null
           stomach: string | null
@@ -415,6 +420,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          aftertaste?: string | null
+          aroma_tags?: string[] | null
           batch_id?: string | null
           caffeine?: boolean
           canonical_strain_id?: string | null
@@ -441,8 +448,10 @@ export type Database = {
           effect_sleepiness?: number | null
           effect_throat_irritation?: number | null
           effects?: string[] | null
+          flavor_tags?: string[] | null
           hydration?: string | null
           id?: string
+          inhale_quality?: string | null
           intent: string
           intent_match_score?: number | null
           local_time?: string | null
@@ -452,6 +461,7 @@ export type Database = {
           outcome?: string | null
           outcome_preference?: string | null
           product_id?: string | null
+          sensory_enjoyment?: number | null
           setting?: string | null
           sleep_quality?: string | null
           stomach?: string | null
@@ -463,6 +473,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          aftertaste?: string | null
+          aroma_tags?: string[] | null
           batch_id?: string | null
           caffeine?: boolean
           canonical_strain_id?: string | null
@@ -489,8 +501,10 @@ export type Database = {
           effect_sleepiness?: number | null
           effect_throat_irritation?: number | null
           effects?: string[] | null
+          flavor_tags?: string[] | null
           hydration?: string | null
           id?: string
+          inhale_quality?: string | null
           intent?: string
           intent_match_score?: number | null
           local_time?: string | null
@@ -500,6 +514,7 @@ export type Database = {
           outcome?: string | null
           outcome_preference?: string | null
           product_id?: string | null
+          sensory_enjoyment?: number | null
           setting?: string | null
           sleep_quality?: string | null
           stomach?: string | null
