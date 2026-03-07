@@ -595,6 +595,29 @@ export default function LogSession() {
                   </div>
                 </Card>
 
+                {/* Outcome Prediction */}
+                {allSessions && allSessions.length >= 3 && selectedIntent && selectedMethod && (
+                  <OutcomePredictionCard
+                    input={{
+                      strainName: strainText,
+                      strainId: selectedStrainId,
+                      canonicalStrainId: canonicalStrainId,
+                      intent: selectedIntent,
+                      method: selectedMethod,
+                      doseLevel: doseLevel,
+                      doseUnit: doseUnit,
+                      doseCount: doseCount ? parseFloat(doseCount) : null,
+                      timeOfDay: context.time_of_day,
+                      sleepQuality: context.sleep_quality,
+                      caffeine: context.caffeine,
+                      moodBefore: context.mood_before,
+                      stressBefore: context.stress_before,
+                      stomach: context.stomach,
+                    }}
+                    sessions={allSessions}
+                  />
+                )}
+
                 <Button
                   variant="primary"
                   size="lg"
