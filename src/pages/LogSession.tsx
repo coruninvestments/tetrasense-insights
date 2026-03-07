@@ -50,6 +50,7 @@ export default function LogSession() {
   const createSession = useCreateSessionLog();
   const { data: profile } = useProfile();
   const { activeBatch, setActiveBatch, clearActiveBatch } = useActiveBatch();
+  const { data: allSessions } = useSessionLogs();
 
   const [step, setStep] = useState<Step>("product");
   const [activeBatchUsed, setActiveBatchUsed] = useState(false);
