@@ -9,6 +9,7 @@ export interface PublicBatchBrowseItem {
   lab_name: string | null;
   coa_status: string;
   lab_panel_common: Record<string, number> | null;
+  lab_panel_custom: Record<string, number> | Array<{ compound: string; value: number }> | null;
   is_public_library: boolean;
   created_at: string;
   product_name: string;
@@ -24,7 +25,7 @@ export function usePublicBatchBrowse() {
     queryFn: async () => {
       const { data: batches, error: bErr } = await supabase
         .from("product_batches")
-        .select("id, product_id, batch_code, tested_at, lab_name, coa_status, lab_panel_common, is_public_library, created_at")
+        .select("id, product_id, batch_code, tested_at, lab_name, coa_status, lab_panel_common, lab_panel_custom, is_public_library, created_at")
         .eq("is_public_library", true)
         .eq("coa_status", "verified")
         .order("created_at", { ascending: false })
