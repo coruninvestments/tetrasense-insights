@@ -173,6 +173,7 @@ const SessionDetail = () => {
                     </div>
                   </div>
                 )}
+              </CardContent>
             </Card>
           </motion.div>
 

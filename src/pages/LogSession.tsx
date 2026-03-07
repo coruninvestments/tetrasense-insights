@@ -523,7 +523,44 @@ export default function LogSession() {
               </div>
             )}
 
-            {/* ─── Step 5: Context ─── */}
+            {/* ─── Step 5b: Sensory ─── */}
+            {step === "sensory" && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="font-serif text-2xl font-medium text-foreground mb-1">
+                    Flavor & Aroma
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Optional — track what you taste and smell
+                  </p>
+                </div>
+
+                <Card className="p-5">
+                  <SensorySection value={sensory} onChange={setSensory} />
+                </Card>
+
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="flex-1"
+                    onClick={goNext}
+                  >
+                    Skip
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    className="flex-1"
+                    onClick={goNext}
+                  >
+                    Continue <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* ─── Step 6: Context ─── */}
             {step === "context" && (
               <div className="space-y-6">
                 <div>
