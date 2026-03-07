@@ -131,6 +131,7 @@ const App = () => (
                   <CommunityInsights />
                 </ProtectedRoute>
               }
+            />
             <Route
               path="/best"
               element={
