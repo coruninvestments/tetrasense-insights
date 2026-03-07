@@ -9,6 +9,8 @@ import { ContextCorrelationsSection } from "@/components/insights/ContextCorrela
 import { DoseInsightsSection } from "@/components/insights/DoseInsightsSection";
 import { PatternTimelineSection } from "@/components/insights/PatternTimelineSection";
 import { TerpenePreferenceCard } from "@/components/insights/TerpenePreferenceCard";
+import { DeepInsightCard } from "@/components/insights/DeepInsightCard";
+import { generateDeepInsights } from "@/lib/deepInsights";
 import { logEvent } from "@/lib/analytics";
 import { tryUnlock } from "@/lib/achievements";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
@@ -38,6 +40,7 @@ export default function Insights() {
   }, []);
 
   const sessionCount = sessions?.length ?? 0;
+  const deepReports = sessions ? generateDeepInsights(sessions as any) : null;
 
   return (
     <>
@@ -142,6 +145,29 @@ export default function Insights() {
             >
               <SectionHeader number={8} title="Terpene Preferences" />
               <TerpenePreferenceCard />
+            </motion.section>
+
+            {/* Section 9 — Deep Insight Reports (Premium) */}
+            <motion.section
+              variants={sectionVariants}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.4 }}
+            >
+              <SectionHeader number={9} title="Deep Insight Reports" />
+              <PaywallGate feature="Deep Insight Reports">
+                <div className="space-y-3">
+                  {deepReports ? (
+                    deepReports.map((report, i) => (
+                      <DeepInsightCard key={report.id} report={report} index={i} />
+                    ))
+                  ) : (
+                    <p className="text-xs text-muted-foreground text-center py-4">
+                      Log at least 5 sessions to unlock deep analysis.
+                    </p>
+                  )}
+                </div>
+              </PaywallGate>
             </motion.section>
 
             {/* Disclaimer */}
