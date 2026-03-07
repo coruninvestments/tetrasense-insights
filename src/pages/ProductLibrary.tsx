@@ -349,6 +349,35 @@ export default function ProductLibrary() {
                 const terps = strainTerpenes.get(strain.name.toLowerCase());
                 const coaStatus = strainCoaStatus.get(strain.name.toLowerCase()) ?? null;
                 const quality = strainQuality.get(strain.name.toLowerCase()) ?? null;
+                const isSelected = compareSelections.some(s => s.id === strain.id);
+
+                const handleClick = (e: React.MouseEvent) => {
+                  if (!compareMode) return; // let Link handle it
+                  e.preventDefault();
+                  if (isSelected) {
+                    setCompareSelections(prev => prev.filter(s => s.id !== strain.id));
+                  } else if (compareSelections.length < 2) {
+                    setCompareSelections(prev => [
+                      ...prev,
+                      {
+                        id: strain.id,
+                        name: strain.name,
+                        type: strain.type,
+                        description: strain.description ?? undefined,
+                        thcMin: strain.thc_min ?? undefined,
+                        thcMax: strain.thc_max ?? undefined,
+                        cbdMin: strain.cbd_min ?? undefined,
+                        cbdMax: strain.cbd_max ?? undefined,
+                        terpenes: terps,
+                        sessionCount: stats?.count,
+                        positiveRate: stats?.positiveRate,
+                        avgAnxiety: strainAnxiety.get(strain.name.toLowerCase()),
+                        quality,
+                        aromaFlavors: strainAromaFlavors.get(strain.name.toLowerCase()),
+                      },
+                    ]);
+                  }
+                };
 
                 return (
                   <motion.div
@@ -356,21 +385,40 @@ export default function ProductLibrary() {
                     initial={{ opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: Math.min(idx * 0.03, 0.3) }}
+                    onClick={handleClick}
+                    className={compareMode ? "cursor-pointer" : ""}
                   >
-                    <Link to={`/strains/${strain.id}`}>
-                      <ProductCard
-                        name={strain.name}
-                        type={strain.type}
-                        description={strain.description ?? undefined}
-                        thcMin={strain.thc_min ?? undefined}
-                        thcMax={strain.thc_max ?? undefined}
-                        coaStatus={coaStatus}
-                        terpenes={terps}
-                        sessionCount={stats?.count}
-                        positiveRate={stats?.positiveRate}
-                        quality={quality}
-                      />
-                    </Link>
+                    <div className={`rounded-xl transition-all ${compareMode && isSelected ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""}`}>
+                      {compareMode ? (
+                        <ProductCard
+                          name={strain.name}
+                          type={strain.type}
+                          description={strain.description ?? undefined}
+                          thcMin={strain.thc_min ?? undefined}
+                          thcMax={strain.thc_max ?? undefined}
+                          coaStatus={coaStatus}
+                          terpenes={terps}
+                          sessionCount={stats?.count}
+                          positiveRate={stats?.positiveRate}
+                          quality={quality}
+                        />
+                      ) : (
+                        <Link to={`/strains/${strain.id}`}>
+                          <ProductCard
+                            name={strain.name}
+                            type={strain.type}
+                            description={strain.description ?? undefined}
+                            thcMin={strain.thc_min ?? undefined}
+                            thcMax={strain.thc_max ?? undefined}
+                            coaStatus={coaStatus}
+                            terpenes={terps}
+                            sessionCount={stats?.count}
+                            positiveRate={stats?.positiveRate}
+                            quality={quality}
+                          />
+                        </Link>
+                      )}
+                    </div>
                   </motion.div>
                 );
               })}
@@ -399,6 +447,25 @@ export default function ProductLibrary() {
             </motion.div>
           )}
         </div>
+
+        {/* Compare mode UI */}
+        {compareMode && (
+          <CompareSelectionBar
+            selections={compareSelections}
+            onClear={() => {
+              setCompareSelections([]);
+              setCompareMode(false);
+            }}
+            onCompare={() => setCompareOpen(true)}
+          />
+        )}
+
+        <CompareProductsDrawer
+          open={compareOpen}
+          onOpenChange={setCompareOpen}
+          productA={compareSelections[0] ?? null}
+          productB={compareSelections[1] ?? null}
+        />
       </div>
     </AppLayout>
   );
