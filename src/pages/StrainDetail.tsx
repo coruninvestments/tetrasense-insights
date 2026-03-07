@@ -42,6 +42,12 @@ export default function StrainDetail() {
   const navigate = useNavigate();
   const { data: strain, isLoading: strainLoading } = useStrain(id || "");
   const { data: communityStats, isLoading: statsLoading } = useStrainCommunityStats(id || "");
+  const { data: strainBatches } = usePublicBatchesByStrain(id || null);
+
+  const qualityResult = useMemo(() => {
+    if (!strainBatches?.length) return null;
+    return bestQualityForBatches(strainBatches as any[]);
+  }, [strainBatches]);
 
   if (strainLoading) {
     return (
