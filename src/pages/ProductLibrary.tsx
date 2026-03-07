@@ -58,7 +58,9 @@ export default function ProductLibrary() {
   const [terpeneFilter, setTerpeneFilter] = useState<TerpeneFilter>(null);
   const [outcomeFilter, setOutcomeFilter] = useState<OutcomeFilter>(null);
   const [sortMode, setSortMode] = useState<"default" | "best">("default");
-
+  const [compareMode, setCompareMode] = useState(false);
+  const [compareSelections, setCompareSelections] = useState<CompareProduct[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
   const hasActiveFilters = !!(search || typeFilter || terpeneFilter || outcomeFilter);
   const resetFilters = useCallback(() => {
     setSearch("");
