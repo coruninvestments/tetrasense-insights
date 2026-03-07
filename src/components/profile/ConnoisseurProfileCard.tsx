@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, TrendingUp, AlertTriangle, Share2, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { computeConnoisseurProfile, type ConnoisseurConfidence } from "@/lib/connoisseurProfile";
-import { useMemo } from "react";
-import { toast } from "sonner";
+import { computeConfidence } from "@/lib/confidenceEngine";
+import { computeTerpenePreferences } from "@/lib/terpenePreferences";
+import { ShareProfileModal } from "./ShareProfileModal";
+import type { ShareProfileData } from "@/lib/shareProfile";
 
 const CONFIDENCE_CONFIG: Record<ConnoisseurConfidence, { label: string; className: string }> = {
   forming: {
@@ -30,11 +33,37 @@ const CONFIDENCE_CONFIG: Record<ConnoisseurConfidence, { label: string; classNam
 
 export function ConnoisseurProfileCard() {
   const { data: sessions, isLoading } = useSessionLogs();
+  const [shareOpen, setShareOpen] = useState(false);
 
   const profile = useMemo(() => {
     if (!sessions || sessions.length === 0) return null;
     return computeConnoisseurProfile(sessions);
   }, [sessions]);
+
+  const shareData = useMemo((): ShareProfileData | null => {
+    if (!profile || !sessions || profile.confidence === "forming") return null;
+    const confidence = computeConfidence(sessions);
+    const terpPrefs = computeTerpenePreferences(sessions);
+    const topTerpene = terpPrefs.preferred.length > 0 ? terpPrefs.preferred[0].name : null;
+
+    // Determine best dose from positive sessions
+    const positives = sessions.filter(s => s.outcome === "positive");
+    const doseCounts: Record<string, number> = {};
+    for (const s of positives) {
+      const lvl = s.dose_level ?? "medium";
+      doseCounts[lvl] = (doseCounts[lvl] ?? 0) + 1;
+    }
+    const bestDose = Object.entries(doseCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "Medium";
+
+    return {
+      profileName: profile.profileName,
+      subtitle: profile.subtitle,
+      clarityScore: confidence.confidenceScore,
+      topTerpene,
+      bestDoseRange: bestDose.charAt(0).toUpperCase() + bestDose.slice(1),
+      sessionCount: profile.sessionCount,
+    };
+  }, [profile, sessions]);
 
   if (isLoading) {
     return (
@@ -126,13 +155,13 @@ export function ConnoisseurProfileCard() {
             </div>
           )}
 
-          {/* Share placeholder */}
+          {/* Share button */}
           {!isForming && (
             <Button
               variant="outline"
               size="sm"
               className="w-full text-xs"
-              onClick={() => toast.info("Profile sharing coming soon")}
+              onClick={() => setShareOpen(true)}
             >
               <Share2 className="w-3.5 h-3.5 mr-1.5" />
               Share Profile
@@ -140,6 +169,15 @@ export function ConnoisseurProfileCard() {
           )}
         </CardContent>
       </Card>
+
+      {/* Share modal */}
+      {shareData && (
+        <ShareProfileModal
+          open={shareOpen}
+          onOpenChange={setShareOpen}
+          data={shareData}
+        />
+      )}
     </motion.div>
   );
 }
