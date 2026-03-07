@@ -9,6 +9,8 @@ import { ContextCorrelationsSection } from "@/components/insights/ContextCorrela
 import { DoseInsightsSection } from "@/components/insights/DoseInsightsSection";
 import { PatternTimelineSection } from "@/components/insights/PatternTimelineSection";
 import { TerpenePreferenceCard } from "@/components/insights/TerpenePreferenceCard";
+import { DeepInsightCard } from "@/components/insights/DeepInsightCard";
+import { generateDeepInsights } from "@/lib/deepInsights";
 import { logEvent } from "@/lib/analytics";
 import { tryUnlock } from "@/lib/achievements";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
