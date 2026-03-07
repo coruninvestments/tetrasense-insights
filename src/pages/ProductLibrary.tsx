@@ -93,6 +93,39 @@ export default function ProductLibrary() {
     return result;
   }, [sessions]);
 
+  // Compute per-strain anxiety avg and aroma/flavor tags
+  const strainAnxiety = useMemo(() => {
+    if (!sessions) return new Map<string, number>();
+    const map = new Map<string, { sum: number; count: number }>();
+    for (const s of sessions) {
+      const key = s.strain_name_text?.toLowerCase();
+      if (!key || s.effect_anxiety == null) continue;
+      const entry = map.get(key) ?? { sum: 0, count: 0 };
+      entry.sum += s.effect_anxiety;
+      entry.count++;
+      map.set(key, entry);
+    }
+    const result = new Map<string, number>();
+    map.forEach((v, k) => result.set(k, v.count > 0 ? v.sum / v.count : 0));
+    return result;
+  }, [sessions]);
+
+  const strainAromaFlavors = useMemo(() => {
+    if (!sessions) return new Map<string, string[]>();
+    const map = new Map<string, Set<string>>();
+    for (const s of sessions) {
+      const key = s.strain_name_text?.toLowerCase();
+      if (!key) continue;
+      const set = map.get(key) ?? new Set<string>();
+      (s.aroma_tags ?? []).forEach(t => set.add(t));
+      (s.flavor_tags ?? []).forEach(t => set.add(t));
+      map.set(key, set);
+    }
+    const result = new Map<string, string[]>();
+    map.forEach((v, k) => { if (v.size > 0) result.set(k, [...v].slice(0, 6)); });
+    return result;
+  }, [sessions]);
+
   // Build map of strain names to COA status (verified > pending > none)
   const strainCoaStatus = useMemo(() => {
     if (!verifiedBatches) return new Map<string, "verified" | "pending">();
