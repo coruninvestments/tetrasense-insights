@@ -29,6 +29,7 @@ import { DISCLAIMER_LINES } from "@/utils/onboarding";
 import { FeedbackSection } from "@/components/profile/FeedbackSection";
 import { AchievementBadges } from "@/components/achievements/AchievementBadges";
 import { ConnoisseurProfileCard } from "@/components/profile/ConnoisseurProfileCard";
+import { TerpenePreferenceCard } from "@/components/insights/TerpenePreferenceCard";
 import { PaywallModal } from "@/components/premium/PaywallGate";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
 import type { AchievementKey } from "@/lib/achievements";
@@ -387,6 +388,12 @@ export default function Profile() {
             {/* Section 1 — Achievements */}
             <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.12 }}>
               <AchievementBadges />
+            </motion.section>
+
+            {/* Section 1b — Terpene Preferences */}
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.13 }}>
+              <h2 className="font-serif text-lg font-medium text-foreground mb-3">Terpene Profile</h2>
+              <TerpenePreferenceCard />
             </motion.section>
 
             {/* Section 2 — Feedback */}
