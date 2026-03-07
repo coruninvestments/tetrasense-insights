@@ -77,6 +77,11 @@ export interface SessionLog {
   dose_unit: string | null;
   dose_count: number | null;
   dose_normalized_score: number | null;
+  aroma_tags: string[] | null;
+  flavor_tags: string[] | null;
+  inhale_quality: string | null;
+  aftertaste: string | null;
+  sensory_enjoyment: number | null;
 }
 
 export interface CreateSessionLogInput {
@@ -109,6 +114,11 @@ export interface CreateSessionLogInput {
   stress_before?: string | null;
   dose_unit?: string | null;
   dose_count?: number | null;
+  aroma_tags?: string[];
+  flavor_tags?: string[];
+  inhale_quality?: string | null;
+  aftertaste?: string | null;
+  sensory_enjoyment?: number | null;
 }
 
 export function useSessionLogs() {
@@ -288,6 +298,11 @@ export function useCreateSessionLog() {
             dose_count: input.dose_count,
             dose_amount_mg: input.dose_amount_mg,
           }),
+          aroma_tags: input.aroma_tags && input.aroma_tags.length > 0 ? input.aroma_tags : [],
+          flavor_tags: input.flavor_tags && input.flavor_tags.length > 0 ? input.flavor_tags : [],
+          inhale_quality: input.inhale_quality || null,
+          aftertaste: input.aftertaste || null,
+          sensory_enjoyment: input.sensory_enjoyment ?? null,
         } as any)
         .select()
         .single();

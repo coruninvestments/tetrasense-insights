@@ -12,6 +12,7 @@ import { BatchChooser } from "@/components/log/BatchChooser";
 import { ActiveBatchCard } from "@/components/log/ActiveBatchCard";
 import { SessionCompletionMoment } from "@/components/log/SessionCompletionMoment";
 import { ContextSection, emptyContext, type SessionContext } from "@/components/log/ContextSection";
+import { SensorySection, emptySensory, type SensoryData } from "@/components/log/SensorySection";
 import { SessionHistoryCard } from "@/components/log/SessionHistoryCard";
 import { useCreateSessionLog, SessionIntent, SessionMethod, DoseLevel, EffectSliders } from "@/hooks/useSessionLogs";
 import { useProfile } from "@/hooks/useProfile";
@@ -23,9 +24,9 @@ import { GOALS } from "@/lib/goals";
 import { METHODS } from "@/lib/methods";
 import { EFFECTS } from "@/lib/effects";
 
-type Step = "product" | "intent" | "dose" | "effects" | "context" | "done";
+type Step = "product" | "intent" | "dose" | "effects" | "sensory" | "context" | "done";
 
-const steps: Step[] = ["product", "intent", "dose", "effects", "context", "done"];
+const steps: Step[] = ["product", "intent", "dose", "effects", "sensory", "context", "done"];
 
 const doseUnits = ["hit", "puff", "bowl", "dab", "g", "mg", "other"] as const;
 
@@ -80,6 +81,7 @@ export default function LogSession() {
 
   // Context
   const [context, setContext] = useState<SessionContext>(emptyContext);
+  const [sensory, setSensory] = useState<SensoryData>(emptySensory);
   const [notes, setNotes] = useState("");
 
   // Flow state
@@ -120,6 +122,7 @@ export default function LogSession() {
       case "intent": return !!selectedIntent;
       case "dose": return !!selectedMethod;
       case "effects": return true;
+      case "sensory": return true;
       case "context": return true;
       default: return false;
     }
@@ -155,6 +158,11 @@ export default function LogSession() {
           sleep_quality: context.sleep_quality,
           mood_before: context.mood_before,
           stress_before: context.stress_before,
+          aroma_tags: sensory.aroma_tags.length > 0 ? sensory.aroma_tags : undefined,
+          flavor_tags: sensory.flavor_tags.length > 0 ? sensory.flavor_tags : undefined,
+          inhale_quality: sensory.inhale_quality || undefined,
+          aftertaste: sensory.aftertaste || undefined,
+          sensory_enjoyment: sensory.sensory_enjoyment ?? undefined,
         });
         if (canonicalStrainId && selectedProductId) {
           setActiveBatch(canonicalStrainId, selectedProductId, selectedBatchId);
@@ -188,6 +196,7 @@ export default function LogSession() {
     intent: "Intent",
     dose: "Dose",
     effects: "Effects",
+    sensory: "Flavor & Aroma",
     context: "Context",
     done: "Complete",
   };
@@ -514,7 +523,44 @@ export default function LogSession() {
               </div>
             )}
 
-            {/* ─── Step 5: Context ─── */}
+            {/* ─── Step 5b: Sensory ─── */}
+            {step === "sensory" && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="font-serif text-2xl font-medium text-foreground mb-1">
+                    Flavor & Aroma
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Optional — track what you taste and smell
+                  </p>
+                </div>
+
+                <Card className="p-5">
+                  <SensorySection value={sensory} onChange={setSensory} />
+                </Card>
+
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="flex-1"
+                    onClick={goNext}
+                  >
+                    Skip
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    className="flex-1"
+                    onClick={goNext}
+                  >
+                    Continue <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* ─── Step 6: Context ─── */}
             {step === "context" && (
               <div className="space-y-6">
                 <div>

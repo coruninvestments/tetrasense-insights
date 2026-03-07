@@ -139,6 +139,40 @@ const SessionDetail = () => {
                     </div>
                   </div>
                 )}
+
+                {/* Sensory Profile */}
+                {(session.aroma_tags?.length > 0 || session.flavor_tags?.length > 0 || session.inhale_quality || session.aftertaste || session.sensory_enjoyment) && (
+                  <div className="pt-2 border-t border-border/50 space-y-2">
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Flavor & Aroma</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {session.aroma_tags?.map((t: string) => (
+                        <span key={`a-${t}`} className="text-[11px] bg-accent text-accent-foreground px-2 py-0.5 rounded-full capitalize">
+                          🌿 {t}
+                        </span>
+                      ))}
+                      {session.flavor_tags?.map((t: string) => (
+                        <span key={`f-${t}`} className="text-[11px] bg-accent text-accent-foreground px-2 py-0.5 rounded-full capitalize">
+                          👅 {t}
+                        </span>
+                      ))}
+                      {session.inhale_quality && (
+                        <span className="text-[11px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full capitalize">
+                          Inhale: {session.inhale_quality}
+                        </span>
+                      )}
+                      {session.aftertaste && (
+                        <span className="text-[11px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full capitalize">
+                          Aftertaste: {session.aftertaste}
+                        </span>
+                      )}
+                      {session.sensory_enjoyment && (
+                        <span className="text-[11px] bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                          Enjoyment: {session.sensory_enjoyment}/5
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
