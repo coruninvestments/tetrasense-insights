@@ -8,6 +8,7 @@ import { EffectDriversSection } from "@/components/insights/EffectDriversSection
 import { ContextCorrelationsSection } from "@/components/insights/ContextCorrelationsSection";
 import { DoseInsightsSection } from "@/components/insights/DoseInsightsSection";
 import { PatternTimelineSection } from "@/components/insights/PatternTimelineSection";
+import { TerpenePreferenceCard } from "@/components/insights/TerpenePreferenceCard";
 import { logEvent } from "@/lib/analytics";
 import { tryUnlock } from "@/lib/achievements";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
@@ -130,6 +131,17 @@ export default function Insights() {
               <PaywallGate feature="Pattern Timeline">
                 <PatternTimelineSection />
               </PaywallGate>
+            </motion.section>
+
+            {/* Section 8 — Terpene Preferences */}
+            <motion.section
+              variants={sectionVariants}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.35 }}
+            >
+              <SectionHeader number={8} title="Terpene Preferences" />
+              <TerpenePreferenceCard />
             </motion.section>
 
             {/* Disclaimer */}
