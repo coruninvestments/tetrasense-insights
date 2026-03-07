@@ -299,6 +299,7 @@ export default function ProductLibrary() {
                 const stats = strainStats.get(strain.name.toLowerCase());
                 const terps = strainTerpenes.get(strain.name.toLowerCase());
                 const coaStatus = strainCoaStatus.get(strain.name.toLowerCase()) ?? null;
+                const quality = strainQuality.get(strain.name.toLowerCase()) ?? null;
 
                 return (
                   <motion.div
@@ -318,6 +319,7 @@ export default function ProductLibrary() {
                         terpenes={terps}
                         sessionCount={stats?.count}
                         positiveRate={stats?.positiveRate}
+                        quality={quality}
                       />
                     </Link>
                   </motion.div>
