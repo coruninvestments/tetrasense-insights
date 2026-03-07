@@ -23,6 +23,7 @@ import AdminCoa from "./pages/AdminCoa";
 import BestForYou from "./pages/BestForYou";
 import SessionDetail from "./pages/SessionDetail";
 import ConnoisseurLearning from "./pages/ConnoisseurLearning";
+import CommunityInsights from "./pages/CommunityInsights";
 
 const App = () => (
   <ThemeProvider>
@@ -123,6 +124,13 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/community-insights"
+              element={
+                <ProtectedRoute>
+                  <CommunityInsights />
+                </ProtectedRoute>
+              }
             <Route
               path="/best"
               element={
