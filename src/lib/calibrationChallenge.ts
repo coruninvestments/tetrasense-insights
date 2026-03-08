@@ -8,7 +8,7 @@
 import type { SessionLog } from "@/hooks/useSessionLogs";
 import { computeConfidence } from "./confidenceEngine";
 import { computeTerpenePreferences, type TerpeneSignal } from "./terpenePreferences";
-import { computeGenome, type GenomeDimension } from "./cannabisGenome";
+import { computeCannabisGenome, type GenomeDimension } from "./cannabisGenome";
 import { normalizeOutcome } from "./sessionOutcome";
 
 /* ── Types ───────────────────────────────────────────────────────── */
