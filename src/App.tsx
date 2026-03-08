@@ -150,6 +150,14 @@ const App = () => (
               }
             />
             <Route
+              path="/admin/founder-dashboard"
+              element={
+                <ProtectedRoute>
+                  <FounderDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/session/:id"
               element={
                 <ProtectedRoute>
