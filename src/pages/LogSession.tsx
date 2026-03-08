@@ -683,6 +683,7 @@ export default function LogSession() {
             )}
           </motion.div>
         </AnimatePresence>
+        )}
       </div>
     </AppLayout>
   );
