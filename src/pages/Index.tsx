@@ -20,6 +20,7 @@ import { ChallengeCard } from "@/components/challenge/ChallengeCard";
 import { SignalStrengthCard } from "@/components/home/SignalStrengthCard";
 import { ToleranceCard } from "@/components/home/ToleranceCard";
 import { QuickLogCard } from "@/components/log/QuickLogCard";
+import { ConnoisseurPointsCard } from "@/components/profile/ConnoisseurPointsCard";
 import { useRecentSessions } from "@/hooks/useSessionLogs";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -92,8 +93,11 @@ const Index = () => {
           {/* Card — Best For You */}
           <BestForYouCard />
 
-          {/* Card — Connoisseur Profile */}
+          {/* Connoisseur Profile */}
           <ConnoisseurProfileCard />
+
+          {/* Connoisseur Points (compact) */}
+          <ConnoisseurPointsCard compact />
 
           {/* Card — Learning Path */}
           <LearningPathCard />
