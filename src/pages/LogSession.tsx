@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Check, ChevronRight, ChevronDown } from "lucide-react";
+import { ArrowLeft, Check, ChevronRight, ChevronDown, Zap } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { QuickLogCard } from "@/components/log/QuickLogCard";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -51,6 +52,9 @@ export default function LogSession() {
   const { data: profile } = useProfile();
   const { activeBatch, setActiveBatch, clearActiveBatch } = useActiveBatch();
   const { data: allSessions } = useSessionLogs();
+
+  const expandFromParam = searchParams.get("expand") === "true";
+  const [isQuickMode, setIsQuickMode] = useState(!expandFromParam);
 
   const [step, setStep] = useState<Step>("product");
   const [activeBatchUsed, setActiveBatchUsed] = useState(false);
@@ -218,24 +222,56 @@ export default function LogSession() {
             </button>
             <div className="flex-1">
               <p className="text-sm font-medium text-foreground">Log Session</p>
-              {step !== "done" && (
+              {!isQuickMode && step !== "done" && (
                 <p className="text-[11px] text-muted-foreground">
                   Step {currentIndex + 1} of {steps.length - 1} — {stepLabels[step]}
                 </p>
               )}
             </div>
+            {/* Quick / Full toggle */}
+            <div className="flex rounded-lg bg-secondary/60 p-0.5">
+              <button
+                onClick={() => setIsQuickMode(true)}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors flex items-center gap-1 ${
+                  isQuickMode
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Zap className="w-3 h-3" />
+                Quick
+              </button>
+              <button
+                onClick={() => setIsQuickMode(false)}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  !isQuickMode
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Full
+              </button>
+            </div>
           </div>
-          {/* Progress bar */}
-          <div className="h-0.5 bg-secondary/40">
-            <motion.div
-              className="h-full bg-primary"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-            />
-          </div>
+          {/* Progress bar — only for full mode */}
+          {!isQuickMode && (
+            <div className="h-0.5 bg-secondary/40">
+              <motion.div
+                className="h-full bg-primary"
+                initial={{ width: 0 }}
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+              />
+            </div>
+          )}
         </header>
 
+        {isQuickMode ? (
+          <div className="px-5 py-6">
+            <QuickLogCard inline onClose={() => navigate("/")} />
+          </div>
+        ) : (
+          <>
         {/* Steps */}
         <AnimatePresence mode="wait">
           <motion.div
@@ -647,6 +683,8 @@ export default function LogSession() {
             )}
           </motion.div>
         </AnimatePresence>
+          </>
+        )}
       </div>
     </AppLayout>
   );
