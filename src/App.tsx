@@ -20,6 +20,7 @@ import CommunityExplore from "./pages/CommunityExplore";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import AdminCoa from "./pages/AdminCoa";
+import FounderDashboard from "./pages/FounderDashboard";
 import BestForYou from "./pages/BestForYou";
 import SessionDetail from "./pages/SessionDetail";
 import ConnoisseurLearning from "./pages/ConnoisseurLearning";
