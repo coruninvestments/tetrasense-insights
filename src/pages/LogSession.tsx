@@ -271,7 +271,7 @@ export default function LogSession() {
             <QuickLogCard inline onClose={() => navigate("/")} />
           </div>
         ) : (
-
+          <>
         {/* Steps */}
         <AnimatePresence mode="wait">
           <motion.div
