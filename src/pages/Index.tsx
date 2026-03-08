@@ -56,6 +56,9 @@ const Index = () => {
         </header>
 
         <div className="px-5 space-y-4 pb-8">
+          {/* Challenge Card — Find Your Signal */}
+          <ChallengeCard />
+
           {/* Card 1 — Today's Goal */}
           <TodaysGoalCard />
 
