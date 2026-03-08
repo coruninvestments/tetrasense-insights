@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   User, LogOut, Mail, Calendar, Crown, ChevronRight,
-  Bell, Moon, Sun, Users, ArrowLeft, Sliders, AlertTriangle, Shield, Settings, Monitor, Zap,
+  Bell, Moon, Sun, Users, ArrowLeft, Sliders, AlertTriangle, Shield, Settings, Monitor, Zap, BarChart3,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useSubscription } from "@/hooks/useSubscription";
