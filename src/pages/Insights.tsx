@@ -143,7 +143,7 @@ export default function Insights() {
               animate="visible"
               transition={{ delay: 0.25 }}
             >
-              <SectionHeader number={6} title="Context Risks" />
+              <SectionHeader number={7} title="Context Risks" />
               <ContextCorrelationsSection />
             </motion.section>
 
@@ -154,7 +154,7 @@ export default function Insights() {
               animate="visible"
               transition={{ delay: 0.3 }}
             >
-              <SectionHeader number={7} title="Pattern Timeline" />
+              <SectionHeader number={8} title="Pattern Timeline" />
               <PaywallGate feature="Pattern Timeline">
                 <PatternTimelineSection />
               </PaywallGate>
@@ -167,7 +167,7 @@ export default function Insights() {
               animate="visible"
               transition={{ delay: 0.35 }}
             >
-              <SectionHeader number={8} title="Terpene Preferences" />
+              <SectionHeader number={9} title="Terpene Preferences" />
               <TerpenePreferenceCard />
             </motion.section>
 
@@ -178,7 +178,7 @@ export default function Insights() {
               animate="visible"
               transition={{ delay: 0.4 }}
             >
-              <SectionHeader number={9} title="Deep Insight Reports" />
+              <SectionHeader number={10} title="Deep Insight Reports" />
               <PaywallGate feature="Deep Insight Reports">
                 <div className="space-y-3">
                   {deepReports ? (
