@@ -19,6 +19,7 @@ import type { AchievementKey } from "@/lib/achievements";
 import { useQueryClient } from "@tanstack/react-query";
 import { SignalLeafLogo } from "@/components/brand/SignalLeafLogo";
 import { PaywallGate } from "@/components/premium/PaywallGate";
+import { ToleranceTrendCard } from "@/components/insights/ToleranceTrendCard";
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -113,14 +114,25 @@ export default function Insights() {
               <DoseInsightsSection />
             </motion.section>
 
-            {/* Section 5 — Effect Drivers */}
+            {/* Section 5 — Tolerance Trend */}
             <motion.section
               variants={sectionVariants}
               initial="hidden"
               animate="visible"
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.18 }}
             >
-              <SectionHeader number={5} title="Effect Drivers" />
+              <SectionHeader number={5} title="Tolerance Trend" />
+              <ToleranceTrendCard />
+            </motion.section>
+
+            {/* Section 6 — Effect Drivers */}
+            <motion.section
+              variants={sectionVariants}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.22 }}
+            >
+              <SectionHeader number={6} title="Effect Drivers" />
               <EffectDriversSection />
             </motion.section>
 
@@ -131,7 +143,7 @@ export default function Insights() {
               animate="visible"
               transition={{ delay: 0.25 }}
             >
-              <SectionHeader number={6} title="Context Risks" />
+              <SectionHeader number={7} title="Context Risks" />
               <ContextCorrelationsSection />
             </motion.section>
 
@@ -142,7 +154,7 @@ export default function Insights() {
               animate="visible"
               transition={{ delay: 0.3 }}
             >
-              <SectionHeader number={7} title="Pattern Timeline" />
+              <SectionHeader number={8} title="Pattern Timeline" />
               <PaywallGate feature="Pattern Timeline">
                 <PatternTimelineSection />
               </PaywallGate>
@@ -155,7 +167,7 @@ export default function Insights() {
               animate="visible"
               transition={{ delay: 0.35 }}
             >
-              <SectionHeader number={8} title="Terpene Preferences" />
+              <SectionHeader number={9} title="Terpene Preferences" />
               <TerpenePreferenceCard />
             </motion.section>
 
@@ -166,7 +178,7 @@ export default function Insights() {
               animate="visible"
               transition={{ delay: 0.4 }}
             >
-              <SectionHeader number={9} title="Deep Insight Reports" />
+              <SectionHeader number={10} title="Deep Insight Reports" />
               <PaywallGate feature="Deep Insight Reports">
                 <div className="space-y-3">
                   {deepReports ? (
