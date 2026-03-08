@@ -385,7 +385,13 @@ export default function Profile() {
               </motion.div>
             )}
 
-            {/* Section 0 — Strain Fingerprint */}
+            {/* Section 0 — Signal Card */}
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.06 }}>
+              <h2 className="font-serif text-lg font-medium text-foreground mb-3">Your Signal Card</h2>
+              <SignalCard />
+            </motion.section>
+
+            {/* Section 0a — Strain Fingerprint */}
             <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.07 }}>
               <h2 className="font-serif text-lg font-medium text-foreground mb-3">Your Fingerprint</h2>
               <StrainFingerprintCard />

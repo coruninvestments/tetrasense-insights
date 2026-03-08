@@ -95,6 +95,9 @@ const Index = () => {
           {/* Card — Best For You */}
           <BestForYouCard />
 
+          {/* Signal Card (compact) */}
+          <SignalCard compact />
+
           {/* Strain Fingerprint (compact) */}
           <StrainFingerprintCard compact />
 
