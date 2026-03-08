@@ -301,6 +301,13 @@ export default function Profile() {
                   }}
                 >Reset Tips</Button>
 
+                {/* Admin: Founder Dashboard link */}
+                {isAdmin && (
+                  <Button variant="outline" className="w-full border-dashed border-primary/30" onClick={() => navigate("/admin/founder-dashboard")}>
+                    <BarChart3 className="w-4 h-4 mr-2" /> Founder Dashboard
+                  </Button>
+                )}
+
                 {/* Dev Premium Override */}
                 {canUseDevPremium && setDevOverride && (
                   <Card className="p-4 flex items-center justify-between border-dashed border-warning/40">
