@@ -40,13 +40,6 @@ export interface FounderMetrics {
 export type TimeRange = "7d" | "30d" | "all";
 
 export async function fetchFounderMetrics(range: TimeRange = "all"): Promise<FounderMetrics> {
-  const { data, error } = await supabase.functions.invoke("founder-metrics", {
-    body: null,
-    method: "GET",
-    headers: {},
-  });
-
-  // Edge functions invoked via supabase-js use POST; use fetch for GET with query params
   const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/founder-metrics?range=${range}`;
   const session = (await supabase.auth.getSession()).data.session;
 
