@@ -19,6 +19,7 @@ import { WeeklyReportCard } from "@/components/insights/WeeklyReportCard";
 import { ChallengeCard } from "@/components/challenge/ChallengeCard";
 import { SignalStrengthCard } from "@/components/home/SignalStrengthCard";
 import { ToleranceCard } from "@/components/home/ToleranceCard";
+import { QuickLogCard } from "@/components/log/QuickLogCard";
 import { useRecentSessions } from "@/hooks/useSessionLogs";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -58,6 +59,9 @@ const Index = () => {
         </header>
 
         <div className="px-5 space-y-4 pb-8">
+          {/* Quick Log */}
+          <QuickLogCard />
+
           {/* Challenge Card — Find Your Signal */}
           <ChallengeCard />
 
