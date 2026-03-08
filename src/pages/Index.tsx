@@ -17,6 +17,7 @@ import { ConnoisseurProfileCard } from "@/components/profile/ConnoisseurProfileC
 import { LearningPathCard } from "@/components/learning/LearningPathCard";
 import { WeeklyReportCard } from "@/components/insights/WeeklyReportCard";
 import { ChallengeCard } from "@/components/challenge/ChallengeCard";
+import { SignalStrengthCard } from "@/components/home/SignalStrengthCard";
 import { useRecentSessions } from "@/hooks/useSessionLogs";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -58,6 +59,9 @@ const Index = () => {
         <div className="px-5 space-y-4 pb-8">
           {/* Challenge Card — Find Your Signal */}
           <ChallengeCard />
+
+          {/* Signal Strength */}
+          <SignalStrengthCard />
 
           {/* Card 1 — Today's Goal */}
           <TodaysGoalCard />
