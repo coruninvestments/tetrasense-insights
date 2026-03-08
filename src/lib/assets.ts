@@ -27,6 +27,10 @@ export const ASSETS = {
   emptyInsightsLight: "/illustrations/empty-insights.light.svg",
   emptyLibraryDark: "/illustrations/empty-library.dark.svg",
   emptyLibraryLight: "/illustrations/empty-library.light.svg",
+  calibrationDark: "/illustrations/illustration-calibration.dark.svg",
+  calibrationLight: "/illustrations/illustration-calibration.light.svg",
+  signalStrengthDark: "/illustrations/illustration-signal-strength.dark.svg",
+  signalStrengthLight: "/illustrations/illustration-signal-strength.light.svg",
 
   /* ── Badges ────────────────────────────────────── */
   badgeVerified: "/badges/verified.svg",
@@ -34,6 +38,32 @@ export const ASSETS = {
   badgePremium: "/badges/premium.svg",
   badgePremiumLock: "/badges/premium-lock.svg",
   badgeLocked: "/badges/locked.svg",
+  badgeSession1: "/badges/badge-session-1.svg",
+  badgeSession3: "/badges/badge-session-3.svg",
+  badgeSession5: "/badges/badge-session-5.svg",
+  badgeSession7: "/badges/badge-session-7.svg",
+  badgeSession10: "/badges/badge-session-10.svg",
+  badgeConnoisseurNovice: "/badges/badge-connoisseur-novice.svg",
+  badgeConnoisseurExplorer: "/badges/badge-connoisseur-explorer.svg",
+  badgeConnoisseurExpert: "/badges/badge-connoisseur-expert.svg",
+  badgeSignalMaster: "/badges/badge-signal-master.svg",
+  badgeQuality: "/badges/quality-badge.svg",
+
+  /* ── Cards ──────────────────────────────────────── */
+  cardSignalProfile: "/cards/card-signal-profile.svg",
+  cardStrainFingerprint: "/cards/card-strain-fingerprint.svg",
+  cardWeeklyReport: "/cards/card-weekly-report.svg",
+  cardChallengeComplete: "/cards/card-challenge-complete.svg",
+
+  /* ── UI ─────────────────────────────────────────── */
+  signalHalo: "/ui/signal-halo.svg",
+  signalPulse: "/ui/signal-pulse.svg",
+  constellationGrid: "/ui/constellation-grid.svg",
+  chartGrid: "/ui/chart-grid.svg",
+
+  /* ── Backgrounds ────────────────────────────────── */
+  signalGlowBg: "/backgrounds/signal-glow-background.svg",
+  premiumHaloBg: "/backgrounds/premium-halo-background.svg",
 } as const;
 
 export type AssetKey = keyof typeof ASSETS;
