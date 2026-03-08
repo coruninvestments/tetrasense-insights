@@ -113,7 +113,7 @@ function buildSignalReport(sessions: SessionLog[]): SignalReportCard | null {
   if (sessions.length < 10) return null;
 
   const confidence = computeConfidence(sessions);
-  const genome = computeGenome(sessions);
+  const genome = computeCannabisGenome(sessions);
   const prefs = computeTerpenePreferences(sessions);
 
   // Clarity score (reuse confidence score 0-100)
