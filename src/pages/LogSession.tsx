@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Check, ChevronRight, ChevronDown } from "lucide-react";
+import { ArrowLeft, Check, ChevronRight, ChevronDown, Zap } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { QuickLogCard } from "@/components/log/QuickLogCard";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -51,6 +52,9 @@ export default function LogSession() {
   const { data: profile } = useProfile();
   const { activeBatch, setActiveBatch, clearActiveBatch } = useActiveBatch();
   const { data: allSessions } = useSessionLogs();
+
+  const expandFromParam = searchParams.get("expand") === "true";
+  const [isQuickMode, setIsQuickMode] = useState(!expandFromParam);
 
   const [step, setStep] = useState<Step>("product");
   const [activeBatchUsed, setActiveBatchUsed] = useState(false);
