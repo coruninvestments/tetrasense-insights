@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 
 /* ── Point values ── */
-const POINTS = {
+const POINTS: Record<string, number> = {
   log_session: 10,
   complete_session: 20,
   flavor_aroma: 5,
@@ -16,7 +16,7 @@ const POINTS = {
   share_profile: 25,
   compare_products: 10,
   first_verified_coa: 20,
-} as const;
+};
 
 /* ── Anti-spam: max CP earnable per day from session logging ── */
 const DAILY_SESSION_CP_CAP = 80;
