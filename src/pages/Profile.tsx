@@ -34,6 +34,7 @@ import { LearningPathCard } from "@/components/learning/LearningPathCard";
 import { ExportReportButton } from "@/components/profile/ExportReportButton";
 import { ConnoisseurPointsCard } from "@/components/profile/ConnoisseurPointsCard";
 import { RecentUnlocksCard } from "@/components/profile/RecentUnlocksCard";
+import { StrainFingerprintCard } from "@/components/profile/StrainFingerprintCard";
 import { PaywallModal } from "@/components/premium/PaywallGate";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
 import type { AchievementKey } from "@/lib/achievements";
@@ -383,7 +384,13 @@ export default function Profile() {
               </motion.div>
             )}
 
-            {/* Section 0 — Connoisseur Profile */}
+            {/* Section 0 — Strain Fingerprint */}
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.07 }}>
+              <h2 className="font-serif text-lg font-medium text-foreground mb-3">Your Fingerprint</h2>
+              <StrainFingerprintCard />
+            </motion.section>
+
+            {/* Section 0a — Connoisseur Profile */}
             <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.08 }}>
               <h2 className="font-serif text-lg font-medium text-foreground mb-3">Your Profile</h2>
               <ConnoisseurProfileCard />

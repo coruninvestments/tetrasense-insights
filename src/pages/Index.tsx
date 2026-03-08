@@ -21,6 +21,7 @@ import { SignalStrengthCard } from "@/components/home/SignalStrengthCard";
 import { ToleranceCard } from "@/components/home/ToleranceCard";
 import { QuickLogCard } from "@/components/log/QuickLogCard";
 import { ConnoisseurPointsCard } from "@/components/profile/ConnoisseurPointsCard";
+import { StrainFingerprintCard } from "@/components/profile/StrainFingerprintCard";
 import { useRecentSessions } from "@/hooks/useSessionLogs";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -92,6 +93,9 @@ const Index = () => {
 
           {/* Card — Best For You */}
           <BestForYouCard />
+
+          {/* Strain Fingerprint (compact) */}
+          <StrainFingerprintCard compact />
 
           {/* Connoisseur Profile */}
           <ConnoisseurProfileCard />
