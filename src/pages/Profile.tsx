@@ -35,6 +35,7 @@ import { ExportReportButton } from "@/components/profile/ExportReportButton";
 import { ConnoisseurPointsCard } from "@/components/profile/ConnoisseurPointsCard";
 import { RecentUnlocksCard } from "@/components/profile/RecentUnlocksCard";
 import { StrainFingerprintCard } from "@/components/profile/StrainFingerprintCard";
+import { SignalCard } from "@/components/profile/SignalCard";
 import { PaywallModal } from "@/components/premium/PaywallGate";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
 import type { AchievementKey } from "@/lib/achievements";
@@ -384,7 +385,13 @@ export default function Profile() {
               </motion.div>
             )}
 
-            {/* Section 0 — Strain Fingerprint */}
+            {/* Section 0 — Signal Card */}
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.06 }}>
+              <h2 className="font-serif text-lg font-medium text-foreground mb-3">Your Signal Card</h2>
+              <SignalCard />
+            </motion.section>
+
+            {/* Section 0a — Strain Fingerprint */}
             <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.07 }}>
               <h2 className="font-serif text-lg font-medium text-foreground mb-3">Your Fingerprint</h2>
               <StrainFingerprintCard />
