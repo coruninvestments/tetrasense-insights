@@ -60,6 +60,9 @@ const Index = () => {
           {/* Challenge Card — Find Your Signal */}
           <ChallengeCard />
 
+          {/* Signal Strength */}
+          <SignalStrengthCard />
+
           {/* Card 1 — Today's Goal */}
           <TodaysGoalCard />
 
