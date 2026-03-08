@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   User, LogOut, Mail, Calendar, Crown, ChevronRight,
-  Bell, Moon, Sun, Users, ArrowLeft, Sliders, AlertTriangle, Shield, Settings, Monitor, Zap,
+  Bell, Moon, Sun, Users, ArrowLeft, Sliders, AlertTriangle, Shield, Settings, Monitor, Zap, BarChart3,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -39,6 +39,7 @@ import { SignalCard } from "@/components/profile/SignalCard";
 import { PaywallModal } from "@/components/premium/PaywallGate";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
 import type { AchievementKey } from "@/lib/achievements";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { format } from "date-fns";
 
 type Section = "main" | "edit" | "notifications" | "privacy" | "settings" | "calibration" | "onboarding";
@@ -56,6 +57,7 @@ export default function Profile() {
   const { data: profile, isLoading: profileLoading } = useProfile();
   const { data: stats, isLoading: statsLoading } = useSessionStats();
   const updateProfile = useUpdateProfile();
+  const { isAdmin } = useIsAdmin();
   const [activeSection, setActiveSection] = useState<Section>("main");
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [unlockedAchievement, setUnlockedAchievement] = useState<AchievementKey | null>(null);
@@ -298,6 +300,13 @@ export default function Profile() {
                     catch { toast.error("Failed to reset tips"); }
                   }}
                 >Reset Tips</Button>
+
+                {/* Admin: Founder Dashboard link */}
+                {isAdmin && (
+                  <Button variant="outline" className="w-full border-dashed border-primary/30" onClick={() => navigate("/admin/founder-dashboard")}>
+                    <BarChart3 className="w-4 h-4 mr-2" /> Founder Dashboard
+                  </Button>
+                )}
 
                 {/* Dev Premium Override */}
                 {canUseDevPremium && setDevOverride && (
