@@ -16,6 +16,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ConnoisseurProfileCard } from "@/components/profile/ConnoisseurProfileCard";
 import { LearningPathCard } from "@/components/learning/LearningPathCard";
 import { WeeklyReportCard } from "@/components/insights/WeeklyReportCard";
+import { ChallengeCard } from "@/components/challenge/ChallengeCard";
 import { useRecentSessions } from "@/hooks/useSessionLogs";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -55,6 +56,9 @@ const Index = () => {
         </header>
 
         <div className="px-5 space-y-4 pb-8">
+          {/* Challenge Card — Find Your Signal */}
+          <ChallengeCard />
+
           {/* Card 1 — Today's Goal */}
           <TodaysGoalCard />
 
