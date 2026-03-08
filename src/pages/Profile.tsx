@@ -32,6 +32,8 @@ import { ConnoisseurProfileCard } from "@/components/profile/ConnoisseurProfileC
 import { TerpenePreferenceCard } from "@/components/insights/TerpenePreferenceCard";
 import { LearningPathCard } from "@/components/learning/LearningPathCard";
 import { ExportReportButton } from "@/components/profile/ExportReportButton";
+import { ConnoisseurPointsCard } from "@/components/profile/ConnoisseurPointsCard";
+import { RecentUnlocksCard } from "@/components/profile/RecentUnlocksCard";
 import { PaywallModal } from "@/components/premium/PaywallGate";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
 import type { AchievementKey } from "@/lib/achievements";
@@ -387,6 +389,14 @@ export default function Profile() {
               <ConnoisseurProfileCard />
               <div className="mt-3">
                 <ExportReportButton />
+              </div>
+            </motion.section>
+
+            {/* Section 0b — Connoisseur Points */}
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.1 }}>
+              <ConnoisseurPointsCard />
+              <div className="mt-3">
+                <RecentUnlocksCard />
               </div>
             </motion.section>
 
