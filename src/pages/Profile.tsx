@@ -57,6 +57,7 @@ export default function Profile() {
   const { data: profile, isLoading: profileLoading } = useProfile();
   const { data: stats, isLoading: statsLoading } = useSessionStats();
   const updateProfile = useUpdateProfile();
+  const { isAdmin } = useIsAdmin();
   const [activeSection, setActiveSection] = useState<Section>("main");
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [unlockedAchievement, setUnlockedAchievement] = useState<AchievementKey | null>(null);
