@@ -18,6 +18,7 @@ import { LearningPathCard } from "@/components/learning/LearningPathCard";
 import { WeeklyReportCard } from "@/components/insights/WeeklyReportCard";
 import { ChallengeCard } from "@/components/challenge/ChallengeCard";
 import { SignalStrengthCard } from "@/components/home/SignalStrengthCard";
+import { ToleranceCard } from "@/components/home/ToleranceCard";
 import { useRecentSessions } from "@/hooks/useSessionLogs";
 import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -74,6 +75,9 @@ const Index = () => {
 
           {/* Card 3b — Confidence Meter */}
           <ConfidenceMeterCard />
+
+          {/* Tolerance Card */}
+          <ToleranceCard />
 
           {/* Streak Card */}
           <StreakCard />

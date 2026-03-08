@@ -19,6 +19,7 @@ import type { AchievementKey } from "@/lib/achievements";
 import { useQueryClient } from "@tanstack/react-query";
 import { SignalLeafLogo } from "@/components/brand/SignalLeafLogo";
 import { PaywallGate } from "@/components/premium/PaywallGate";
+import { ToleranceTrendCard } from "@/components/insights/ToleranceTrendCard";
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 20 },
@@ -113,14 +114,25 @@ export default function Insights() {
               <DoseInsightsSection />
             </motion.section>
 
-            {/* Section 5 — Effect Drivers */}
+            {/* Section 5 — Tolerance Trend */}
             <motion.section
               variants={sectionVariants}
               initial="hidden"
               animate="visible"
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.18 }}
             >
-              <SectionHeader number={5} title="Effect Drivers" />
+              <SectionHeader number={5} title="Tolerance Trend" />
+              <ToleranceTrendCard />
+            </motion.section>
+
+            {/* Section 6 — Effect Drivers */}
+            <motion.section
+              variants={sectionVariants}
+              initial="hidden"
+              animate="visible"
+              transition={{ delay: 0.22 }}
+            >
+              <SectionHeader number={6} title="Effect Drivers" />
               <EffectDriversSection />
             </motion.section>
 
