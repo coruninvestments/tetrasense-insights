@@ -436,6 +436,12 @@ export default function Profile() {
               <FeedbackSection />
             </motion.section>
 
+            {/* Section 2b — Support */}
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.17 }}>
+              <h2 className="font-serif text-lg font-medium text-foreground mb-3">Help & Support</h2>
+              <SupportCenterCard />
+            </motion.section>
+
             {/* Section 3 — Settings */}
             <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.2 }}>
               <h2 className="font-serif text-lg font-medium text-foreground mb-3">Settings</h2>
