@@ -419,6 +419,11 @@ export default function Profile() {
               <AchievementBadges />
             </motion.section>
 
+            {/* Section 1a — Hidden Discoveries */}
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.125 }}>
+              <HiddenUnlocksCard />
+            </motion.section>
+
             {/* Section 1b — Terpene Preferences */}
             <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.13 }}>
               <h2 className="font-serif text-lg font-medium text-foreground mb-3">Terpene Profile</h2>
