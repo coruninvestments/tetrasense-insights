@@ -35,6 +35,12 @@ export interface FounderMetrics {
   doseDistribution: Record<string, number>;
   verifiedCoaCount: number;
   analyticsEvents: Record<string, number>;
+  support: {
+    total: number;
+    byType: Record<string, number>;
+    unresolved: number;
+    recent: Array<{ type: string; status: string; created_at: string }>;
+  };
 }
 
 export type TimeRange = "7d" | "30d" | "all";
