@@ -1,4 +1,55 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <rect width="200" height="200" fill="#0B0F0E"/>
-  <text x="100" y="105" text-anchor="middle" fill="#6FAF9F" font-size="14" font-family="sans-serif">signal-halo</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" fill="none">
+  <defs>
+    <radialGradient id="haloGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6FAF9F" stop-opacity="0"/>
+      <stop offset="56%" stop-color="#6FAF9F" stop-opacity="0.08"/>
+      <stop offset="78%" stop-color="#6FAF9F" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#6FAF9F" stop-opacity="0"/>
+    </radialGradient>
+
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+    </filter>
+  </defs>
+
+  <circle cx="300" cy="300" r="190" fill="url(#haloGlow)"/>
+
+  <circle cx="300" cy="300" r="168"
+    stroke="#EDE8DE"
+    stroke-opacity="0.22"
+    stroke-width="1.4"/>
+
+  <circle cx="300" cy="300" r="126"
+    stroke="#6FAF9F"
+    stroke-opacity="0.18"
+    stroke-width="1"/>
+
+  <g filter="url(#softGlow)">
+    <circle cx="300" cy="132" r="2.1" fill="#EDE8DE" fill-opacity="0.8"/>
+    <circle cx="372" cy="145" r="1.8" fill="#EDE8DE" fill-opacity="0.65"/>
+    <circle cx="435" cy="184" r="1.8" fill="#6FAF9F" fill-opacity="0.75"/>
+    <circle cx="466" cy="252" r="1.6" fill="#EDE8DE" fill-opacity="0.5"/>
+    <circle cx="468" cy="336" r="1.9" fill="#6FAF9F" fill-opacity="0.65"/>
+    <circle cx="430" cy="410" r="1.7" fill="#EDE8DE" fill-opacity="0.58"/>
+    <circle cx="364" cy="454" r="1.9" fill="#6FAF9F" fill-opacity="0.72"/>
+    <circle cx="300" cy="468" r="2.1" fill="#EDE8DE" fill-opacity="0.72"/>
+    <circle cx="232" cy="452" r="1.8" fill="#6FAF9F" fill-opacity="0.6"/>
+    <circle cx="172" cy="410" r="1.6" fill="#EDE8DE" fill-opacity="0.52"/>
+    <circle cx="132" cy="336" r="1.9" fill="#6FAF9F" fill-opacity="0.55"/>
+    <circle cx="132" cy="258" r="1.6" fill="#EDE8DE" fill-opacity="0.5"/>
+    <circle cx="164" cy="186" r="1.9" fill="#6FAF9F" fill-opacity="0.68"/>
+    <circle cx="228" cy="146" r="1.7" fill="#EDE8DE" fill-opacity="0.62"/>
+  </g>
+
+  <g fill="#EDE8DE" fill-opacity="0.45">
+    <circle cx="338" cy="126" r="0.8"/>
+    <circle cx="409" cy="164" r="0.7"/>
+    <circle cx="452" cy="219" r="0.8"/>
+    <circle cx="456" cy="374" r="0.9"/>
+    <circle cx="396" cy="438" r="0.8"/>
+    <circle cx="254" cy="459" r="0.7"/>
+    <circle cx="160" cy="379" r="0.8"/>
+    <circle cx="146" cy="225" r="0.8"/>
+    <circle cx="204" cy="156" r="0.7"/>
+  </g>
 </svg>
