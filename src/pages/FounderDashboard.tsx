@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Users, Activity, Zap, Trophy, CreditCard, Fingerprint, BarChart3,
   Beaker, Leaf, ArrowLeft, RefreshCw, Clock, Shield, Download,
-  Star, Target, FlaskConical, TrendingUp,
+  Star, Target, FlaskConical, TrendingUp, Bug, HelpCircle, MessageSquare,
 } from "lucide-react";
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -267,6 +267,30 @@ export default function FounderDashboard() {
             </div>
           </FounderChartCard>
         )}
+
+        {/* ── Support Tickets ── */}
+        <section>
+          <SectionHeader icon={HelpCircle} label="Support Tickets" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
+            <FounderMetricCard label="Total Tickets" value={m?.support.total ?? "—"} icon={<MessageSquare className="w-4 h-4 text-primary" />} loading={isLoading} />
+            <FounderMetricCard label="Bugs" value={m?.support.byType?.bug ?? 0} icon={<Bug className="w-4 h-4 text-primary" />} loading={isLoading} />
+            <FounderMetricCard label="Support" value={m?.support.byType?.support ?? 0} icon={<HelpCircle className="w-4 h-4 text-primary" />} loading={isLoading} />
+            <FounderMetricCard label="Unresolved" value={m?.support.unresolved ?? 0} icon={<Clock className="w-4 h-4 text-primary" />} loading={isLoading} />
+          </div>
+          {m && m.support.recent.length > 0 && (
+            <FounderChartCard title="Recent Tickets" loading={isLoading}>
+              <div className="space-y-1.5 max-h-60 overflow-y-auto">
+                {m.support.recent.map((t, i) => (
+                  <div key={i} className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-secondary/30">
+                    <Badge variant="secondary" className="text-[10px] capitalize">{t.type}</Badge>
+                    <span className="text-xs text-muted-foreground flex-1">{new Date(t.created_at).toLocaleDateString()}</span>
+                    <Badge variant={t.status === "new" ? "default" : "secondary"} className="text-[10px] capitalize">{t.status}</Badge>
+                  </div>
+                ))}
+              </div>
+            </FounderChartCard>
+          )}
+        </section>
 
         {/* ── Founder Utilities ── */}
         <section>

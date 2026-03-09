@@ -27,6 +27,7 @@ import { CalibrationScreen } from "@/components/onboarding/CalibrationScreen";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { DISCLAIMER_LINES } from "@/utils/onboarding";
 import { FeedbackSection } from "@/components/profile/FeedbackSection";
+import { SupportCenterCard } from "@/components/support/SupportCenterCard";
 import { AchievementBadges } from "@/components/achievements/AchievementBadges";
 import { ConnoisseurProfileCard } from "@/components/profile/ConnoisseurProfileCard";
 import { TerpenePreferenceCard } from "@/components/insights/TerpenePreferenceCard";
@@ -433,6 +434,12 @@ export default function Profile() {
             <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.15 }}>
               <h2 className="font-serif text-lg font-medium text-foreground mb-3">Feedback</h2>
               <FeedbackSection />
+            </motion.section>
+
+            {/* Section 2b — Support */}
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.17 }}>
+              <h2 className="font-serif text-lg font-medium text-foreground mb-3">Help & Support</h2>
+              <SupportCenterCard />
             </motion.section>
 
             {/* Section 3 — Settings */}
