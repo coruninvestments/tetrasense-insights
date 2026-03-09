@@ -68,9 +68,11 @@ export function getEggDef(key: EasterEggKey): EasterEggDef {
   return EGG_DEFS[key];
 }
 
-export function getUnlockedEggDefs(keys: string[]): EasterEggDef[] {
-  return keys
-    .filter((k): k is EasterEggKey => k in EGG_DEFS)
+export function getUnlockedEggDefs(achievementKeys: string[]): EasterEggDef[] {
+  return achievementKeys
+    .filter((k) => k.startsWith("egg_"))
+    .map((k) => k.replace("egg_", "") as EasterEggKey)
+    .filter((k) => k in EGG_DEFS)
     .map((k) => EGG_DEFS[k]);
 }
 
