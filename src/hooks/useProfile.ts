@@ -76,7 +76,7 @@ export function useUpdateProfile() {
       }
       if (blocked) {
         console.error("[SECURITY] Blocked client-side attempt to update protected profile fields");
-        logEvent("blocked_client_write_products");
+        logEvent("blocked_client_write_premium");
       }
 
       const { data, error } = await supabase
