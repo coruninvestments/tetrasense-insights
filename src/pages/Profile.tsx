@@ -36,6 +36,7 @@ import { ExportReportButton } from "@/components/profile/ExportReportButton";
 import { ConnoisseurPointsCard } from "@/components/profile/ConnoisseurPointsCard";
 import { RecentUnlocksCard } from "@/components/profile/RecentUnlocksCard";
 import { StrainFingerprintCard } from "@/components/profile/StrainFingerprintCard";
+import { HiddenUnlocksCard } from "@/components/profile/HiddenUnlocksCard";
 import { SignalCard } from "@/components/profile/SignalCard";
 import { PaywallModal } from "@/components/premium/PaywallGate";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
