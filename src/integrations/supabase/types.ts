@@ -399,6 +399,7 @@ export type Database = {
           hydration: string | null
           id: string
           inhale_quality: string | null
+          intensity_score: number | null
           intent: string
           intent_match_score: number | null
           local_time: string | null
@@ -452,6 +453,7 @@ export type Database = {
           hydration?: string | null
           id?: string
           inhale_quality?: string | null
+          intensity_score?: number | null
           intent: string
           intent_match_score?: number | null
           local_time?: string | null
@@ -505,6 +507,7 @@ export type Database = {
           hydration?: string | null
           id?: string
           inhale_quality?: string | null
+          intensity_score?: number | null
           intent?: string
           intent_match_score?: number | null
           local_time?: string | null

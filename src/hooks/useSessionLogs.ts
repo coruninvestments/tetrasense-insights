@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { SessionOutcome, computeSessionOutcome } from "@/lib/sessionOutcome";
 import { computeDoseNormalizedScore } from "@/lib/doseNormalization";
+import { computeIntensity } from "@/lib/psychoactiveIntensity";
 import { checkSessionMilestones } from "@/lib/analytics";
 import { checkSessionAchievements, type AchievementKey } from "@/lib/achievements";
 
@@ -86,6 +87,7 @@ export interface SessionLog {
   product_id: string | null;
   batch_id: string | null;
   coa_attached: boolean;
+  intensity_score: number | null;
 }
 
 export interface CreateSessionLogInput {
@@ -302,6 +304,19 @@ export function useCreateSessionLog() {
             dose_count: input.dose_count,
             dose_amount_mg: input.dose_amount_mg,
           }),
+          intensity_score: computeIntensity({
+            method: input.method,
+            doseLevel: input.dose_level,
+            doseNormalizedScore: computeDoseNormalizedScore({
+              dose_level: input.dose_level,
+              dose_unit: input.dose_unit,
+              dose_count: input.dose_count,
+              dose_amount_mg: input.dose_amount_mg,
+            }),
+            thcMg: input.dose_amount_mg ?? null,
+            doseUnit: input.dose_unit ?? null,
+            doseCount: input.dose_count ?? null,
+          }).intensityScore,
           aroma_tags: input.aroma_tags && input.aroma_tags.length > 0 ? input.aroma_tags : [],
           flavor_tags: input.flavor_tags && input.flavor_tags.length > 0 ? input.flavor_tags : [],
           inhale_quality: input.inhale_quality || null,
