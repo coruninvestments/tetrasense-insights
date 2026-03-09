@@ -27,6 +27,7 @@ import { CalibrationScreen } from "@/components/onboarding/CalibrationScreen";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { DISCLAIMER_LINES } from "@/utils/onboarding";
 import { FeedbackSection } from "@/components/profile/FeedbackSection";
+import { SupportCenterCard } from "@/components/support/SupportCenterCard";
 import { AchievementBadges } from "@/components/achievements/AchievementBadges";
 import { ConnoisseurProfileCard } from "@/components/profile/ConnoisseurProfileCard";
 import { TerpenePreferenceCard } from "@/components/insights/TerpenePreferenceCard";
