@@ -10,9 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { CompareModal } from "@/components/session/CompareModal";
+import { IntensityBadge } from "@/components/shared/IntensityBadge";
 import { useSession } from "@/hooks/useSession";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { normalizeOutcome } from "@/lib/sessionOutcome";
+import { intensityFromSession } from "@/lib/psychoactiveIntensity";
 import { generateSessionReplay, getKeyEffects, type SimilarSession } from "@/lib/sessionReplay";
 import { logEvent } from "@/lib/analytics";
 
