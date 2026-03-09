@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Plus, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { SignalLeafLogo } from "@/components/brand/SignalLeafLogo";
