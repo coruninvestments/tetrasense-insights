@@ -46,7 +46,14 @@ export const ASSETS = {
   badgeConnoisseurNovice: "/badges/badge-connoisseur-novice.svg",
   badgeConnoisseurExplorer: "/badges/badge-connoisseur-explorer.svg",
   badgeConnoisseurExpert: "/badges/badge-connoisseur-expert.svg",
+  badgeConnoisseurSeed: "/badges/badge-connoisseur-seed.svg",
+  badgeConnoisseurSprout: "/badges/badge-connoisseur-sprout.svg",
+  badgeConnoisseurGrower: "/badges/badge-connoisseur-grower.svg",
+  badgeConnoisseurCurator: "/badges/badge-connoisseur-curator.svg",
+  badgeConnoisseurMaster: "/badges/badge-connoisseur-master.svg",
   badgeSignalMaster: "/badges/badge-signal-master.svg",
+  badgeFounder: "/badges/badge-founder.svg",
+  badgeDeveloper: "/badges/badge-developer.svg",
   badgeQuality: "/badges/quality-badge.svg",
 
   /* ── Cards ──────────────────────────────────────── */
