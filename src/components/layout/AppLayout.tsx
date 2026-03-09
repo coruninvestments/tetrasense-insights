@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { BottomNav } from "./BottomNav";
 import { PageTransition } from "./PageTransition";
 import { useNotificationTriggers } from "@/hooks/useNotificationTriggers";
+import { useEasterEggs } from "@/hooks/useEasterEggs";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -10,6 +11,7 @@ interface AppLayoutProps {
 
 export function AppLayout({ children, showNav = true }: AppLayoutProps) {
   useNotificationTriggers();
+  const { newUnlock, dismissUnlock, Toast } = useEasterEggs();
 
   return (
     <div className="min-h-screen bg-background">
@@ -19,6 +21,7 @@ export function AppLayout({ children, showNav = true }: AppLayoutProps) {
         </main>
       </PageTransition>
       {showNav && <BottomNav />}
+      <Toast eggKey={newUnlock} onClose={dismissUnlock} />
     </div>
   );
 }

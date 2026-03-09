@@ -36,6 +36,7 @@ import { ExportReportButton } from "@/components/profile/ExportReportButton";
 import { ConnoisseurPointsCard } from "@/components/profile/ConnoisseurPointsCard";
 import { RecentUnlocksCard } from "@/components/profile/RecentUnlocksCard";
 import { StrainFingerprintCard } from "@/components/profile/StrainFingerprintCard";
+import { HiddenUnlocksCard } from "@/components/profile/HiddenUnlocksCard";
 import { SignalCard } from "@/components/profile/SignalCard";
 import { PaywallModal } from "@/components/premium/PaywallGate";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
@@ -416,6 +417,11 @@ export default function Profile() {
             {/* Section 1 — Achievements */}
             <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.12 }}>
               <AchievementBadges />
+            </motion.section>
+
+            {/* Section 1a — Hidden Discoveries */}
+            <motion.section variants={sectionVariants} initial="hidden" animate="visible" transition={{ delay: 0.125 }}>
+              <HiddenUnlocksCard />
             </motion.section>
 
             {/* Section 1b — Terpene Preferences */}
