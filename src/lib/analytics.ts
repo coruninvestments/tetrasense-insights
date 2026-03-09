@@ -14,8 +14,7 @@ type AnalyticsEvent =
   | "tapped_confidence_cta"
   | "streak_incremented"
   | "viewed_streak_card"
-  | "blocked_client_write_products"
-  | "blocked_client_write_premium";
+   | "blocked_client_write_premium";
 
 export async function logEvent(eventName: AnalyticsEvent) {
   try {
