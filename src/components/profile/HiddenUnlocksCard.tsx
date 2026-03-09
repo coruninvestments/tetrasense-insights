@@ -6,14 +6,9 @@ import { useAchievements } from "@/hooks/useAchievements";
 export function HiddenUnlocksCard() {
   const { data: achievements } = useAchievements();
   const achievementKeys = (achievements ?? []).map((a) => a.key);
-  const unlockedEggKeys = getUnlockedEggs(achievementKeys);
+  const eggDefs = getUnlockedEggDefs(achievementKeys);
 
-  if (unlockedEggKeys.length === 0) return null;
-
-  const eggDefs = unlockedEggKeys.map((k) => {
-    const allDefs = getUnlockedEggDefs([`egg_${k}`]);
-    return allDefs[0];
-  }).filter(Boolean);
+  if (eggDefs.length === 0) return null;
 
   return (
     <motion.div
