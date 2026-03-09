@@ -40,6 +40,7 @@ import { PaywallModal } from "@/components/premium/PaywallGate";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
 import type { AchievementKey } from "@/lib/achievements";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { ReminderSettingsCard } from "@/components/settings/ReminderSettingsCard";
 import { format } from "date-fns";
 
 type Section = "main" | "edit" | "notifications" | "privacy" | "settings" | "calibration" | "onboarding";
@@ -182,20 +183,8 @@ export default function Profile() {
             )}
 
             {activeSection === "notifications" && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-                {[
-                  { label: "Session Reminders", desc: "Get reminded to log your sessions" },
-                  { label: "Weekly Insights", desc: "Receive your weekly summary" },
-                  { label: "New Strains", desc: "Get notified about new strains" },
-                ].map(item => (
-                  <Card key={item.label} className="p-4 flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{item.label}</p>
-                      <p className="text-xs text-muted-foreground">{item.desc}</p>
-                    </div>
-                    <Switch />
-                  </Card>
-                ))}
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                <ReminderSettingsCard />
               </motion.div>
             )}
 
