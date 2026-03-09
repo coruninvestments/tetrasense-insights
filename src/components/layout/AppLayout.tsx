@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { BottomNav } from "./BottomNav";
 import { PageTransition } from "./PageTransition";
+import { useNotificationTriggers } from "@/hooks/useNotificationTriggers";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -8,6 +9,8 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children, showNav = true }: AppLayoutProps) {
+  useNotificationTriggers();
+
   return (
     <div className="min-h-screen bg-background">
       <PageTransition>

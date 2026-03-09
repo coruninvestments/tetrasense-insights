@@ -58,7 +58,10 @@ const Index = () => {
             className="flex items-center justify-between"
           >
             <SignalLeafLogo variant="full" size="md" />
-            <p className="text-sm text-muted-foreground">{getGreeting()}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-sm text-muted-foreground">{getGreeting()}</p>
+              <NotificationBell />
+            </div>
           </motion.div>
         </header>
 
