@@ -87,6 +87,7 @@ export interface SessionLog {
   product_id: string | null;
   batch_id: string | null;
   coa_attached: boolean;
+  intensity_score: number | null;
 }
 
 export interface CreateSessionLogInput {
