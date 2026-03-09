@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { SessionOutcome, computeSessionOutcome } from "@/lib/sessionOutcome";
 import { computeDoseNormalizedScore } from "@/lib/doseNormalization";
+import { computeIntensity } from "@/lib/psychoactiveIntensity";
 import { checkSessionMilestones } from "@/lib/analytics";
 import { checkSessionAchievements, type AchievementKey } from "@/lib/achievements";
 
