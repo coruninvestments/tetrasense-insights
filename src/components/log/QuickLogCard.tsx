@@ -5,8 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { IntensityBadge } from "@/components/shared/IntensityBadge";
 import { useCanonicalStrains } from "@/hooks/useCanonicalStrains";
 import { useCreateSessionLog, type SessionIntent } from "@/hooks/useSessionLogs";
+import { computeIntensity } from "@/lib/psychoactiveIntensity";
 import {
   QUICK_METHODS,
   getDoseOptions,
