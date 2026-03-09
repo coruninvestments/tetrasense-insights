@@ -1,53 +1,65 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
-<defs>
-  <radialGradient id="eid-halo" cx="50%" cy="50%" r="40%">
-    <stop offset="0%" stop-color="#6FAF9F" stop-opacity="0.4"/>
-    <stop offset="55%" stop-color="#6FAF9F" stop-opacity="0.12"/>
-    <stop offset="100%" stop-color="#6FAF9F" stop-opacity="0"/>
-  </radialGradient>
-  <linearGradient id="eid-leaf1" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%" stop-color="#7BBFAF"/>
-    <stop offset="100%" stop-color="#5a8a6e"/>
-  </linearGradient>
-  <linearGradient id="eid-leaf2" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%" stop-color="#5a8a6e"/>
-    <stop offset="100%" stop-color="#3d6b52"/>
-  </linearGradient>
-</defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" fill="none">
+  <defs>
+    <radialGradient id="insightGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6FAF9F" stop-opacity="0.10"/>
+      <stop offset="70%" stop-color="#6FAF9F" stop-opacity="0.03"/>
+      <stop offset="100%" stop-color="#6FAF9F" stop-opacity="0"/>
+    </radialGradient>
 
-<rect width="600" height="400" fill="#0E1915"/>
+    <linearGradient id="unknownCore" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F2EEE5"/>
+      <stop offset="100%" stop-color="#6FAF9F"/>
+    </linearGradient>
+  </defs>
 
-<circle cx="300" cy="200" r="130" fill="url(#eid-halo)"/>
+  <rect width="600" height="400" fill="#0B0F0E"/>
+  <rect width="600" height="400" fill="url(#insightGlow)"/>
 
-<!-- Orbit rings -->
-<circle cx="300" cy="200" r="110" stroke="#6FAF9F" stroke-width="0.7" fill="none" opacity="0.3"/>
-<circle cx="300" cy="200" r="75" stroke="#6FAF9F" stroke-width="0.5" fill="none" opacity="0.2"/>
+  <!-- outer halo -->
+  <circle cx="300" cy="200" r="120" stroke="#EDE8DE" stroke-opacity="0.16" stroke-width="1"/>
+  <circle cx="300" cy="200" r="90" stroke="#6FAF9F" stroke-opacity="0.14" stroke-width="0.9"/>
 
-<!-- Small leaf center -->
-<path d="M300 172 C300 172, 293 183, 287 190 C283 194, 280 198, 280 206 C280 214, 286 221, 294 221 C296 221, 298 220.5, 299 220 L300 219 Z"
-      fill="url(#eid-leaf1)" opacity="0.7"/>
-<path d="M300 172 C300 172, 307 183, 313 190 C317 194, 320 198, 320 206 C320 214, 314 221, 306 221 C304 221, 302 220.5, 301 220 L300 219 Z"
-      fill="url(#eid-leaf2)" opacity="0.7"/>
+  <!-- faint constellation nodes -->
+  <g>
+    <circle cx="180" cy="120" r="1.4" fill="#EDE8DE" fill-opacity="0.40"/>
+    <circle cx="240" cy="90" r="1.2" fill="#6FAF9F" fill-opacity="0.40"/>
+    <circle cx="360" cy="92" r="1.3" fill="#EDE8DE" fill-opacity="0.36"/>
+    <circle cx="430" cy="140" r="1.2" fill="#6FAF9F" fill-opacity="0.38"/>
+    <circle cx="440" cy="230" r="1.3" fill="#EDE8DE" fill-opacity="0.34"/>
+    <circle cx="380" cy="300" r="1.2" fill="#6FAF9F" fill-opacity="0.32"/>
+    <circle cx="220" cy="300" r="1.2" fill="#EDE8DE" fill-opacity="0.32"/>
+    <circle cx="160" cy="240" r="1.3" fill="#6FAF9F" fill-opacity="0.36"/>
+  </g>
 
-<!-- Signal arcs (smaller) -->
-<path d="M290 205 C293 202, 296 200, 300 200 C304 200, 307 202, 310 205"
-      stroke="#8FCFC0" stroke-width="0.9" stroke-linecap="round" fill="none" opacity="0.5"/>
-<path d="M286 210 C290 206, 295 204, 300 204 C305 204, 310 206, 314 210"
-      stroke="#8FCFC0" stroke-width="0.7" stroke-linecap="round" fill="none" opacity="0.35"/>
+  <!-- partial connections -->
+  <g stroke="#6FAF9F" stroke-opacity="0.12" stroke-width="0.8">
+    <line x1="240" y1="90" x2="300" y2="160"/>
+    <line x1="360" y1="92" x2="300" y2="160"/>
+    <line x1="380" y1="300" x2="300" y2="240"/>
+    <line x1="220" y1="300" x2="300" y2="240"/>
+  </g>
 
-<!-- Constellation dots — scattered "data points waiting" -->
-<circle cx="210" cy="140" r="1.5" fill="#6FAF9F" opacity="0.5"/>
-<circle cx="390" cy="130" r="1.3" fill="#6FAF9F" opacity="0.45"/>
-<circle cx="420" cy="260" r="1.4" fill="#6FAF9F" opacity="0.4"/>
-<circle cx="180" cy="270" r="1.2" fill="#6FAF9F" opacity="0.4"/>
-<circle cx="240" cy="100" r="0.9" fill="#8FCFC0" opacity="0.3"/>
-<circle cx="360" cy="95" r="1.0" fill="#8FCFC0" opacity="0.3"/>
-<circle cx="450" cy="200" r="0.8" fill="#6FAF9F" opacity="0.25"/>
-<circle cx="150" cy="195" r="0.9" fill="#6FAF9F" opacity="0.25"/>
+  <!-- central unknown node -->
+  <circle cx="300" cy="200" r="18" fill="url(#unknownCore)" opacity="0.9"/>
 
-<!-- Dashed connector lines (incomplete — "not enough data yet") -->
-<line x1="210" y1="140" x2="300" y2="200" stroke="#6FAF9F" stroke-width="0.4" stroke-dasharray="4 6" opacity="0.2"/>
-<line x1="390" y1="130" x2="300" y2="200" stroke="#6FAF9F" stroke-width="0.4" stroke-dasharray="4 6" opacity="0.2"/>
-<line x1="420" y1="260" x2="300" y2="200" stroke="#6FAF9F" stroke-width="0.4" stroke-dasharray="4 6" opacity="0.2"/>
-<line x1="180" y1="270" x2="300" y2="200" stroke="#6FAF9F" stroke-width="0.4" stroke-dasharray="4 6" opacity="0.2"/>
+  <!-- dotted discovery ring -->
+  <circle cx="300" cy="200" r="52"
+    stroke="#6FAF9F"
+    stroke-opacity="0.26"
+    stroke-width="1"
+    stroke-dasharray="3 6"/>
+
+  <!-- subtle pulse arcs -->
+  <path d="M260 210 C275 195 325 195 340 210"
+    stroke="#6FAF9F"
+    stroke-opacity="0.30"
+    stroke-width="1.2"
+    stroke-linecap="round"/>
+
+  <path d="M270 228 C282 215 318 215 330 228"
+    stroke="#EDE8DE"
+    stroke-opacity="0.22"
+    stroke-width="1"
+    stroke-linecap="round"/>
+
 </svg>
