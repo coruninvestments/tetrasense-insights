@@ -206,6 +206,12 @@ serve(async (req) => {
       doseDistribution: doseCounts,
       verifiedCoaCount: verifiedCoaCount ?? 0,
       analyticsEvents: eventCounts,
+      support: {
+        total: tickets.length,
+        byType: ticketsByType,
+        unresolved: unresolvedCount,
+        recent: recentTickets,
+      },
     };
 
     return new Response(JSON.stringify(metrics), {
