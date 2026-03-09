@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   Users, Activity, Zap, Trophy, CreditCard, Fingerprint, BarChart3,
   Beaker, Leaf, ArrowLeft, RefreshCw, Clock, Shield, Download,
-  Star, Target, FlaskConical, TrendingUp,
+  Star, Target, FlaskConical, TrendingUp, Bug, HelpCircle, MessageSquare,
 } from "lucide-react";
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
