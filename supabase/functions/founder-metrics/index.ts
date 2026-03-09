@@ -150,6 +150,20 @@ serve(async (req) => {
     // ── Verified COA products ──
     const { count: verifiedCoaCount } = await admin.from("product_batches").select("*", { count: "exact", head: true }).eq("coa_status", "verified");
 
+    // ── Support tickets ──
+    const { data: allTickets } = await admin.from("support_tickets").select("type, status, created_at");
+    const tickets = allTickets ?? [];
+    const ticketsByType: Record<string, number> = {};
+    let unresolvedCount = 0;
+    for (const t of tickets) {
+      ticketsByType[t.type] = (ticketsByType[t.type] || 0) + 1;
+      if (t.status === "new" || t.status === "open") unresolvedCount++;
+    }
+    const recentTickets = tickets
+      .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 10)
+      .map((t: any) => ({ type: t.type, status: t.status, created_at: t.created_at }));
+
     // ── Analytics events ──
     const { data: analyticsEvents } = await admin.from("analytics_events").select("event_name");
     const eventCounts: Record<string, number> = {};
