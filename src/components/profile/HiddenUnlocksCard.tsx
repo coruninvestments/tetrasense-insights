@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { getUnlockedEggs, getUnlockedEggDefs, type EasterEggKey } from "@/lib/easterEggs";
+import { getUnlockedEggDefs } from "@/lib/easterEggs";
 import { useAchievements } from "@/hooks/useAchievements";
 
 export function HiddenUnlocksCard() {
