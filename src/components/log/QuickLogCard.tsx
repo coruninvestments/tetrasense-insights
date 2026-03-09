@@ -339,6 +339,23 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
                 <Check className="w-6 h-6 text-success" />
               </motion.div>
               <p className="text-sm font-medium text-foreground">Session logged</p>
+              {method && dose && outcome && (() => {
+                const intensity = computeIntensity({
+                  method,
+                  doseLevel: dose.doseLevel,
+                  thcMg: dose.doseAmountMg ?? null,
+                  doseUnit: dose.doseUnit ?? null,
+                  doseCount: dose.doseCount ?? null,
+                });
+                return (
+                  <IntensityBadge
+                    score={intensity.intensityScore}
+                    confidence={intensity.confidence}
+                    reasoning={intensity.reasoning}
+                    size="md"
+                  />
+                );
+              })()}
               <div className="flex gap-2 justify-center">
                 <Button
                   variant="outline"

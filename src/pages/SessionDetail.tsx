@@ -121,6 +121,18 @@ const SessionDetail = () => {
                   {session.dose_level && (
                     <Badge variant="outline" className="capitalize text-xs">{session.dose_level} dose</Badge>
                   )}
+                  {(() => {
+                    const intensity = session.intensity_score != null
+                      ? { intensityScore: session.intensity_score, ...intensityFromSession(session) }
+                      : intensityFromSession(session);
+                    return (
+                      <IntensityBadge
+                        score={intensity.intensityScore}
+                        confidence={intensity.confidence}
+                        reasoning={intensity.reasoning}
+                      />
+                    );
+                  })()}
                 </div>
 
                 {/* Clarity Snapshot */}
