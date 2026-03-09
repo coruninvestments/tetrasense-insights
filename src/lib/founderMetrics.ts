@@ -28,6 +28,44 @@ export interface FounderMetrics {
     signalCard: number;
     genome: number;
   };
+  activation: {
+    activationRate: number;
+    avgTimeToFirst: number | null;
+    avgTimeTo5: number | null;
+    avgTimeTo10: number | null;
+  };
+  dataQuality: {
+    avgCompleteness: number;
+    pctDose: number;
+    pctEffects: number;
+    pctContext: number;
+    pctSensory: number;
+    avgUniqueProducts: number;
+  };
+  retention: {
+    active7d: number;
+    active30d: number;
+    avgSessionsPerActiveUser: number;
+    avgDaysBetweenSessions: number | null;
+    weeklyReturning: number;
+  };
+  featureAdoption: {
+    quickLogRate: number;
+    fullLogRate: number;
+    compareUsage: number;
+    exportUsage: number;
+    communityViews: number;
+    supportCreationRate: number;
+    mostUsedEvents: Array<{ name: string; count: number }>;
+  };
+  supportHealth: {
+    total: number;
+    byType: Record<string, number>;
+    unresolved: number;
+    bugTrend: number[];
+    supportFeedbackRatio: number | null;
+    recent: Array<{ type: string; status: string; created_at: string }>;
+  };
   topAchievements: Array<{ key: string; count: number }>;
   methodDistribution: Array<{ method: string; count: number }>;
   topStrains: Array<{ name: string; count: number }>;
@@ -90,3 +128,45 @@ export const METHOD_LABELS: Record<string, string> = {
   topical: "Topical",
   other: "Other",
 };
+
+/* ── Diagnostic insight generation ── */
+export interface DiagnosticInsight {
+  message: string;
+  severity: "info" | "warn" | "good";
+}
+
+export function generateDiagnosticInsights(m: FounderMetrics): DiagnosticInsight[] {
+  const insights: DiagnosticInsight[] = [];
+
+  if (m.featureAdoption.quickLogRate > 60) {
+    insights.push({ message: `Quick Log is used in ${m.featureAdoption.quickLogRate}% of sessions`, severity: "info" });
+  }
+  if (m.dataQuality.pctSensory < 30) {
+    insights.push({ message: `Only ${m.dataQuality.pctSensory}% of sessions include flavor/aroma`, severity: "warn" });
+  }
+  if (m.dataQuality.pctContext < 40) {
+    insights.push({ message: `Only ${m.dataQuality.pctContext}% of sessions have context data`, severity: "warn" });
+  }
+  if (m.challenge.completionRate > 0) {
+    insights.push({ message: `Challenge completion rate is ${m.challenge.completionRate}%`, severity: m.challenge.completionRate >= 40 ? "good" : "info" });
+  }
+  if (m.activation.activationRate > 0) {
+    insights.push({ message: `Activation rate (≥5 sessions) is ${m.activation.activationRate}%`, severity: m.activation.activationRate >= 30 ? "good" : "warn" });
+  }
+  if (m.supportHealth.unresolved > 0) {
+    insights.push({ message: `${m.supportHealth.unresolved} unresolved support ticket${m.supportHealth.unresolved > 1 ? "s" : ""}`, severity: "warn" });
+  }
+  const bugThisWeek = m.supportHealth.bugTrend?.[0] ?? 0;
+  const bugLastWeek = m.supportHealth.bugTrend?.[1] ?? 0;
+  if (bugThisWeek > bugLastWeek && bugThisWeek > 0) {
+    insights.push({ message: `Bug reports increased this week (${bugThisWeek} vs ${bugLastWeek} last week)`, severity: "warn" });
+  }
+  if (m.dataQuality.pctEffects >= 70) {
+    insights.push({ message: `${m.dataQuality.pctEffects}% of sessions have effect data — strong signal quality`, severity: "good" });
+  }
+  if (m.retention.weeklyReturning > 0) {
+    insights.push({ message: `${m.retention.weeklyReturning} returning user${m.retention.weeklyReturning > 1 ? "s" : ""} this week`, severity: "good" });
+  }
+
+  return insights.slice(0, 6);
+}
