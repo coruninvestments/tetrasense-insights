@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { fetchFounderMetrics, ACHIEVEMENT_LABELS, METHOD_LABELS, type TimeRange, type FounderMetrics } from "@/lib/founderMetrics";
+import { PreBetaToolsPanel } from "@/components/admin/PreBetaToolsPanel";
 import { FounderMetricCard } from "@/components/admin/FounderMetricCard";
 import { FounderChartCard } from "@/components/admin/FounderChartCard";
 import { Button } from "@/components/ui/button";
@@ -292,36 +293,12 @@ export default function FounderDashboard() {
           )}
         </section>
 
-        {/* ── Founder Utilities ── */}
+        {/* ── Pre-Beta Tools ── */}
         <section>
-          <SectionHeader icon={Target} label="Founder Utilities" />
-          <Card className="mt-2">
-            <CardContent className="p-4">
-              <p className="text-xs text-muted-foreground mb-4">
-                Placeholder actions for pre-beta preparation. Backend logic will be wired later.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                {[
-                  { label: "Prepare beta reset", icon: RefreshCw },
-                  { label: "Mark my account as Creator", icon: Star },
-                  { label: "Mark my account as Developer", icon: Shield },
-                  { label: "View hidden easter egg flags", icon: Leaf },
-                  { label: "Export metrics snapshot", icon: Download },
-                ].map(({ label, icon: Icon }) => (
-                  <Button
-                    key={label}
-                    variant="outline"
-                    size="sm"
-                    className="justify-start gap-2 text-xs"
-                    onClick={() => toast.info(`${label} — coming soon`)}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    {label}
-                  </Button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <SectionHeader icon={Target} label="Pre-Beta Tools" />
+          <div className="mt-2">
+            <PreBetaToolsPanel />
+          </div>
         </section>
 
         {/* Footer */}
