@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { fetchFounderMetrics, ACHIEVEMENT_LABELS, METHOD_LABELS, type TimeRange, type FounderMetrics } from "@/lib/founderMetrics";
+import { PreBetaToolsPanel } from "@/components/admin/PreBetaToolsPanel";
 import { FounderMetricCard } from "@/components/admin/FounderMetricCard";
 import { FounderChartCard } from "@/components/admin/FounderChartCard";
 import { Button } from "@/components/ui/button";
