@@ -40,6 +40,7 @@ import { PaywallModal } from "@/components/premium/PaywallGate";
 import { AchievementUnlockedModal } from "@/components/achievements/AchievementUnlockedModal";
 import type { AchievementKey } from "@/lib/achievements";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { ReminderSettingsCard } from "@/components/settings/ReminderSettingsCard";
 import { format } from "date-fns";
 
 type Section = "main" | "edit" | "notifications" | "privacy" | "settings" | "calibration" | "onboarding";
