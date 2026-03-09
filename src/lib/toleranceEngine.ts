@@ -32,7 +32,12 @@ function getLevel(score: number): ToleranceLevel {
 
 /** Estimate standardized THC exposure for one session */
 function estimateExposure(session: SessionLog): number {
-  // If dose_normalized_score exists, use it as primary signal (0-10 scale)
+  // Prefer intensity_score (0-100) mapped to 0-10 scale
+  if ((session as any).intensity_score != null && (session as any).intensity_score > 0) {
+    return ((session as any).intensity_score as number) / 10;
+  }
+
+  // Fallback: dose_normalized_score (0-10 scale)
   if (session.dose_normalized_score != null && session.dose_normalized_score > 0) {
     return session.dose_normalized_score;
   }
