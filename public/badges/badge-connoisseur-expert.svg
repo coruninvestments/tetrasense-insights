@@ -1,4 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="8" fill="#0B0F0E"/>
-  <text x="32" y="36" text-anchor="middle" fill="#6FAF9F" font-size="6.5" font-family="sans-serif">connoisseur-expert</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="expertLeaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F2EEE5"/>
+      <stop offset="100%" stop-color="#6FAF9F"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="60" cy="60" r="52" fill="#0B0F0E" stroke="#6FAF9F" stroke-opacity="0.7" stroke-width="2"/>
+  <circle cx="60" cy="60" r="38" stroke="#EDE8DE" stroke-opacity="0.24"/>
+
+  <circle cx="60" cy="22" r="1.8" fill="#EDE8DE" fill-opacity="0.86"/>
+  <circle cx="91" cy="36" r="1.4" fill="#6FAF9F" fill-opacity="0.72"/>
+  <circle cx="98" cy="66" r="1.2" fill="#EDE8DE" fill-opacity="0.54"/>
+  <circle cx="80" cy="92" r="1.2" fill="#6FAF9F" fill-opacity="0.58"/>
+  <circle cx="40" cy="92" r="1.2" fill="#EDE8DE" fill-opacity="0.52"/>
+  <circle cx="22" cy="66" r="1.2" fill="#6FAF9F" fill-opacity="0.54"/>
+  <circle cx="29" cy="36" r="1.3" fill="#EDE8DE" fill-opacity="0.58"/>
+
+  <g stroke="#6FAF9F" stroke-opacity="0.16" stroke-width="0.8">
+    <line x1="60" y1="22" x2="91" y2="36"/>
+    <line x1="91" y1="36" x2="98" y2="66"/>
+    <line x1="98" y1="66" x2="80" y2="92"/>
+    <line x1="80" y1="92" x2="40" y2="92"/>
+    <line x1="40" y1="92" x2="22" y2="66"/>
+    <line x1="22" y1="66" x2="29" y2="36"/>
+    <line x1="29" y1="36" x2="60" y2="22"/>
+  </g>
+
+  <path d="M60 84 L60 40" stroke="#6FAF9F" stroke-width="2.6" stroke-linecap="round"/>
+
+  <path d="M60 56
+    C42 48 42 70 60 72
+    C78 70 78 48 60 56Z"
+    fill="url(#expertLeaf)"/>
+
+  <path d="M60 36 L64 44 L72 45 L66 51 L68 60 L60 55 L52 60 L54 51 L48 45 L56 44 Z"
+    fill="#6FAF9F" fill-opacity="0.92"/>
 </svg>
