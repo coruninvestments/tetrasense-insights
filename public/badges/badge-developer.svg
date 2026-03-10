@@ -1,4 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="8" fill="#0B0F0E"/>
-  <text x="32" y="36" text-anchor="middle" fill="#6FAF9F" font-size="7" font-family="sans-serif">developer</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <circle cx="60" cy="60" r="52" fill="#0B0F0E" stroke="#355B4A" stroke-width="2"/>
+  <circle cx="60" cy="60" r="37" stroke="#6FAF9F" stroke-opacity="0.28"/>
+
+  <circle cx="60" cy="26" r="1.7" fill="#EDE8DE" fill-opacity="0.80"/>
+  <circle cx="88" cy="40" r="1.3" fill="#6FAF9F" fill-opacity="0.64"/>
+  <circle cx="94" cy="70" r="1.1" fill="#EDE8DE" fill-opacity="0.48"/>
+  <circle cx="60" cy="94" r="1.5" fill="#6FAF9F" fill-opacity="0.58"/>
+  <circle cx="26" cy="68" r="1.2" fill="#EDE8DE" fill-opacity="0.50"/>
+  <circle cx="32" cy="40" r="1.2" fill="#6FAF9F" fill-opacity="0.54"/>
+
+  <g stroke="#6FAF9F" stroke-opacity="0.14" stroke-width="0.8">
+    <line x1="60" y1="26" x2="88" y2="40"/>
+    <line x1="88" y1="40" x2="94" y2="70"/>
+    <line x1="94" y1="70" x2="60" y2="94"/>
+    <line x1="60" y1="94" x2="26" y2="68"/>
+    <line x1="26" y1="68" x2="32" y2="40"/>
+    <line x1="32" y1="40" x2="60" y2="26"/>
+  </g>
+
+  <path d="M44 48 L30 60 L44 72" stroke="#F2EEE5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M76 48 L90 60 L76 72" stroke="#6FAF9F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M66 42 L54 78" stroke="#6FAF9F" stroke-width="3" stroke-linecap="round"/>
 </svg>
