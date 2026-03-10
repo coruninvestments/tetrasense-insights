@@ -1,4 +1,34 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="8" fill="#0B0F0E"/>
-  <text x="32" y="36" text-anchor="middle" fill="#6FAF9F" font-size="7" font-family="sans-serif">founder</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="founderCore" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F2EEE5"/>
+      <stop offset="100%" stop-color="#6FAF9F"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="60" cy="60" r="52" fill="#0B0F0E" stroke="#6FAF9F" stroke-width="2.2"/>
+  <circle cx="60" cy="60" r="38" stroke="#EDE8DE" stroke-opacity="0.26"/>
+
+  <circle cx="60" cy="22" r="1.8" fill="#EDE8DE" fill-opacity="0.86"/>
+  <circle cx="92" cy="38" r="1.4" fill="#6FAF9F" fill-opacity="0.74"/>
+  <circle cx="98" cy="68" r="1.2" fill="#EDE8DE" fill-opacity="0.56"/>
+  <circle cx="82" cy="94" r="1.2" fill="#6FAF9F" fill-opacity="0.58"/>
+  <circle cx="38" cy="94" r="1.2" fill="#EDE8DE" fill-opacity="0.54"/>
+  <circle cx="22" cy="68" r="1.2" fill="#6FAF9F" fill-opacity="0.56"/>
+  <circle cx="28" cy="38" r="1.2" fill="#EDE8DE" fill-opacity="0.58"/>
+
+  <g stroke="#6FAF9F" stroke-opacity="0.16" stroke-width="0.8">
+    <line x1="60" y1="22" x2="92" y2="38"/>
+    <line x1="92" y1="38" x2="98" y2="68"/>
+    <line x1="98" y1="68" x2="82" y2="94"/>
+    <line x1="82" y1="94" x2="38" y2="94"/>
+    <line x1="38" y1="94" x2="22" y2="68"/>
+    <line x1="22" y1="68" x2="28" y2="38"/>
+    <line x1="28" y1="38" x2="60" y2="22"/>
+  </g>
+
+  <path d="M60 34 L68 50 L84 52 L72 64 L76 82 L60 72 L44 82 L48 64 L36 52 L52 50 Z"
+    fill="url(#founderCore)"/>
+
+  <circle cx="60" cy="60" r="6" fill="#0B0F0E" fill-opacity="0.18"/>
 </svg>
