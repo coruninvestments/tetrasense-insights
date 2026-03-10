@@ -1,4 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="8" fill="#0B0F0E"/>
-  <text x="32" y="36" text-anchor="middle" fill="#6FAF9F" font-size="7" font-family="sans-serif">connoisseur-novice</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="noviceLeaf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F2EEE5"/>
+      <stop offset="100%" stop-color="#6FAF9F"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="60" cy="60" r="52" fill="#0B0F0E" stroke="#355B4A" stroke-width="2"/>
+  <circle cx="60" cy="60" r="36" stroke="#6FAF9F" stroke-opacity="0.24"/>
+
+  <circle cx="60" cy="30" r="1.6" fill="#EDE8DE" fill-opacity="0.75"/>
+  <circle cx="86" cy="44" r="1.2" fill="#6FAF9F" fill-opacity="0.6"/>
+  <circle cx="88" cy="78" r="1.1" fill="#EDE8DE" fill-opacity="0.45"/>
+  <circle cx="34" cy="78" r="1.1" fill="#6FAF9F" fill-opacity="0.45"/>
+  <circle cx="34" cy="44" r="1.2" fill="#EDE8DE" fill-opacity="0.55"/>
+
+  <path d="M60 80
+    C52 70 52 58 60 50
+    C68 58 68 70 60 80Z"
+    fill="url(#noviceLeaf)"/>
+
+  <line x1="60" y1="80" x2="60" y2="90" stroke="#EDE8DE" stroke-opacity="0.5" stroke-width="1.4" stroke-linecap="round"/>
 </svg>
