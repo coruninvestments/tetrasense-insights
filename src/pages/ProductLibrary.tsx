@@ -251,6 +251,15 @@ export default function ProductLibrary() {
                 />
               </div>
               <Button
+                variant="outline"
+                size="icon"
+                className="h-11 w-11 shrink-0 rounded-xl"
+                onClick={() => setImportCoaOpen(true)}
+                title="Import COA"
+              >
+                <QrCode className="w-4 h-4" />
+              </Button>
+              <Button
                 variant={compareMode ? "default" : "outline"}
                 size="icon"
                 className="h-11 w-11 shrink-0 rounded-xl"
