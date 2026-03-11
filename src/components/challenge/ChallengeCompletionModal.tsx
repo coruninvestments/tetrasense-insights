@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import type { SignalReportCard } from "@/lib/calibrationChallenge";
 import type { GenomeDimension } from "@/lib/cannabisGenome";
+import { ASSETS } from "@/lib/assets";
 import {
   RadarChart,
   PolarGrid,
