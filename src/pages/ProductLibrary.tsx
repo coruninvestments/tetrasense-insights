@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Search, ShieldCheck, ShieldAlert, Clock, Beaker, BarChart3, Leaf, Trophy, RotateCcw, GitCompareArrows } from "lucide-react";
+import { Search, ShieldCheck, ShieldAlert, Clock, Beaker, BarChart3, Leaf, Trophy, RotateCcw, GitCompareArrows, QrCode } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,6 +19,7 @@ import { ASSETS } from "@/lib/assets";
 import { Button } from "@/components/ui/button";
 import { QualityScorePill } from "@/components/product/QualityScore";
 import { CompareProductsDrawer, CompareSelectionBar, type CompareProduct } from "@/components/product/CompareProductsDrawer";
+import { ImportCOAModal } from "@/components/product/ImportCOAModal";
 
 const TYPE_OPTIONS = ["Indica", "Sativa", "Hybrid"] as const;
 
@@ -61,6 +62,7 @@ export default function ProductLibrary() {
   const [compareMode, setCompareMode] = useState(false);
   const [compareSelections, setCompareSelections] = useState<CompareProduct[]>([]);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [importCoaOpen, setImportCoaOpen] = useState(false);
   const hasActiveFilters = !!(search || typeFilter || terpeneFilter || outcomeFilter);
   const resetFilters = useCallback(() => {
     setSearch("");
@@ -248,6 +250,15 @@ export default function ProductLibrary() {
                   className="w-full h-11 pl-11 pr-4 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow"
                 />
               </div>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-11 w-11 shrink-0 rounded-xl"
+                onClick={() => setImportCoaOpen(true)}
+                title="Import COA"
+              >
+                <QrCode className="w-4 h-4" />
+              </Button>
               <Button
                 variant={compareMode ? "default" : "outline"}
                 size="icon"
@@ -465,6 +476,11 @@ export default function ProductLibrary() {
           onOpenChange={setCompareOpen}
           productA={compareSelections[0] ?? null}
           productB={compareSelections[1] ?? null}
+        />
+
+        <ImportCOAModal
+          open={importCoaOpen}
+          onOpenChange={setImportCoaOpen}
         />
       </div>
     </AppLayout>
