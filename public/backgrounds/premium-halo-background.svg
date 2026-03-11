@@ -1,4 +1,47 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
-  <rect width="600" height="400" fill="#0B0F0E"/>
-  <text x="300" y="200" text-anchor="middle" fill="#6FAF9F" font-size="24" font-family="sans-serif">Placeholder: premium-halo-background</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" fill="none">
+  <defs>
+    <linearGradient id="premiumBase" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B0F0E"/>
+      <stop offset="100%" stop-color="#16211D"/>
+    </linearGradient>
+
+    <radialGradient id="premiumGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6FAF9F" stop-opacity="0.18"/>
+      <stop offset="60%" stop-color="#6FAF9F" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#6FAF9F" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="ivoryGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F2EEE5" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#F2EEE5" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="900" height="500" fill="url(#premiumBase)"/>
+  <circle cx="450" cy="250" r="190" fill="url(#premiumGlow)"/>
+  <circle cx="450" cy="250" r="140" fill="url(#ivoryGlow)"/>
+
+  <circle cx="450" cy="250" r="160" stroke="#6FAF9F" stroke-opacity="0.16"/>
+  <circle cx="450" cy="250" r="124" stroke="#EDE8DE" stroke-opacity="0.10"/>
+  <circle cx="450" cy="250" r="92" stroke="#6FAF9F" stroke-opacity="0.08"/>
+
+  <circle cx="450" cy="56" r="2.5" fill="#EDE8DE" fill-opacity="0.64"/>
+  <circle cx="622" cy="122" r="1.8" fill="#6FAF9F" fill-opacity="0.56"/>
+  <circle cx="704" cy="250" r="1.8" fill="#EDE8DE" fill-opacity="0.40"/>
+  <circle cx="622" cy="378" r="1.8" fill="#6FAF9F" fill-opacity="0.46"/>
+  <circle cx="450" cy="444" r="2.2" fill="#EDE8DE" fill-opacity="0.50"/>
+  <circle cx="278" cy="378" r="1.8" fill="#6FAF9F" fill-opacity="0.42"/>
+  <circle cx="196" cy="250" r="1.8" fill="#EDE8DE" fill-opacity="0.34"/>
+  <circle cx="278" cy="122" r="1.8" fill="#6FAF9F" fill-opacity="0.44"/>
+
+  <g stroke="#6FAF9F" stroke-opacity="0.08" stroke-width="0.9">
+    <line x1="450" y1="56" x2="622" y2="122"/>
+    <line x1="622" y1="122" x2="704" y2="250"/>
+    <line x1="704" y1="250" x2="622" y2="378"/>
+    <line x1="622" y1="378" x2="450" y2="444"/>
+    <line x1="450" y1="444" x2="278" y2="378"/>
+    <line x1="278" y1="378" x2="196" y2="250"/>
+    <line x1="196" y1="250" x2="278" y2="122"/>
+    <line x1="278" y1="122" x2="450" y2="56"/>
+  </g>
 </svg>
