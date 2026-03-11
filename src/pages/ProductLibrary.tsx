@@ -62,6 +62,7 @@ export default function ProductLibrary() {
   const [compareMode, setCompareMode] = useState(false);
   const [compareSelections, setCompareSelections] = useState<CompareProduct[]>([]);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [importCoaOpen, setImportCoaOpen] = useState(false);
   const hasActiveFilters = !!(search || typeFilter || terpeneFilter || outcomeFilter);
   const resetFilters = useCallback(() => {
     setSearch("");
