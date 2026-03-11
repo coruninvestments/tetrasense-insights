@@ -1,4 +1,62 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
-  <rect width="600" height="400" rx="16" fill="#0B0F0E"/>
-  <text x="300" y="200" text-anchor="middle" fill="#6FAF9F" font-size="28" font-family="sans-serif">Placeholder: card-challenge-complete</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" fill="none">
+
+<defs>
+  <linearGradient id="bgGradient" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#0B0F0E"/>
+    <stop offset="100%" stop-color="#1E2B25"/>
+  </linearGradient>
+
+  <radialGradient id="haloGlow" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="#6FAF9F" stop-opacity="0.18"/>
+    <stop offset="70%" stop-color="#6FAF9F" stop-opacity="0.05"/>
+    <stop offset="100%" stop-color="#6FAF9F" stop-opacity="0"/>
+  </radialGradient>
+
+  <linearGradient id="leafCore" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#F2EEE5"/>
+    <stop offset="100%" stop-color="#6FAF9F"/>
+  </linearGradient>
+</defs>
+
+<rect width="900" height="500" fill="url(#bgGradient)"/>
+
+<circle cx="450" cy="240" r="160" fill="url(#haloGlow)"/>
+
+<circle cx="450" cy="240" r="140" stroke="#6FAF9F" stroke-opacity="0.22"/>
+<circle cx="450" cy="240" r="110" stroke="#EDE8DE" stroke-opacity="0.16"/>
+
+<path d="M450 300
+C420 260 420 210 450 180
+C480 210 480 260 450 300Z"
+fill="url(#leafCore)"/>
+
+<line x1="450" y1="300" x2="450" y2="330"
+stroke="#EDE8DE"
+stroke-opacity="0.6"
+stroke-width="3"
+stroke-linecap="round"/>
+
+<circle cx="450" cy="90" r="3" fill="#EDE8DE"/>
+<circle cx="600" cy="150" r="2" fill="#6FAF9F"/>
+<circle cx="630" cy="310" r="2" fill="#EDE8DE"/>
+<circle cx="450" cy="390" r="2.5" fill="#6FAF9F"/>
+<circle cx="300" cy="310" r="2" fill="#EDE8DE"/>
+<circle cx="270" cy="150" r="2" fill="#6FAF9F"/>
+
+<text x="450" y="420"
+text-anchor="middle"
+fill="#F2EEE5"
+font-size="34"
+font-family="system-ui">
+Signal Calibration Complete
+</text>
+
+<text x="450" y="455"
+text-anchor="middle"
+fill="#6FAF9F"
+font-size="18"
+font-family="system-ui">
+Signal Leaf
+</text>
+
 </svg>
