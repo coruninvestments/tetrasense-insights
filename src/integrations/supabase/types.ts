@@ -56,6 +56,80 @@ export type Database = {
         }
         Relationships: []
       }
+      cannabinoid_aliases: {
+        Row: {
+          alias_name: string
+          cannabinoid_id: string
+          created_at: string
+          id: string
+        }
+        Insert: {
+          alias_name: string
+          cannabinoid_id: string
+          created_at?: string
+          id?: string
+        }
+        Update: {
+          alias_name?: string
+          cannabinoid_id?: string
+          created_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cannabinoid_aliases_cannabinoid_id_fkey"
+            columns: ["cannabinoid_id"]
+            isOneToOne: false
+            referencedRelation: "cannabinoids_canonical"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cannabinoids_canonical: {
+        Row: {
+          boiling_point_c: number | null
+          canonical_name: string
+          created_at: string
+          evidence_level: number
+          id: string
+          is_active: boolean
+          medical_interest_tags: string[]
+          potential_effect_tags: string[]
+          psychoactive_level: string
+          research_summary: string | null
+          short_name: string
+          updated_at: string
+        }
+        Insert: {
+          boiling_point_c?: number | null
+          canonical_name: string
+          created_at?: string
+          evidence_level?: number
+          id?: string
+          is_active?: boolean
+          medical_interest_tags?: string[]
+          potential_effect_tags?: string[]
+          psychoactive_level?: string
+          research_summary?: string | null
+          short_name: string
+          updated_at?: string
+        }
+        Update: {
+          boiling_point_c?: number | null
+          canonical_name?: string
+          created_at?: string
+          evidence_level?: number
+          id?: string
+          is_active?: boolean
+          medical_interest_tags?: string[]
+          potential_effect_tags?: string[]
+          psychoactive_level?: string
+          research_summary?: string | null
+          short_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       coa_ingestions: {
         Row: {
           batch_id: string
@@ -734,6 +808,83 @@ export type Database = {
           subject?: string
           type?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      terpene_aliases: {
+        Row: {
+          alias_name: string
+          created_at: string
+          id: string
+          terpene_id: string
+        }
+        Insert: {
+          alias_name: string
+          created_at?: string
+          id?: string
+          terpene_id: string
+        }
+        Update: {
+          alias_name?: string
+          created_at?: string
+          id?: string
+          terpene_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "terpene_aliases_terpene_id_fkey"
+            columns: ["terpene_id"]
+            isOneToOne: false
+            referencedRelation: "terpenes_canonical"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      terpenes_canonical: {
+        Row: {
+          aroma_tags: string[]
+          boiling_point_c: number | null
+          canonical_name: string
+          chemical_family: string | null
+          created_at: string
+          evidence_level: number
+          flavor_tags: string[]
+          id: string
+          is_active: boolean
+          potential_effect_tags: string[]
+          research_summary: string | null
+          short_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          aroma_tags?: string[]
+          boiling_point_c?: number | null
+          canonical_name: string
+          chemical_family?: string | null
+          created_at?: string
+          evidence_level?: number
+          flavor_tags?: string[]
+          id?: string
+          is_active?: boolean
+          potential_effect_tags?: string[]
+          research_summary?: string | null
+          short_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          aroma_tags?: string[]
+          boiling_point_c?: number | null
+          canonical_name?: string
+          chemical_family?: string | null
+          created_at?: string
+          evidence_level?: number
+          flavor_tags?: string[]
+          id?: string
+          is_active?: boolean
+          potential_effect_tags?: string[]
+          research_summary?: string | null
+          short_name?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
