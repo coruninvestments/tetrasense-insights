@@ -8,6 +8,8 @@ import { HelpTip } from "@/components/guide/HelpTip";
 import { useProfile, useUpdateProfile, CalibrationAnchors } from "@/hooks/useProfile";
 import { toast } from "sonner";
 import { CALIBRATION_EFFECTS } from "@/lib/effects";
+import { BrandImage } from "@/components/brand/BrandImage";
+import { ASSETS } from "@/lib/assets";
 
 const categories = CALIBRATION_EFFECTS.map((e) => ({
   key: e.key,
