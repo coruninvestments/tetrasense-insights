@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import type { SignalReportCard } from "@/lib/calibrationChallenge";
 import type { GenomeDimension } from "@/lib/cannabisGenome";
+import { ASSETS } from "@/lib/assets";
 import {
   RadarChart,
   PolarGrid,
@@ -47,6 +48,13 @@ export function ChallengeCompletionModal({ open, onClose, signalReport, genomeDi
       <DialogContent className="max-w-sm mx-auto p-0 overflow-hidden border-primary/20 bg-card">
         {/* Glow header */}
         <div className="relative bg-gradient-to-b from-primary/15 to-transparent px-6 pt-8 pb-4 text-center">
+          {/* Signal halo background */}
+          <img
+            src={ASSETS.signalHalo}
+            alt=""
+            aria-hidden
+            className="absolute inset-0 w-full h-full object-contain opacity-[0.12] pointer-events-none"
+          />
           <motion.div
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}

@@ -8,6 +8,8 @@ import { HelpTip } from "@/components/guide/HelpTip";
 import { useProfile, useUpdateProfile, CalibrationAnchors } from "@/hooks/useProfile";
 import { toast } from "sonner";
 import { CALIBRATION_EFFECTS } from "@/lib/effects";
+import { BrandImage } from "@/components/brand/BrandImage";
+import { ASSETS } from "@/lib/assets";
 
 const categories = CALIBRATION_EFFECTS.map((e) => ({
   key: e.key,
@@ -69,6 +71,16 @@ export function CalibrationScreen({ onBack, embedded }: CalibrationScreenProps) 
       )}
 
       <div className={embedded ? "space-y-4" : "px-5 pb-8 space-y-4"}>
+        {!embedded && (
+          <div className="w-full h-[120px] flex items-center justify-center opacity-70">
+            <BrandImage
+              src={ASSETS.calibrationDark}
+              alt="Scale calibration"
+              themeAware
+              className="h-full w-auto object-contain"
+            />
+          </div>
+        )}
         <p className="text-sm text-muted-foreground">
           Define what 0 and 10 mean for each effect. This keeps your ratings consistent over time.
         </p>
