@@ -1,4 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400">
-  <rect width="600" height="400" fill="#0B0F0E"/>
-  <text x="300" y="200" text-anchor="middle" fill="#6FAF9F" font-size="24" font-family="sans-serif">Placeholder: signal-glow-background</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" fill="none">
+  <defs>
+    <linearGradient id="bgBase" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B0F0E"/>
+      <stop offset="100%" stop-color="#1E2B25"/>
+    </linearGradient>
+
+    <radialGradient id="signalGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#6FAF9F" stop-opacity="0.14"/>
+      <stop offset="65%" stop-color="#6FAF9F" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#6FAF9F" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="900" height="500" fill="url(#bgBase)"/>
+  <circle cx="450" cy="250" r="180" fill="url(#signalGlow)"/>
+
+  <circle cx="450" cy="250" r="145" stroke="#6FAF9F" stroke-opacity="0.12"/>
+  <circle cx="450" cy="250" r="110" stroke="#EDE8DE" stroke-opacity="0.08"/>
+  <circle cx="450" cy="250" r="78" stroke="#6FAF9F" stroke-opacity="0.06"/>
+
+  <circle cx="450" cy="70" r="2.2" fill="#EDE8DE" fill-opacity="0.55"/>
+  <circle cx="610" cy="130" r="1.7" fill="#6FAF9F" fill-opacity="0.48"/>
+  <circle cx="670" cy="250" r="1.5" fill="#EDE8DE" fill-opacity="0.34"/>
+  <circle cx="610" cy="372" r="1.6" fill="#6FAF9F" fill-opacity="0.38"/>
+  <circle cx="450" cy="430" r="2" fill="#EDE8DE" fill-opacity="0.44"/>
+  <circle cx="290" cy="372" r="1.6" fill="#6FAF9F" fill-opacity="0.34"/>
+  <circle cx="230" cy="250" r="1.5" fill="#EDE8DE" fill-opacity="0.30"/>
+  <circle cx="290" cy="130" r="1.6" fill="#6FAF9F" fill-opacity="0.38"/>
 </svg>
