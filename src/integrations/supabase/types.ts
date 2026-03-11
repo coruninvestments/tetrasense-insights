@@ -665,25 +665,31 @@ export type Database = {
       strain_aliases_canonical: {
         Row: {
           alias_name: string
+          alias_type: string | null
           confidence: number
           created_at: string
           id: string
+          normalized_alias: string
           source: string
           strain_id: string
         }
         Insert: {
           alias_name: string
+          alias_type?: string | null
           confidence?: number
           created_at?: string
           id?: string
+          normalized_alias: string
           source?: string
           strain_id: string
         }
         Update: {
           alias_name?: string
+          alias_type?: string | null
           confidence?: number
           created_at?: string
           id?: string
+          normalized_alias?: string
           source?: string
           strain_id?: string
         }
@@ -753,28 +759,58 @@ export type Database = {
       }
       strains_canonical: {
         Row: {
+          breeder_name: string | null
           canonical_name: string
+          confidence_level: number
           created_at: string
           description: string | null
           id: string
+          is_active: boolean
           is_verified: boolean
+          lineage_summary: string | null
+          normalized_name: string
+          parent_1_name: string | null
+          parent_2_name: string | null
+          source_notes: string | null
           strain_type: string | null
+          updated_at: string
+          verified_batch_count: number
         }
         Insert: {
+          breeder_name?: string | null
           canonical_name: string
+          confidence_level?: number
           created_at?: string
           description?: string | null
           id?: string
+          is_active?: boolean
           is_verified?: boolean
+          lineage_summary?: string | null
+          normalized_name: string
+          parent_1_name?: string | null
+          parent_2_name?: string | null
+          source_notes?: string | null
           strain_type?: string | null
+          updated_at?: string
+          verified_batch_count?: number
         }
         Update: {
+          breeder_name?: string | null
           canonical_name?: string
+          confidence_level?: number
           created_at?: string
           description?: string | null
           id?: string
+          is_active?: boolean
           is_verified?: boolean
+          lineage_summary?: string | null
+          normalized_name?: string
+          parent_1_name?: string | null
+          parent_2_name?: string | null
+          source_notes?: string | null
           strain_type?: string | null
+          updated_at?: string
+          verified_batch_count?: number
         }
         Relationships: []
       }
