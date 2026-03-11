@@ -56,6 +56,90 @@ export type Database = {
         }
         Relationships: []
       }
+      batch_cannabinoids: {
+        Row: {
+          batch_id: string
+          cannabinoid_id: string
+          created_at: string
+          id: string
+          mg_value: number | null
+          percent_value: number | null
+        }
+        Insert: {
+          batch_id: string
+          cannabinoid_id: string
+          created_at?: string
+          id?: string
+          mg_value?: number | null
+          percent_value?: number | null
+        }
+        Update: {
+          batch_id?: string
+          cannabinoid_id?: string
+          created_at?: string
+          id?: string
+          mg_value?: number | null
+          percent_value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batch_cannabinoids_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "product_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batch_cannabinoids_cannabinoid_id_fkey"
+            columns: ["cannabinoid_id"]
+            isOneToOne: false
+            referencedRelation: "cannabinoids_canonical"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      batch_terpenes: {
+        Row: {
+          batch_id: string
+          created_at: string
+          id: string
+          percent_value: number
+          rank_order: number | null
+          terpene_id: string
+        }
+        Insert: {
+          batch_id: string
+          created_at?: string
+          id?: string
+          percent_value: number
+          rank_order?: number | null
+          terpene_id: string
+        }
+        Update: {
+          batch_id?: string
+          created_at?: string
+          id?: string
+          percent_value?: number
+          rank_order?: number | null
+          terpene_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batch_terpenes_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "product_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batch_terpenes_terpene_id_fkey"
+            columns: ["terpene_id"]
+            isOneToOne: false
+            referencedRelation: "terpenes_canonical"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cannabinoid_aliases: {
         Row: {
           alias_name: string
@@ -251,51 +335,87 @@ export type Database = {
       product_batches: {
         Row: {
           batch_code: string | null
+          batch_number: string | null
           coa_file_path: string | null
           coa_reject_reason: string | null
+          coa_source_type: string
           coa_status: string
           coa_url: string | null
           created_at: string
           created_by_user_id: string | null
+          expiration_date: string | null
           id: string
+          intensity_hint_score: number | null
           is_public_library: boolean
           lab_name: string | null
           lab_panel_common: Json | null
           lab_panel_custom: Json | null
+          lot_number: string | null
           product_id: string
           tested_at: string | null
+          total_cbd_percent: number | null
+          total_terpenes_percent: number | null
+          total_thc_percent: number | null
+          updated_at: string
+          verification_status: string
+          verified_at: string | null
+          verified_by: string | null
         }
         Insert: {
           batch_code?: string | null
+          batch_number?: string | null
           coa_file_path?: string | null
           coa_reject_reason?: string | null
+          coa_source_type?: string
           coa_status?: string
           coa_url?: string | null
           created_at?: string
           created_by_user_id?: string | null
+          expiration_date?: string | null
           id?: string
+          intensity_hint_score?: number | null
           is_public_library?: boolean
           lab_name?: string | null
           lab_panel_common?: Json | null
           lab_panel_custom?: Json | null
+          lot_number?: string | null
           product_id: string
           tested_at?: string | null
+          total_cbd_percent?: number | null
+          total_terpenes_percent?: number | null
+          total_thc_percent?: number | null
+          updated_at?: string
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Update: {
           batch_code?: string | null
+          batch_number?: string | null
           coa_file_path?: string | null
           coa_reject_reason?: string | null
+          coa_source_type?: string
           coa_status?: string
           coa_url?: string | null
           created_at?: string
           created_by_user_id?: string | null
+          expiration_date?: string | null
           id?: string
+          intensity_hint_score?: number | null
           is_public_library?: boolean
           lab_name?: string | null
           lab_panel_common?: Json | null
           lab_panel_custom?: Json | null
+          lot_number?: string | null
           product_id?: string
           tested_at?: string | null
+          total_cbd_percent?: number | null
+          total_terpenes_percent?: number | null
+          total_thc_percent?: number | null
+          updated_at?: string
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: [
           {
@@ -310,27 +430,54 @@ export type Database = {
       products: {
         Row: {
           brand_name: string | null
+          country_code: string | null
           created_at: string
           form: string | null
           id: string
+          is_active: boolean
+          is_verified: boolean
+          normalized_brand_name: string | null
+          normalized_product_name: string | null
           product_name: string
+          product_type: string
+          source_type: string
+          state_code: string | null
           strain_id: string | null
+          updated_at: string
         }
         Insert: {
           brand_name?: string | null
+          country_code?: string | null
           created_at?: string
           form?: string | null
           id?: string
+          is_active?: boolean
+          is_verified?: boolean
+          normalized_brand_name?: string | null
+          normalized_product_name?: string | null
           product_name: string
+          product_type?: string
+          source_type?: string
+          state_code?: string | null
           strain_id?: string | null
+          updated_at?: string
         }
         Update: {
           brand_name?: string | null
+          country_code?: string | null
           created_at?: string
           form?: string | null
           id?: string
+          is_active?: boolean
+          is_verified?: boolean
+          normalized_brand_name?: string | null
+          normalized_product_name?: string | null
           product_name?: string
+          product_type?: string
+          source_type?: string
+          state_code?: string | null
           strain_id?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
