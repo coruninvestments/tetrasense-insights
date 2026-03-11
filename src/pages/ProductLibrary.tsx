@@ -477,6 +477,11 @@ export default function ProductLibrary() {
           productA={compareSelections[0] ?? null}
           productB={compareSelections[1] ?? null}
         />
+
+        <ImportCOAModal
+          open={importCoaOpen}
+          onOpenChange={setImportCoaOpen}
+        />
       </div>
     </AppLayout>
   );
