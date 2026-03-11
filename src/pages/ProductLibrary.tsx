@@ -19,6 +19,7 @@ import { ASSETS } from "@/lib/assets";
 import { Button } from "@/components/ui/button";
 import { QualityScorePill } from "@/components/product/QualityScore";
 import { CompareProductsDrawer, CompareSelectionBar, type CompareProduct } from "@/components/product/CompareProductsDrawer";
+import { ImportCOAModal } from "@/components/product/ImportCOAModal";
 
 const TYPE_OPTIONS = ["Indica", "Sativa", "Hybrid"] as const;
 
