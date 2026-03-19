@@ -13,6 +13,20 @@ interface Props {
 }
 
 export function BatchChemistrySummary({ batch, terpenes = [], cannabinoids = [], showCoaLink = true }: Props) {
+  const isVerified = batch?.verification_status === "verified";
+  const isPending = batch?.verification_status === "pending";
+  const status = !batch ? "unknown" as const : isVerified ? "verified" as const : isPending ? "pending" as const : "unknown" as const;
+
+  const topTerpenes = useMemo(() => 
+    [...terpenes].sort((a, b) => b.percent_value - a.percent_value).slice(0, 5),
+    [terpenes]
+  );
+
+  const topCannabinoids = useMemo(() =>
+    [...cannabinoids].filter(c => c.percent_value != null && c.percent_value > 0).sort((a, b) => (b.percent_value ?? 0) - (a.percent_value ?? 0)).slice(0, 6),
+    [cannabinoids]
+  );
+
   if (!batch) {
     return (
       <Card className="overflow-hidden">
@@ -25,20 +39,6 @@ export function BatchChemistrySummary({ batch, terpenes = [], cannabinoids = [],
       </Card>
     );
   }
-
-  const isVerified = batch.verification_status === "verified";
-  const isPending = batch.verification_status === "pending";
-  const status = isVerified ? "verified" as const : isPending ? "pending" as const : "unknown" as const;
-
-  const topTerpenes = useMemo(() => 
-    [...terpenes].sort((a, b) => b.percent_value - a.percent_value).slice(0, 5),
-    [terpenes]
-  );
-
-  const topCannabinoids = useMemo(() =>
-    [...cannabinoids].filter(c => c.percent_value != null && c.percent_value > 0).sort((a, b) => (b.percent_value ?? 0) - (a.percent_value ?? 0)).slice(0, 6),
-    [cannabinoids]
-  );
 
   return (
     <Card className="overflow-hidden">
