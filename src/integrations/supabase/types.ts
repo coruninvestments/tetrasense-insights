@@ -1116,6 +1116,7 @@ export type Database = {
     }
     Functions: {
       admin_approve_batch: { Args: { _batch_id: string }; Returns: undefined }
+      admin_batch_detail: { Args: { _batch_id: string }; Returns: Json }
       admin_pending_batches: {
         Args: never
         Returns: {
@@ -1142,11 +1143,69 @@ export type Database = {
         Args: { _batch_id: string; _reason: string }
         Returns: undefined
       }
+      admin_remove_batch_compound: {
+        Args: { _row_id: string; _type: string }
+        Returns: undefined
+      }
+      admin_review_queue: {
+        Args: { _has_unmapped?: boolean; _lab_name?: string; _status?: string }
+        Returns: {
+          batch_number: string
+          brand_name: string
+          cannabinoid_count: number
+          coa_file_path: string
+          coa_source_type: string
+          coa_status: string
+          coa_url: string
+          created_at: string
+          created_by_user_id: string
+          id: string
+          lab_name: string
+          lab_panel_custom: Json
+          lot_number: string
+          product_id: string
+          product_name: string
+          strain_id: string
+          strain_name: string
+          terpene_count: number
+          tested_at: string
+          total_cbd_percent: number
+          total_terpenes_percent: number
+          total_thc_percent: number
+          verification_status: string
+        }[]
+      }
+      admin_review_stats: { Args: never; Returns: Json }
+      admin_set_verification_status: {
+        Args: { _batch_id: string; _reason?: string; _status: string }
+        Returns: undefined
+      }
+      admin_update_batch_metadata: {
+        Args: {
+          _batch_id: string
+          _batch_number?: string
+          _lab_name?: string
+          _lot_number?: string
+          _total_cbd_percent?: number
+          _total_terpenes_percent?: number
+          _total_thc_percent?: number
+        }
+        Returns: undefined
+      }
       admin_update_lab_panel: {
         Args: {
           _batch_id: string
           _lab_panel_common: Json
           _lab_panel_custom: Json
+        }
+        Returns: undefined
+      }
+      admin_update_product_metadata: {
+        Args: {
+          _brand_name?: string
+          _product_id: string
+          _product_name?: string
+          _strain_id?: string
         }
         Returns: undefined
       }
