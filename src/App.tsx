@@ -151,6 +151,14 @@ const App = () => (
               }
             />
             <Route
+              path="/admin/coa-review"
+              element={
+                <ProtectedRoute>
+                  <COAReviewQueue />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/admin/founder-dashboard"
               element={
                 <ProtectedRoute>
