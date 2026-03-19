@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Search, ShieldCheck, ShieldAlert, Clock, Beaker, BarChart3, Leaf, Trophy, RotateCcw, GitCompareArrows, QrCode } from "lucide-react";
+import { Search, Beaker, BarChart3, Leaf, Trophy, RotateCcw, GitCompareArrows, QrCode } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { SignalLeafLogo } from "@/components/brand/SignalLeafLogo";
 import { useStrains, formatPotencyRange } from "@/hooks/useStrains";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { usePublicBatchBrowse } from "@/hooks/usePublicBatchBrowse";
+import { useProductLibrarySearch } from "@/hooks/useProductLibrarySearch";
 import { normalizeOutcome } from "@/lib/sessionOutcome";
 import { bestQualityForBatches, type QualityResult } from "@/lib/productQuality";
 import { computeStrainRankings } from "@/lib/bestForYou";
@@ -18,20 +19,15 @@ import { BrandImage } from "@/components/brand/BrandImage";
 import { ASSETS } from "@/lib/assets";
 import { Button } from "@/components/ui/button";
 import { QualityScorePill } from "@/components/product/QualityScore";
+import { ChemistryStatusBadge } from "@/components/product/ChemistryStatusBadge";
 import { CompareProductsDrawer, CompareSelectionBar, type CompareProduct } from "@/components/product/CompareProductsDrawer";
 import { ImportCOAModal } from "@/components/product/ImportCOAModal";
 
 const TYPE_OPTIONS = ["Indica", "Sativa", "Hybrid"] as const;
 
 const TERPENE_OPTIONS = [
-  "Myrcene",
-  "Limonene",
-  "Caryophyllene",
-  "Linalool",
-  "Pinene",
-  "Terpinolene",
-  "Humulene",
-  "Ocimene",
+  "Myrcene", "Limonene", "Caryophyllene", "Linalool",
+  "Pinene", "Terpinolene", "Humulene", "Ocimene",
 ] as const;
 
 const OUTCOME_OPTIONS = [
@@ -43,7 +39,6 @@ type TypeFilter = (typeof TYPE_OPTIONS)[number] | null;
 type TerpeneFilter = string | null;
 type OutcomeFilter = string | null;
 
-// Fallback strains when DB is empty
 const FALLBACK_STRAINS = [
   { id: "1", name: "Blue Dream", type: "Hybrid", common_effects: ["Relaxed", "Creative", "Euphoric"], thc_min: 17, thc_max: 24, description: "A balanced hybrid known for gentle cerebral invigoration" },
   { id: "2", name: "Granddaddy Purple", type: "Indica", common_effects: ["Sleepy", "Relaxed", "Hungry"], thc_min: 17, thc_max: 27, description: "A famous indica with potent physical relaxation effects" },
@@ -65,16 +60,16 @@ export default function ProductLibrary() {
   const [importCoaOpen, setImportCoaOpen] = useState(false);
   const hasActiveFilters = !!(search || typeFilter || terpeneFilter || outcomeFilter);
   const resetFilters = useCallback(() => {
-    setSearch("");
-    setTypeFilter(null);
-    setTerpeneFilter(null);
-    setOutcomeFilter(null);
-    setSortMode("default");
+    setSearch(""); setTypeFilter(null); setTerpeneFilter(null); setOutcomeFilter(null); setSortMode("default");
   }, []);
 
   const { data: dbStrains, isLoading: strainsLoading } = useStrains(search, typeFilter);
   const { data: sessions } = useSessionLogs();
   const { data: verifiedBatches } = usePublicBatchBrowse();
+  const { data: productSearchResults, isLoading: productSearchLoading } = useProductLibrarySearch(search);
+
+  // When we have product search results from the enhanced search, merge with strain results
+  const hasProductResults = productSearchResults && productSearchResults.length > 0;
 
   // Compute per-strain stats from sessions
   const strainStats = useMemo(() => {
@@ -95,7 +90,6 @@ export default function ProductLibrary() {
     return result;
   }, [sessions]);
 
-  // Compute per-strain anxiety avg and aroma/flavor tags
   const strainAnxiety = useMemo(() => {
     if (!sessions) return new Map<string, number>();
     const map = new Map<string, { sum: number; count: number }>();
@@ -128,20 +122,17 @@ export default function ProductLibrary() {
     return result;
   }, [sessions]);
 
-  // Build map of strain names to COA status (verified > pending > none)
   const strainCoaStatus = useMemo(() => {
     if (!verifiedBatches) return new Map<string, "verified" | "pending">();
     const map = new Map<string, "verified" | "pending">();
     for (const b of verifiedBatches as any[]) {
       const name = (b.strain_name || b.product_name || "").toLowerCase();
       if (!name) continue;
-      // verified batches from usePublicBatchBrowse are always verified
       map.set(name, "verified");
     }
     return map;
   }, [verifiedBatches]);
 
-  // Terpene highlights from verified batch lab panels
   const strainTerpenes = useMemo(() => {
     if (!verifiedBatches) return new Map<string, string[]>();
     const map = new Map<string, string[]>();
@@ -157,7 +148,6 @@ export default function ProductLibrary() {
     return map;
   }, [verifiedBatches]);
 
-  // Quality scores per strain from verified batches
   const strainQuality = useMemo(() => {
     if (!verifiedBatches) return new Map<string, QualityResult>();
     const grouped = new Map<string, any[]>();
@@ -178,7 +168,6 @@ export default function ProductLibrary() {
 
   const strains = dbStrains && dbStrains.length > 0 ? dbStrains : FALLBACK_STRAINS;
 
-  // Compute Best For You rankings for sort mode
   const bestForYouScores = useMemo(() => {
     if (sortMode !== "best" || !sessions) return new Map<string, number>();
     const rankings = computeStrainRankings(sessions, null, null, 1);
@@ -187,7 +176,6 @@ export default function ProductLibrary() {
     return map;
   }, [sessions, sortMode]);
 
-  // Apply local filters
   const filtered = useMemo(() => {
     let list = dbStrains && dbStrains.length > 0
       ? strains
@@ -197,7 +185,6 @@ export default function ProductLibrary() {
           return matchSearch && matchType;
         });
 
-    // Terpene filter
     if (terpeneFilter) {
       const tf = terpeneFilter.toLowerCase();
       list = list.filter(s => {
@@ -206,7 +193,6 @@ export default function ProductLibrary() {
       });
     }
 
-    // Outcome filter
     if (outcomeFilter) {
       const threshold = outcomeFilter === "high" ? 70 : 50;
       list = list.filter(s => {
@@ -215,7 +201,6 @@ export default function ProductLibrary() {
       });
     }
 
-    // Apply Best For You sort
     if (sortMode === "best") {
       list = [...list].sort((a, b) => {
         const scoreA = bestForYouScores.get(a.name.toLowerCase()) ?? -1;
@@ -226,6 +211,8 @@ export default function ProductLibrary() {
 
     return list;
   }, [strains, dbStrains, search, typeFilter, terpeneFilter, outcomeFilter, strainTerpenes, strainStats, sortMode, bestForYouScores]);
+
+  const isLoading = strainsLoading || (search.length >= 2 && productSearchLoading);
 
   return (
     <AppLayout>
@@ -238,7 +225,6 @@ export default function ProductLibrary() {
               <h1 className="font-serif text-2xl font-medium text-foreground">Product Library</h1>
             </div>
 
-            {/* Compare toggle */}
             <div className="flex items-center gap-2 mb-4">
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -246,28 +232,14 @@ export default function ProductLibrary() {
                   type="text"
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  placeholder="Search strains or products…"
+                  placeholder="Search products, strains, or aliases…"
                   className="w-full h-11 pl-11 pr-4 rounded-xl bg-card border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow"
                 />
               </div>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-11 w-11 shrink-0 rounded-xl"
-                onClick={() => setImportCoaOpen(true)}
-                title="Import COA"
-              >
+              <Button variant="outline" size="icon" className="h-11 w-11 shrink-0 rounded-xl" onClick={() => setImportCoaOpen(true)} title="Import COA">
                 <QrCode className="w-4 h-4" />
               </Button>
-              <Button
-                variant={compareMode ? "default" : "outline"}
-                size="icon"
-                className="h-11 w-11 shrink-0 rounded-xl"
-                onClick={() => {
-                  setCompareMode(!compareMode);
-                  setCompareSelections([]);
-                }}
-              >
+              <Button variant={compareMode ? "default" : "outline"} size="icon" className="h-11 w-11 shrink-0 rounded-xl" onClick={() => { setCompareMode(!compareMode); setCompareSelections([]); }}>
                 <GitCompareArrows className="w-4 h-4" />
               </Button>
             </div>
@@ -276,78 +248,73 @@ export default function ProductLibrary() {
 
         {/* Filters */}
         <div className="px-5 pb-4 space-y-3">
-          {/* Type chips */}
           <div className="flex gap-2 flex-wrap">
             {TYPE_OPTIONS.map(type => (
-              <FilterChip
-                key={type}
-                label={type}
-                active={typeFilter === type}
-                onClick={() => setTypeFilter(typeFilter === type ? null : type)}
-              />
+              <FilterChip key={type} label={type} active={typeFilter === type} onClick={() => setTypeFilter(typeFilter === type ? null : type)} />
             ))}
           </div>
-
-          {/* Terpene chips */}
           <div className="flex gap-2 flex-wrap">
             <span className="text-[11px] text-muted-foreground uppercase tracking-wide self-center mr-1">Terpene</span>
             {TERPENE_OPTIONS.map(t => (
-              <FilterChip
-                key={t}
-                label={t}
-                active={terpeneFilter === t}
-                onClick={() => setTerpeneFilter(terpeneFilter === t ? null : t)}
-                size="sm"
-              />
+              <FilterChip key={t} label={t} active={terpeneFilter === t} onClick={() => setTerpeneFilter(terpeneFilter === t ? null : t)} size="sm" />
             ))}
           </div>
-
-          {/* Outcome chips */}
           <div className="flex gap-2 flex-wrap">
             <span className="text-[11px] text-muted-foreground uppercase tracking-wide self-center mr-1">Outcome</span>
             {OUTCOME_OPTIONS.map(o => (
-              <FilterChip
-                key={o.value}
-                label={o.label}
-                active={outcomeFilter === o.value}
-                onClick={() => setOutcomeFilter(outcomeFilter === o.value ? null : o.value)}
-                size="sm"
-              />
+              <FilterChip key={o.value} label={o.label} active={outcomeFilter === o.value} onClick={() => setOutcomeFilter(outcomeFilter === o.value ? null : o.value)} size="sm" />
             ))}
           </div>
-
-          {/* Sort toggle */}
           <div className="flex gap-2 flex-wrap items-center">
             <span className="text-[11px] text-muted-foreground uppercase tracking-wide self-center mr-1">Sort</span>
-            <FilterChip
-              label="Default"
-              active={sortMode === "default"}
-              onClick={() => setSortMode("default")}
-              size="sm"
-            />
-            <button
-              onClick={() => setSortMode("best")}
-              className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition-all flex items-center gap-1 ${
-                sortMode === "best"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card border border-border text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Trophy className="w-3 h-3" />
-              Best for you
+            <FilterChip label="Default" active={sortMode === "default"} onClick={() => setSortMode("default")} size="sm" />
+            <button onClick={() => setSortMode("best")} className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition-all flex items-center gap-1 ${sortMode === "best" ? "bg-primary text-primary-foreground" : "bg-card border border-border text-muted-foreground hover:text-foreground"}`}>
+              <Trophy className="w-3 h-3" /> Best for you
             </button>
-            <Link
-              to="/best"
-              className="rounded-full px-2.5 py-1 text-[11px] font-medium bg-primary/10 text-primary hover:bg-primary/15 transition-colors flex items-center gap-1 ml-auto"
-            >
+            <Link to="/best" className="rounded-full px-2.5 py-1 text-[11px] font-medium bg-primary/10 text-primary hover:bg-primary/15 transition-colors flex items-center gap-1 ml-auto">
               Full ranking →
             </Link>
           </div>
         </div>
 
+        {/* Product search results (shown when searching and products matched) */}
+        {hasProductResults && (
+          <div className="px-5 pb-4">
+            <p className="text-[11px] text-muted-foreground uppercase tracking-wide mb-2">Product matches</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {productSearchResults.map((product, idx) => (
+                <motion.div key={product.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(idx * 0.03, 0.2) }}>
+                  <Card variant="glass" className="hover:shadow-elevated hover:-translate-y-0.5 transition-all cursor-pointer h-full">
+                    <CardContent className="p-4 flex flex-col gap-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <h3 className="font-serif text-base font-medium text-foreground truncate">{product.product_name}</h3>
+                          {product.brand_name && <p className="text-[11px] text-muted-foreground">{product.brand_name}</p>}
+                        </div>
+                        <ChemistryStatusBadge status={product.is_verified ? "verified" : "unknown"} />
+                      </div>
+                      {product.strain_name && (
+                        <div className="flex items-center gap-1.5">
+                          <Leaf className="w-3 h-3 text-primary/60 shrink-0" />
+                          <span className="text-xs text-muted-foreground">{product.strain_name}</span>
+                          {product.match_source === "alias" && (
+                            <span className="text-[9px] text-primary/70 bg-primary/10 px-1.5 py-0.5 rounded-full">alias match</span>
+                          )}
+                        </div>
+                      )}
+                      <span className="text-[10px] text-muted-foreground capitalize">{product.product_type}</span>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+            {filtered.length > 0 && <p className="text-[11px] text-muted-foreground uppercase tracking-wide mt-5 mb-2">Strain matches</p>}
+          </div>
+        )}
+
         {/* Grid */}
         <div className="px-5 pb-28">
-          {strainsLoading ? (
+          {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {[1, 2, 3, 4, 5, 6].map(i => (
                 <Skeleton key={i} className="h-44 rounded-xl" />
@@ -363,7 +330,7 @@ export default function ProductLibrary() {
                 const isSelected = compareSelections.some(s => s.id === strain.id);
 
                 const handleClick = (e: React.MouseEvent) => {
-                  if (!compareMode) return; // let Link handle it
+                  if (!compareMode) return;
                   e.preventDefault();
                   if (isSelected) {
                     setCompareSelections(prev => prev.filter(s => s.id !== strain.id));
@@ -371,19 +338,12 @@ export default function ProductLibrary() {
                     setCompareSelections(prev => [
                       ...prev,
                       {
-                        id: strain.id,
-                        name: strain.name,
-                        type: strain.type,
+                        id: strain.id, name: strain.name, type: strain.type,
                         description: strain.description ?? undefined,
-                        thcMin: strain.thc_min ?? undefined,
-                        thcMax: strain.thc_max ?? undefined,
-                        cbdMin: (strain as any).cbd_min ?? undefined,
-                        cbdMax: (strain as any).cbd_max ?? undefined,
-                        terpenes: terps,
-                        sessionCount: stats?.count,
-                        positiveRate: stats?.positiveRate,
-                        avgAnxiety: strainAnxiety.get(strain.name.toLowerCase()),
-                        quality,
+                        thcMin: strain.thc_min ?? undefined, thcMax: strain.thc_max ?? undefined,
+                        cbdMin: (strain as any).cbd_min ?? undefined, cbdMax: (strain as any).cbd_max ?? undefined,
+                        terpenes: terps, sessionCount: stats?.count, positiveRate: stats?.positiveRate,
+                        avgAnxiety: strainAnxiety.get(strain.name.toLowerCase()), quality,
                         aromaFlavors: strainAromaFlavors.get(strain.name.toLowerCase()),
                       },
                     ]);
@@ -391,42 +351,13 @@ export default function ProductLibrary() {
                 };
 
                 return (
-                  <motion.div
-                    key={strain.id}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: Math.min(idx * 0.03, 0.3) }}
-                    onClick={handleClick}
-                    className={compareMode ? "cursor-pointer" : ""}
-                  >
+                  <motion.div key={strain.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(idx * 0.03, 0.3) }} onClick={handleClick} className={compareMode ? "cursor-pointer" : ""}>
                     <div className={`rounded-xl transition-all ${compareMode && isSelected ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""}`}>
                       {compareMode ? (
-                        <ProductCard
-                          name={strain.name}
-                          type={strain.type}
-                          description={strain.description ?? undefined}
-                          thcMin={strain.thc_min ?? undefined}
-                          thcMax={strain.thc_max ?? undefined}
-                          coaStatus={coaStatus}
-                          terpenes={terps}
-                          sessionCount={stats?.count}
-                          positiveRate={stats?.positiveRate}
-                          quality={quality}
-                        />
+                        <ProductCard name={strain.name} type={strain.type} description={strain.description ?? undefined} thcMin={strain.thc_min ?? undefined} thcMax={strain.thc_max ?? undefined} coaStatus={coaStatus} terpenes={terps} sessionCount={stats?.count} positiveRate={stats?.positiveRate} quality={quality} />
                       ) : (
                         <Link to={`/strains/${strain.id}`}>
-                          <ProductCard
-                            name={strain.name}
-                            type={strain.type}
-                            description={strain.description ?? undefined}
-                            thcMin={strain.thc_min ?? undefined}
-                            thcMax={strain.thc_max ?? undefined}
-                            coaStatus={coaStatus}
-                            terpenes={terps}
-                            sessionCount={stats?.count}
-                            positiveRate={stats?.positiveRate}
-                            quality={quality}
-                          />
+                          <ProductCard name={strain.name} type={strain.type} description={strain.description ?? undefined} thcMin={strain.thc_min ?? undefined} thcMax={strain.thc_max ?? undefined} coaStatus={coaStatus} terpenes={terps} sessionCount={stats?.count} positiveRate={stats?.positiveRate} quality={quality} />
                         </Link>
                       )}
                     </div>
@@ -435,53 +366,25 @@ export default function ProductLibrary() {
               })}
             </div>
           ) : (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.97 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center text-center py-12 gap-4"
-            >
+            <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center text-center py-12 gap-4">
               <div className="w-full h-[160px] flex items-center justify-center opacity-50">
-                <BrandImage
-                  src={ASSETS.emptyLibraryDark}
-                  alt="No results"
-                  themeAware
-                  className="max-h-[160px] w-auto object-contain rounded-xl"
-                />
+                <BrandImage src={ASSETS.emptyLibraryDark} alt="No results" themeAware className="max-h-[160px] w-auto object-contain rounded-xl" />
               </div>
               <p className="text-sm text-muted-foreground">No products match your filters</p>
               {hasActiveFilters && (
                 <Button variant="soft" size="sm" onClick={resetFilters}>
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  Reset filters
+                  <RotateCcw className="w-3.5 h-3.5" /> Reset filters
                 </Button>
               )}
             </motion.div>
           )}
         </div>
 
-        {/* Compare mode UI */}
         {compareMode && (
-          <CompareSelectionBar
-            selections={compareSelections}
-            onClear={() => {
-              setCompareSelections([]);
-              setCompareMode(false);
-            }}
-            onCompare={() => setCompareOpen(true)}
-          />
+          <CompareSelectionBar selections={compareSelections} onClear={() => { setCompareSelections([]); setCompareMode(false); }} onCompare={() => setCompareOpen(true)} />
         )}
-
-        <CompareProductsDrawer
-          open={compareOpen}
-          onOpenChange={setCompareOpen}
-          productA={compareSelections[0] ?? null}
-          productB={compareSelections[1] ?? null}
-        />
-
-        <ImportCOAModal
-          open={importCoaOpen}
-          onOpenChange={setImportCoaOpen}
-        />
+        <CompareProductsDrawer open={compareOpen} onOpenChange={setCompareOpen} productA={compareSelections[0] ?? null} productB={compareSelections[1] ?? null} />
+        <ImportCOAModal open={importCoaOpen} onOpenChange={setImportCoaOpen} />
       </div>
     </AppLayout>
   );
@@ -489,157 +392,57 @@ export default function ProductLibrary() {
 
 /* ─── Sub-components ─── */
 
-function FilterChip({
-  label,
-  active,
-  onClick,
-  size = "md",
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-  size?: "sm" | "md";
-}) {
+function FilterChip({ label, active, onClick, size = "md" }: { label: string; active: boolean; onClick: () => void; size?: "sm" | "md" }) {
   return (
-    <button
-      onClick={onClick}
-      className={`rounded-full font-medium transition-all ${
-        size === "sm" ? "px-2.5 py-1 text-[11px]" : "px-3.5 py-1.5 text-xs"
-      } ${
-        active
-          ? "bg-primary text-primary-foreground"
-          : "bg-card border border-border text-muted-foreground hover:text-foreground"
-      }`}
-    >
+    <button onClick={onClick} className={`rounded-full font-medium transition-all ${size === "sm" ? "px-2.5 py-1 text-[11px]" : "px-3.5 py-1.5 text-xs"} ${active ? "bg-primary text-primary-foreground" : "bg-card border border-border text-muted-foreground hover:text-foreground"}`}>
       {label}
     </button>
   );
 }
 
-function ProductCard({
-  name,
-  type,
-  description,
-  thcMin,
-  thcMax,
-  coaStatus,
-  terpenes,
-  sessionCount,
-  positiveRate,
-  quality,
-}: {
-  name: string;
-  type: string;
-  description?: string;
-  thcMin?: number;
-  thcMax?: number;
-  coaStatus: "verified" | "pending" | null;
-  terpenes?: string[];
-  sessionCount?: number;
-  positiveRate?: number;
-  quality?: QualityResult | null;
+function ProductCard({ name, type, description, thcMin, thcMax, coaStatus, terpenes, sessionCount, positiveRate, quality }: {
+  name: string; type: string; description?: string; thcMin?: number; thcMax?: number;
+  coaStatus: "verified" | "pending" | null; terpenes?: string[]; sessionCount?: number; positiveRate?: number; quality?: QualityResult | null;
 }) {
   const typeLower = type.toLowerCase();
-  const typeStyle =
-    typeLower === "indica"
-      ? "bg-accent/20 text-accent-foreground"
-      : typeLower === "sativa"
-      ? "bg-primary/15 text-primary"
-      : "bg-secondary text-secondary-foreground";
-
+  const typeStyle = typeLower === "indica" ? "bg-accent/20 text-accent-foreground" : typeLower === "sativa" ? "bg-primary/15 text-primary" : "bg-secondary text-secondary-foreground";
   const thcLabel = formatPotencyRange(thcMin ?? null, thcMax ?? null);
 
   return (
     <Card variant="glass" className="hover:shadow-elevated hover:-translate-y-0.5 transition-all cursor-pointer h-full">
       <CardContent className="p-4 flex flex-col gap-3 h-full">
-        {/* Top row */}
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <h3 className="font-serif text-base font-medium text-foreground truncate">{name}</h3>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
-              <Badge className={`text-[10px] font-medium border-0 ${typeStyle}`}>
-                {type}
-              </Badge>
-              {coaStatus && <CoaBadgeWithTooltip status={coaStatus} />}
+              <Badge className={`text-[10px] font-medium border-0 ${typeStyle}`}>{type}</Badge>
+              <ChemistryStatusBadge status={coaStatus ?? "unknown"} />
               {quality && <QualityScorePill result={quality} />}
             </div>
           </div>
-          {thcLabel && (
-            <span className="text-xs text-muted-foreground shrink-0">THC {thcLabel}</span>
-          )}
+          {thcLabel && <span className="text-xs text-muted-foreground shrink-0">THC {thcLabel}</span>}
         </div>
 
-        {/* Description */}
-        {description && (
-          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-            {description}
-          </p>
-        )}
+        {description && <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{description}</p>}
 
-        {/* Terpene highlights */}
         {terpenes && terpenes.length > 0 && (
           <div className="flex items-center gap-1.5 flex-wrap">
             <Beaker className="w-3 h-3 text-primary/60 shrink-0" />
             {terpenes.map(t => (
-              <span
-                key={t}
-                className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary capitalize"
-              >
-                {t}
-              </span>
+              <span key={t} className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary capitalize">{t}</span>
             ))}
           </div>
         )}
 
-        {/* Bottom stats */}
         {(sessionCount != null && sessionCount > 0) && (
           <div className="flex items-center gap-3 mt-auto pt-1 border-t border-border/50">
             <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-              <BarChart3 className="w-3 h-3" />
-              {sessionCount} session{sessionCount !== 1 ? "s" : ""}
+              <BarChart3 className="w-3 h-3" /> {sessionCount} session{sessionCount !== 1 ? "s" : ""}
             </span>
-            {positiveRate != null && (
-              <span className="text-[11px] text-success font-medium">
-                {positiveRate}% positive
-              </span>
-            )}
+            {positiveRate != null && <span className="text-[11px] text-success font-medium">{positiveRate}% positive</span>}
           </div>
         )}
       </CardContent>
     </Card>
-  );
-}
-
-function CoaBadgeWithTooltip({ status }: { status: "verified" | "pending" }) {
-  const isVerified = status === "verified";
-
-  return (
-    <TooltipProvider delayDuration={200}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span>
-            <Badge
-              className={`text-[10px] font-medium border-0 gap-1 cursor-help ${
-                isVerified
-                  ? "bg-success/15 text-success"
-                  : "bg-amber-500/15 text-amber-600 dark:text-amber-400"
-              }`}
-            >
-              {isVerified ? (
-                <ShieldCheck className="w-3 h-3" />
-              ) : (
-                <Clock className="w-3 h-3" />
-              )}
-              {isVerified ? "Verified" : "Pending"}
-            </Badge>
-          </span>
-        </TooltipTrigger>
-        <TooltipContent side="top" className="max-w-[200px] text-xs">
-          {isVerified
-            ? "Verified laboratory analysis available for this batch."
-            : "Pending verification — lab results are awaiting review."}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
   );
 }
