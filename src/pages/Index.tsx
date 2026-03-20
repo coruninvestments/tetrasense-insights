@@ -70,6 +70,9 @@ const Index = () => {
           {/* Quick Log */}
           <QuickLogCard />
 
+          {/* Daily Signal Check */}
+          <DailySignalCard />
+
           {/* Challenge Card — Find Your Signal */}
           <ChallengeCard />
 
