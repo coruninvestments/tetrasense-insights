@@ -21,6 +21,7 @@ import { ChallengeCard } from "@/components/challenge/ChallengeCard";
 import { SignalStrengthCard } from "@/components/home/SignalStrengthCard";
 import { ToleranceCard } from "@/components/home/ToleranceCard";
 import { QuickLogCard } from "@/components/log/QuickLogCard";
+import { DailySignalCard } from "@/components/home/DailySignalCard";
 import { ConnoisseurPointsCard } from "@/components/profile/ConnoisseurPointsCard";
 import { StrainFingerprintCard } from "@/components/profile/StrainFingerprintCard";
 import { SignalCard } from "@/components/profile/SignalCard";
