@@ -1,18 +1,20 @@
 import { useState } from "react";
 import {
   CheckCircle, XCircle, AlertTriangle, RefreshCw, Star, Shield,
-  FileSearch, Trash2, Loader2,
+  FileSearch, Trash2, Loader2, Zap,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { ConfirmDangerActionModal } from "./ConfirmDangerActionModal";
 import {
   fetchDryRunReport, fetchReadinessReport, assignFounderIdentity, requestBetaReset,
-  type DryRunReport, type ReadinessReport,
+  requestFullBetaReset,
+  type DryRunReport, type ReadinessReport, type FullResetResult,
 } from "@/lib/preBetaTools";
 
 export function PreBetaToolsPanel() {
@@ -21,7 +23,10 @@ export function PreBetaToolsPanel() {
   const [loading, setLoading] = useState<string | null>(null);
   const [identityUserId, setIdentityUserId] = useState("");
   const [showResetModal, setShowResetModal] = useState(false);
+  const [showFullResetModal, setShowFullResetModal] = useState(false);
   const [showIdentityModal, setShowIdentityModal] = useState<"creator" | "developer" | null>(null);
+  const [preserveAdmin, setPreserveAdmin] = useState(true);
+  const [fullResetResult, setFullResetResult] = useState<FullResetResult | null>(null);
 
   const runReadiness = async () => {
     setLoading("readiness");
@@ -65,6 +70,21 @@ export function PreBetaToolsPanel() {
         toast.success("Beta reset executed");
       } else {
         toast.info(result.message);
+      }
+    } catch (e: any) {
+      toast.error(e.message);
+      throw e;
+    }
+  };
+
+  const handleFullBetaReset = async () => {
+    try {
+      const result = await requestFullBetaReset("RESET SIGNAL LEAF BETA", preserveAdmin);
+      setFullResetResult(result);
+      if (result.success) {
+        toast.success("Full beta reset complete — app is clean");
+      } else {
+        toast.error(result.message);
       }
     } catch (e: any) {
       toast.error(e.message);
@@ -174,21 +194,55 @@ export function PreBetaToolsPanel() {
         </CardContent>
       </Card>
 
-      {/* ── Danger Zone ── */}
+      {/* ── Full Beta Reset ── */}
+      <Card className="border-destructive/50">
+        <CardContent className="p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <Zap className="w-4 h-4 text-destructive" />
+            <p className="text-sm font-medium text-destructive">Full Beta Reset</p>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Wipe all user data, sessions, products, batches, analytics, and auth users.
+            Canonical catalog (strains, terpenes, cannabinoids) will be preserved.
+          </p>
+          <div className="flex items-center justify-between rounded-lg bg-secondary/30 p-2">
+            <Label htmlFor="preserve-admin" className="text-xs text-foreground">Preserve my admin account</Label>
+            <Switch id="preserve-admin" checked={preserveAdmin} onCheckedChange={setPreserveAdmin} />
+          </div>
+          <Button
+            variant="destructive" size="sm" className="gap-1.5 text-xs w-full"
+            onClick={() => setShowFullResetModal(true)}
+          >
+            <Zap className="w-3.5 h-3.5" /> Full Beta Reset
+          </Button>
+          {fullResetResult?.success && fullResetResult.deleted && (
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              {Object.entries(fullResetResult.deleted).map(([table, count]) => (
+                <div key={table} className="flex items-center justify-between p-2 rounded-lg bg-destructive/10">
+                  <span className="text-xs text-muted-foreground">{table.replace(/_/g, " ")}</span>
+                  <Badge variant="destructive" className="text-xs font-mono">{count}</Badge>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ── Legacy Danger Zone ── */}
       <Card className="border-destructive/30">
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-destructive" />
-            <p className="text-sm font-medium text-destructive">Danger Zone</p>
+            <p className="text-sm font-medium text-destructive">Legacy Reset (Stubbed)</p>
           </div>
           <p className="text-xs text-muted-foreground">
-            Reset all data for beta launch. Requires typed confirmation. Currently stubbed — no data will be deleted.
+            Original stub — use Full Beta Reset above instead.
           </p>
           <Button
             variant="destructive" size="sm" className="gap-1.5 text-xs"
             onClick={() => setShowResetModal(true)}
           >
-            <Trash2 className="w-3.5 h-3.5" /> Reset for Beta
+            <Trash2 className="w-3.5 h-3.5" /> Reset for Beta (legacy)
           </Button>
         </CardContent>
       </Card>
@@ -212,6 +266,16 @@ export function PreBetaToolsPanel() {
         description="This will remove all test data. This action is irreversible once implemented."
         confirmPhrase="RESET FOR BETA"
         onConfirm={handleBetaReset}
+        destructive
+      />
+
+      <ConfirmDangerActionModal
+        open={showFullResetModal}
+        onClose={() => setShowFullResetModal(false)}
+        title="Full Beta Reset"
+        description={`This will permanently delete ALL user data, sessions, products, batches, analytics, and ${preserveAdmin ? "all users except you" : "ALL users including you"}. Canonical catalog will be preserved. This cannot be undone.`}
+        confirmPhrase="RESET SIGNAL LEAF BETA"
+        onConfirm={handleFullBetaReset}
         destructive
       />
     </div>
