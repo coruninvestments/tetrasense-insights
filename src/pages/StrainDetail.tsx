@@ -42,6 +42,7 @@ const effectColors: Record<string, string> = {
 export default function StrainDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [matchModalOpen, setMatchModalOpen] = useState(false);
   const { data: strain, isLoading: strainLoading } = useStrain(id || "");
   const { data: communityStats, isLoading: statsLoading } = useStrainCommunityStats(id || "");
   const { data: strainBatches } = usePublicBatchesByStrain(id || null);
