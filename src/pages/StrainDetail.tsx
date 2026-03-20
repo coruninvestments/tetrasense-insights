@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Users, Shield, TrendingUp, Award, Beaker, Leaf, QrCode } from "lucide-react";
 import { useParams, useNavigate, Link } from "react-router-dom";
@@ -13,6 +13,9 @@ import { QualityScoreBreakdown } from "@/components/product/QualityScore";
 import { BatchChemistrySummary } from "@/components/product/BatchChemistrySummary";
 import { ChemistryStatusBanner } from "@/components/product/ChemistryStatusBadge";
 import { useNewestVerifiedBatchChemistry } from "@/hooks/useProductBatchChemistry";
+import { useSignalMatch } from "@/hooks/useSignalMatch";
+import { SignalMatchBadge } from "@/components/product/SignalMatchBadge";
+import { SignalMatchDetailModal } from "@/components/product/SignalMatchDetailModal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -39,6 +42,7 @@ const effectColors: Record<string, string> = {
 export default function StrainDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [matchModalOpen, setMatchModalOpen] = useState(false);
   const { data: strain, isLoading: strainLoading } = useStrain(id || "");
   const { data: communityStats, isLoading: statsLoading } = useStrainCommunityStats(id || "");
   const { data: strainBatches } = usePublicBatchesByStrain(id || null);
@@ -50,6 +54,7 @@ export default function StrainDetail() {
   }, [strainBatches]);
 
   const { data: batchChemistry } = useNewestVerifiedBatchChemistry(firstProductId);
+  const { match: signalMatch } = useSignalMatch(firstProductId);
 
   const qualityResult = useMemo(() => {
     if (!strainBatches?.length) return null;
@@ -97,6 +102,9 @@ export default function StrainDetail() {
                   <Badge className={`text-xs font-medium border-0 ${typeColors[strain.type] ?? "bg-secondary text-secondary-foreground"}`}>
                     {strain.type}
                   </Badge>
+                  {signalMatch?.ready && (
+                    <SignalMatchBadge match={signalMatch} size="sm" onClick={() => setMatchModalOpen(true)} />
+                  )}
                 </div>
               </div>
             </div>
@@ -234,6 +242,13 @@ export default function StrainDetail() {
             </Link>
           </motion.div>
         </div>
+
+        <SignalMatchDetailModal
+          open={matchModalOpen}
+          onOpenChange={setMatchModalOpen}
+          match={signalMatch}
+          productName={strain.name}
+        />
       </div>
     </AppLayout>
   );
