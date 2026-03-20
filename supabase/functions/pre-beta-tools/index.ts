@@ -126,7 +126,7 @@ serve(async (req) => {
       });
     }
 
-    // ── Beta Reset (stubbed) ──
+    // ── Beta Reset (stubbed — legacy) ──
     if (action === "beta_reset") {
       const confirmation = body.confirmation as string;
       if (confirmation !== "RESET FOR BETA") {
@@ -135,17 +135,114 @@ serve(async (req) => {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-
-      // TODO: Implement actual destructive reset when ready.
-      // This stub logs the intent but does NOT delete anything.
       await admin.from("analytics_events").insert({
         user_id: adminUserId,
         event_name: "admin_beta_reset_requested",
       });
-
       return new Response(JSON.stringify({
         success: false,
-        message: "Beta reset is not yet implemented. This request has been logged for audit. Wire destructive operations when ready.",
+        message: "Use 'full_beta_reset' action instead. This legacy stub is preserved for audit.",
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ── Full Beta Reset ──
+    if (action === "full_beta_reset") {
+      const confirmation = body.confirmation as string;
+      const preserveAdmin = body.preserve_admin !== false; // default true
+
+      if (confirmation !== "RESET SIGNAL LEAF BETA") {
+        return new Response(JSON.stringify({ error: "Invalid confirmation phrase" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // Log intent BEFORE deleting analytics
+      await admin.from("analytics_events").insert({
+        user_id: adminUserId,
+        event_name: "admin_full_beta_reset_executed",
+        metadata: { timestamp: new Date().toISOString(), preserve_admin: preserveAdmin },
+      });
+
+      const deleted: Record<string, number> = {};
+
+      // 1. Delete user-generated data (order matters for FK constraints)
+      for (const table of [
+        "feedback",
+        "support_tickets",
+        "achievements",
+        "analytics_events",
+        "session_logs",
+      ]) {
+        const { count } = await admin.from(table).delete().neq("id", "00000000-0000-0000-0000-000000000000").select("*", { count: "exact", head: true });
+        deleted[table] = count ?? 0;
+      }
+
+      // 2. Clear product ecosystem (FK order: compounds → batches → ingestions → products)
+      for (const table of [
+        "batch_terpenes",
+        "batch_cannabinoids",
+        "coa_ingestions",
+        "product_batches",
+        "products",
+      ]) {
+        const { count } = await admin.from(table).delete().neq("id", "00000000-0000-0000-0000-000000000000").select("*", { count: "exact", head: true });
+        deleted[table] = count ?? 0;
+      }
+
+      // 3. Clear community stats
+      const { count: statsCount } = await admin.from("community_strain_stats").delete().neq("id", "00000000-0000-0000-0000-000000000000").select("*", { count: "exact", head: true });
+      deleted["community_strain_stats"] = statsCount ?? 0;
+
+      // 4. Reset verified_batch_count on strains_canonical
+      await admin.from("strains_canonical").update({ verified_batch_count: 0 }).neq("id", "00000000-0000-0000-0000-000000000000");
+
+      // 5. Reset profiles (clear active references)
+      await admin.from("profiles").update({
+        active_batch_id: null,
+        active_product_id: null,
+        active_strain_id: null,
+        onboarding_completed: false,
+        calibration_anchors: null,
+        dismissed_tip_ids: [],
+      }).neq("id", "00000000-0000-0000-0000-000000000000");
+
+      // 6. Delete users (via admin auth API) — preserve current admin if requested
+      if (preserveAdmin && adminUserId) {
+        // Delete all user_roles except admin's
+        await admin.from("user_roles").delete().neq("user_id", adminUserId);
+        // Delete all profiles except admin's
+        await admin.from("profiles").delete().neq("user_id", adminUserId);
+        // Delete auth users except admin
+        const { data: authUsers } = await admin.auth.admin.listUsers({ perPage: 1000 });
+        let usersDeleted = 0;
+        for (const u of (authUsers?.users ?? [])) {
+          if (u.id !== adminUserId) {
+            await admin.auth.admin.deleteUser(u.id);
+            usersDeleted++;
+          }
+        }
+        deleted["auth_users"] = usersDeleted;
+      } else {
+        // Delete all roles and profiles, then all auth users
+        await admin.from("user_roles").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+        await admin.from("profiles").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+        const { data: authUsers } = await admin.auth.admin.listUsers({ perPage: 1000 });
+        let usersDeleted = 0;
+        for (const u of (authUsers?.users ?? [])) {
+          await admin.auth.admin.deleteUser(u.id);
+          usersDeleted++;
+        }
+        deleted["auth_users"] = usersDeleted;
+      }
+
+      return new Response(JSON.stringify({
+        success: true,
+        message: "Full beta reset complete. Canonical catalog preserved.",
+        deleted,
+        preserve_admin: preserveAdmin,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
