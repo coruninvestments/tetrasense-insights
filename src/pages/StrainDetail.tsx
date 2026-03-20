@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, Users, Shield, TrendingUp, Award, Beaker, Leaf, QrCode } from "lucide-react";
 import { useParams, useNavigate, Link } from "react-router-dom";
@@ -13,6 +13,9 @@ import { QualityScoreBreakdown } from "@/components/product/QualityScore";
 import { BatchChemistrySummary } from "@/components/product/BatchChemistrySummary";
 import { ChemistryStatusBanner } from "@/components/product/ChemistryStatusBadge";
 import { useNewestVerifiedBatchChemistry } from "@/hooks/useProductBatchChemistry";
+import { useSignalMatch } from "@/hooks/useSignalMatch";
+import { SignalMatchBadge } from "@/components/product/SignalMatchBadge";
+import { SignalMatchDetailModal } from "@/components/product/SignalMatchDetailModal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
