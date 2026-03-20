@@ -22,6 +22,7 @@ import { DataQualitySection } from "@/components/admin/DataQualitySection";
 import { RetentionSection } from "@/components/admin/RetentionSection";
 import { FeatureAdoptionSection } from "@/components/admin/FeatureAdoptionSection";
 import { SupportHealthSection } from "@/components/admin/SupportHealthSection";
+import { BetaActivationSection } from "@/components/admin/BetaActivationSection";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
