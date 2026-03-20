@@ -17,12 +17,17 @@ export function useSignalMatch(productId: string | null | undefined): {
   const match = useMemo(() => {
     if (!sessions || !chemistry?.batch) return null;
 
-    return computeSignalMatch(
-      sessions,
-      chemistry.batch,
-      chemistry.terpenes,
-      chemistry.cannabinoids
-    );
+    try {
+      return computeSignalMatch(
+        sessions,
+        chemistry.batch,
+        chemistry.terpenes ?? [],
+        chemistry.cannabinoids ?? []
+      );
+    } catch (err) {
+      console.warn("[useSignalMatch] failed:", err);
+      return null;
+    }
   }, [sessions, chemistry]);
 
   return {

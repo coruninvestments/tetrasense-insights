@@ -80,15 +80,25 @@ export async function ingestCoaUrl(input: CoaIngestionInput): Promise<CoaIngesti
 
     if (error) {
       console.error("COA ingest function error:", error);
-      return { ...errorResult, labDetection, error: error.message || "Failed to process COA" };
+      // Still return partial result with lab detection info
+      return {
+        ...errorResult,
+        labDetection,
+        status: "partial",
+        error: error.message || "Failed to process COA",
+        warnings: ["Import encountered an error — a draft may have been created"],
+      };
     }
 
     if (!data || !data.success) {
       return {
         ...errorResult,
         labDetection,
+        status: data?.batchId ? "partial" : "error",
+        batchId: data?.batchId || null,
+        productId: data?.productId || null,
         error: data?.error || "Unknown error during COA processing",
-        warnings: data?.warnings || [],
+        warnings: data?.warnings || ["Partial import — some data may be missing"],
       };
     }
 

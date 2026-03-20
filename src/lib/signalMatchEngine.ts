@@ -253,60 +253,68 @@ export function computeSignalMatch(
   batchTerpenes: BatchTerpene[],
   batchCannabinoids: BatchCannabinoid[]
 ): SignalMatchResult {
-  const n = sessions.length;
-
-  if (n < MIN_SESSIONS) {
-    return {
-      score: 0,
-      confidence: "low",
-      breakdown: { terpeneScore: 0, cannabinoidScore: 0, intensityScore: 0, outcomeScore: 0, riskPenalty: 0 },
-      reasons: [`Need at least ${MIN_SESSIONS} sessions to generate a match score`],
-      ready: false,
-    };
-  }
-
-  // Get terpene preferences
-  const terpPrefs = computeTerpenePreferences(sessions);
-  const preferredTerpenes = terpPrefs.preferred;
-
-  // Score each component
-  const terpene = scoreTerpeneMatch(preferredTerpenes, batchTerpenes);
-  const cannabinoid = scoreCannabinoidMatch(sessions, batch, batchCannabinoids);
-  const intensity = scoreIntensityMatch(sessions, batch);
-  const outcome = scoreOutcomeReinforcement(sessions, batchTerpenes);
-  const risk = scoreRiskPenalty(sessions, batchTerpenes, batch);
-
-  const rawScore =
-    terpene.score +
-    cannabinoid.score +
-    intensity.score +
-    outcome.score +
-    risk.penalty;
-
-  const finalScore = clamp(Math.round(rawScore), 0, 100);
-  const confidence = getConfidence(n);
-
-  const reasons = [
-    ...terpene.reasons,
-    ...cannabinoid.reasons,
-    ...intensity.reasons,
-    ...outcome.reasons,
-    ...risk.reasons,
-  ];
-
-  return {
-    score: finalScore,
-    confidence,
-    breakdown: {
-      terpeneScore: terpene.score,
-      cannabinoidScore: cannabinoid.score,
-      intensityScore: intensity.score,
-      outcomeScore: outcome.score,
-      riskPenalty: risk.penalty,
-    },
-    reasons,
-    ready: true,
+  const fallback: SignalMatchResult = {
+    score: 0,
+    confidence: "low",
+    breakdown: { terpeneScore: 0, cannabinoidScore: 0, intensityScore: 0, outcomeScore: 0, riskPenalty: 0 },
+    reasons: [],
+    ready: false,
   };
+
+  try {
+    const safeSessions = sessions?.filter(Boolean) ?? [];
+    const n = safeSessions.length;
+
+    if (n < MIN_SESSIONS) {
+      return { ...fallback, reasons: [`Need at least ${MIN_SESSIONS} sessions to generate a match score`] };
+    }
+
+    // Get terpene preferences
+    const terpPrefs = computeTerpenePreferences(safeSessions);
+    const preferredTerpenes = terpPrefs.preferred ?? [];
+
+    // Score each component
+    const terpene = scoreTerpeneMatch(preferredTerpenes, batchTerpenes ?? []);
+    const cannabinoid = scoreCannabinoidMatch(safeSessions, batch, batchCannabinoids ?? []);
+    const intensity = scoreIntensityMatch(safeSessions, batch);
+    const outcome = scoreOutcomeReinforcement(safeSessions, batchTerpenes ?? []);
+    const risk = scoreRiskPenalty(safeSessions, batchTerpenes ?? [], batch);
+
+    const rawScore =
+      terpene.score +
+      cannabinoid.score +
+      intensity.score +
+      outcome.score +
+      risk.penalty;
+
+    const finalScore = clamp(Math.round(rawScore), 0, 100);
+    const confidence = getConfidence(n);
+
+    const reasons = [
+      ...terpene.reasons,
+      ...cannabinoid.reasons,
+      ...intensity.reasons,
+      ...outcome.reasons,
+      ...risk.reasons,
+    ];
+
+    return {
+      score: finalScore,
+      confidence,
+      breakdown: {
+        terpeneScore: terpene.score,
+        cannabinoidScore: cannabinoid.score,
+        intensityScore: intensity.score,
+        outcomeScore: outcome.score,
+        riskPenalty: risk.penalty,
+      },
+      reasons,
+      ready: true,
+    };
+  } catch (err) {
+    console.warn("[SignalMatch] computation failed, returning fallback:", err);
+    return fallback;
+  }
 }
 
 /* ── Score label helper ──────────────────────────────────────── */

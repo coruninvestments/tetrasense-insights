@@ -9,13 +9,17 @@ export function useDailySignal() {
   const signals = useMemo<DailySignal[]>(() => {
     if (!sessions || sessions.length === 0) return [];
 
-    const tolerance = computeTolerance(sessions);
-
-    return generateDailySignals({
-      sessions,
-      toleranceLevel: tolerance.ready ? tolerance.level : undefined,
-      toleranceTrend: tolerance.ready ? tolerance.trend : undefined,
-    });
+    try {
+      const tolerance = computeTolerance(sessions);
+      return generateDailySignals({
+        sessions,
+        toleranceLevel: tolerance.ready ? tolerance.level : undefined,
+        toleranceTrend: tolerance.ready ? tolerance.trend : undefined,
+      });
+    } catch (err) {
+      console.warn("[useDailySignal] failed:", err);
+      return [];
+    }
   }, [sessions]);
 
   return {

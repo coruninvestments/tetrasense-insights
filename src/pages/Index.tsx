@@ -5,6 +5,7 @@ import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { SignalLeafLogo } from "@/components/brand/SignalLeafLogo";
+import { SafeCard } from "@/components/SafeCard";
 import { TodaysGoalCard } from "@/components/home/TodaysGoalCard";
 import { PatternSnapshotCard } from "@/components/home/PatternSnapshotCard";
 import { ClarityScoreCard } from "@/components/home/ClarityScoreCard";
@@ -67,56 +68,23 @@ const Index = () => {
         </header>
 
         <div className="px-5 space-y-4 pb-8">
-          {/* Quick Log */}
-          <QuickLogCard />
-
-          {/* Daily Signal Check */}
-          <DailySignalCard />
-
-          {/* Challenge Card — Find Your Signal */}
-          <ChallengeCard />
-
-          {/* Signal Strength */}
-          <SignalStrengthCard />
-
-          {/* Card 1 — Today's Goal */}
-          <TodaysGoalCard />
-
-          {/* Card 2 — Pattern Snapshot */}
-          <PatternSnapshotCard />
-
-          {/* Card 3 — Clarity Score */}
-          <ClarityScoreCard />
-
-          {/* Card 3b — Confidence Meter */}
-          <ConfidenceMeterCard />
-
-          {/* Tolerance Card */}
-          <ToleranceCard />
-
-          {/* Streak Card */}
-          <StreakCard />
-
-          {/* Weekly Report */}
-          <WeeklyReportCard />
-
-          {/* Card — Best For You */}
-          <BestForYouCard />
-
-          {/* Signal Card (compact) */}
-          <SignalCard compact />
-
-          {/* Strain Fingerprint (compact) */}
-          <StrainFingerprintCard compact />
-
-          {/* Connoisseur Profile */}
-          <ConnoisseurProfileCard />
-
-          {/* Connoisseur Points (compact) */}
-          <ConnoisseurPointsCard compact />
-
-          {/* Card — Learning Path */}
-          <LearningPathCard />
+          <SafeCard name="QuickLog"><QuickLogCard /></SafeCard>
+          <SafeCard name="DailySignal"><DailySignalCard /></SafeCard>
+          <SafeCard name="Challenge"><ChallengeCard /></SafeCard>
+          <SafeCard name="SignalStrength"><SignalStrengthCard /></SafeCard>
+          <SafeCard name="TodaysGoal"><TodaysGoalCard /></SafeCard>
+          <SafeCard name="PatternSnapshot"><PatternSnapshotCard /></SafeCard>
+          <SafeCard name="ClarityScore"><ClarityScoreCard /></SafeCard>
+          <SafeCard name="ConfidenceMeter"><ConfidenceMeterCard /></SafeCard>
+          <SafeCard name="Tolerance"><ToleranceCard /></SafeCard>
+          <SafeCard name="Streak"><StreakCard /></SafeCard>
+          <SafeCard name="WeeklyReport"><WeeklyReportCard /></SafeCard>
+          <SafeCard name="BestForYou"><BestForYouCard /></SafeCard>
+          <SafeCard name="SignalCard"><SignalCard compact /></SafeCard>
+          <SafeCard name="StrainFingerprint"><StrainFingerprintCard compact /></SafeCard>
+          <SafeCard name="ConnoisseurProfile"><ConnoisseurProfileCard /></SafeCard>
+          <SafeCard name="ConnoisseurPoints"><ConnoisseurPointsCard compact /></SafeCard>
+          <SafeCard name="LearningPath"><LearningPathCard /></SafeCard>
 
           {/* Card 4 — Recent Sessions */}
           <motion.div
