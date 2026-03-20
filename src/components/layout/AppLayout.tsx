@@ -14,6 +14,15 @@ interface AppLayoutProps {
 export function AppLayout({ children, showNav = true }: AppLayoutProps) {
   useNotificationTriggers();
   const { newUnlock, dismissUnlock, Toast } = useEasterEggs();
+  const { user } = useAuth();
+  const trackedRef = useRef(false);
+
+  useEffect(() => {
+    if (!user || trackedRef.current) return;
+    trackedRef.current = true;
+    trackAppOpened();
+    checkRetentionEvents();
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-background">
