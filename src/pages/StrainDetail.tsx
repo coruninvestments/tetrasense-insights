@@ -102,6 +102,9 @@ export default function StrainDetail() {
                   <Badge className={`text-xs font-medium border-0 ${typeColors[strain.type] ?? "bg-secondary text-secondary-foreground"}`}>
                     {strain.type}
                   </Badge>
+                  {signalMatch?.ready && (
+                    <SignalMatchBadge match={signalMatch} size="sm" onClick={() => setMatchModalOpen(true)} />
+                  )}
                 </div>
               </div>
             </div>
