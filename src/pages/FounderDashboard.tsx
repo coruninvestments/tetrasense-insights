@@ -144,6 +144,12 @@ export default function FounderDashboard() {
           )}
         </FounderChartCard>
 
+        {/* ═══ Beta Tracking ═══ */}
+        <section className="space-y-3">
+          <SectionHeader icon={TrendingUp} label="Beta Activation & Retention" />
+          {m ? <BetaActivationSection metrics={m.beta} loading={isLoading} /> : <SkeletonBlock />}
+        </section>
+
         {/* ═══ 2. Activation Funnel ═══ */}
         <section className="space-y-3">
           <SectionHeader icon={Target} label="Activation Funnel" />
