@@ -22,6 +22,7 @@ import { DataQualitySection } from "@/components/admin/DataQualitySection";
 import { RetentionSection } from "@/components/admin/RetentionSection";
 import { FeatureAdoptionSection } from "@/components/admin/FeatureAdoptionSection";
 import { SupportHealthSection } from "@/components/admin/SupportHealthSection";
+import { BetaActivationSection } from "@/components/admin/BetaActivationSection";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -142,6 +143,12 @@ export default function FounderDashboard() {
             <p className="text-xs text-muted-foreground text-center py-8">No session data</p>
           )}
         </FounderChartCard>
+
+        {/* ═══ Beta Tracking ═══ */}
+        <section className="space-y-3">
+          <SectionHeader icon={TrendingUp} label="Beta Activation & Retention" />
+          {m ? <BetaActivationSection metrics={m.beta} loading={isLoading} /> : <SkeletonBlock />}
+        </section>
 
         {/* ═══ 2. Activation Funnel ═══ */}
         <section className="space-y-3">

@@ -73,6 +73,14 @@ export interface FounderMetrics {
   doseDistribution: Record<string, number>;
   verifiedCoaCount: number;
   analyticsEvents: Record<string, number>;
+  beta: {
+    totalUsers: number;
+    pctReaching2: number;
+    pctReaching5: number;
+    avgSessionsPerUser: number;
+    retention24h: number;
+    retention7d: number;
+  };
   support: {
     total: number;
     byType: Record<string, number>;
