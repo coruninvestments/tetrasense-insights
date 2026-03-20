@@ -54,6 +54,7 @@ export default function StrainDetail() {
   }, [strainBatches]);
 
   const { data: batchChemistry } = useNewestVerifiedBatchChemistry(firstProductId);
+  const { match: signalMatch } = useSignalMatch(firstProductId);
 
   const qualityResult = useMemo(() => {
     if (!strainBatches?.length) return null;
