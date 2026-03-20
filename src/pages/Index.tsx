@@ -5,6 +5,7 @@ import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { Button } from "@/components/ui/button";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { SignalLeafLogo } from "@/components/brand/SignalLeafLogo";
+import { SafeCard } from "@/components/SafeCard";
 import { TodaysGoalCard } from "@/components/home/TodaysGoalCard";
 import { PatternSnapshotCard } from "@/components/home/PatternSnapshotCard";
 import { ClarityScoreCard } from "@/components/home/ClarityScoreCard";
