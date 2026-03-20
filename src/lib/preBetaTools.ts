@@ -61,3 +61,17 @@ export async function assignFounderIdentity(userId: string, role: "creator" | "d
 export async function requestBetaReset(confirmation: string): Promise<{ success: boolean; message: string }> {
   return callPreBetaTools("beta_reset", { confirmation });
 }
+
+export interface FullResetResult {
+  success: boolean;
+  message: string;
+  deleted?: Record<string, number>;
+  preserve_admin?: boolean;
+}
+
+export async function requestFullBetaReset(
+  confirmation: string,
+  preserveAdmin = true,
+): Promise<FullResetResult> {
+  return callPreBetaTools("full_beta_reset", { confirmation, preserve_admin: preserveAdmin });
+}
