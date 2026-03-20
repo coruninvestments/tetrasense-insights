@@ -242,6 +242,13 @@ export default function StrainDetail() {
             </Link>
           </motion.div>
         </div>
+
+        <SignalMatchDetailModal
+          open={matchModalOpen}
+          onOpenChange={setMatchModalOpen}
+          match={signalMatch}
+          productName={strain.name}
+        />
       </div>
     </AppLayout>
   );
