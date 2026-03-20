@@ -238,6 +238,18 @@ serve(async (req) => {
     const feedbackCount = tickets.filter((t: any) => t.type === "feedback" || t.type === "feature_request").length;
     const supportFeedbackRatio = feedbackCount > 0 ? Math.round((supportCount / feedbackCount) * 10) / 10 : null;
 
+    // ── Beta activation metrics ──
+    const reached2 = Object.values(userSessionCounts).filter((c) => c >= 2).length;
+    const pctReaching2 = totalUsers > 0 ? Math.round((reached2 / totalUsers) * 100) : 0;
+    const pctReaching5 = totalUsers > 0 ? Math.round((reached5 / totalUsers) * 100) : 0;
+
+    // 24h and 7d retention from analytics events
+    const { count: returned24hCount } = await admin.from("analytics_events").select("*", { count: "exact", head: true }).eq("event_name", "returned_24h");
+    const { count: returned7dCount } = await admin.from("analytics_events").select("*", { count: "exact", head: true }).eq("event_name", "returned_7d");
+    const usersWithSessions = Object.keys(userSessionCounts).length;
+    const retention24h = usersWithSessions > 0 ? Math.round(((returned24hCount ?? 0) / usersWithSessions) * 100) : 0;
+    const retention7d = usersWithSessions > 0 ? Math.round(((returned7dCount ?? 0) / usersWithSessions) * 100) : 0;
+
     const metrics = {
       users: {
         total: totalUsers,
@@ -271,6 +283,14 @@ serve(async (req) => {
         avgTimeToFirst,
         avgTimeTo5,
         avgTimeTo10,
+      },
+      beta: {
+        totalUsers,
+        pctReaching2,
+        pctReaching5,
+        avgSessionsPerUser: avgSessionsPerUser,
+        retention24h,
+        retention7d,
       },
       dataQuality: {
         avgCompleteness: completionRate,
@@ -311,7 +331,6 @@ serve(async (req) => {
       doseDistribution: doseCounts,
       verifiedCoaCount: verifiedCoaCount ?? 0,
       analyticsEvents: eventCounts,
-      // Keep old support key for backward compat
       support: {
         total: tickets.length,
         byType: ticketsByType,
