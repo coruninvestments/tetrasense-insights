@@ -95,6 +95,27 @@ export default function LogSession() {
 
   // Flow state
   const [saving, setSaving] = useState(false);
+  const [showCoaImport, setShowCoaImport] = useState(false);
+
+  const handleCoaImported = (result: CoaIngestionResult) => {
+    if (result.productId) {
+      setSelectedProductId(result.productId);
+      if (result.batchId) {
+        setSelectedBatchId(result.batchId);
+        setCoaAttached(true);
+      }
+      if (result.productName && !strainText) {
+        setStrainText(result.productName);
+      }
+      const msg = result.status === "complete"
+        ? "Product added — pending admin review"
+        : "COA imported for review — you can continue logging";
+      toast.success(msg);
+    } else {
+      toast.message("Import incomplete — please enter product details manually");
+    }
+    setShowCoaImport(false);
+  };
 
   const { data: memory } = useSessionMemory(
     selectedIntent || undefined,
