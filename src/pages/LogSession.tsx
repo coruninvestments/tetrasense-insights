@@ -352,6 +352,30 @@ export default function LogSession() {
                   )}
                 </Card>
 
+                {/* COA Import CTA */}
+                <Card className="p-4 border-dashed bg-secondary/30">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <QrCode className="w-4 h-4 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground">Can't find your product?</p>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        Scan or import the COA from your package.
+                      </p>
+                      <Button
+                        variant="soft"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => setShowCoaImport(true)}
+                      >
+                        <QrCode className="w-4 h-4 mr-1.5" />
+                        Scan or Import COA
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+
                 {strainText && <SessionHistoryCard memory={memory} />}
 
                 <Button
