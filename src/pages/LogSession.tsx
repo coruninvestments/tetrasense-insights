@@ -733,6 +733,11 @@ export default function LogSession() {
           </>
         )}
       </div>
+      <ImportCOAModal
+        open={showCoaImport}
+        onOpenChange={setShowCoaImport}
+        onImportComplete={handleCoaImported}
+      />
     </AppLayout>
   );
 }
