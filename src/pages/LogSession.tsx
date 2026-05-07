@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Check, ChevronRight, ChevronDown, Zap } from "lucide-react";
+import { ArrowLeft, Check, ChevronRight, ChevronDown, Zap, QrCode } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { QuickLogCard } from "@/components/log/QuickLogCard";
+import { ImportCOAModal } from "@/components/product/ImportCOAModal";
+import type { CoaIngestionResult } from "@/lib/coaIngestion";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -93,6 +95,27 @@ export default function LogSession() {
 
   // Flow state
   const [saving, setSaving] = useState(false);
+  const [showCoaImport, setShowCoaImport] = useState(false);
+
+  const handleCoaImported = (result: CoaIngestionResult) => {
+    if (result.productId) {
+      setSelectedProductId(result.productId);
+      if (result.batchId) {
+        setSelectedBatchId(result.batchId);
+        setCoaAttached(true);
+      }
+      if (result.productName && !strainText) {
+        setStrainText(result.productName);
+      }
+      const msg = result.status === "complete"
+        ? "Product added — pending admin review"
+        : "COA imported for review — you can continue logging";
+      toast.success(msg);
+    } else {
+      toast.message("Import incomplete — please enter product details manually");
+    }
+    setShowCoaImport(false);
+  };
 
   const { data: memory } = useSessionMemory(
     selectedIntent || undefined,
@@ -327,6 +350,30 @@ export default function LogSession() {
                       onSelect={handleBatchSelect}
                     />
                   )}
+                </Card>
+
+                {/* COA Import CTA */}
+                <Card className="p-4 border-dashed bg-secondary/30">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <QrCode className="w-4 h-4 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground">Can't find your product?</p>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        Scan or import the COA from your package.
+                      </p>
+                      <Button
+                        variant="soft"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => setShowCoaImport(true)}
+                      >
+                        <QrCode className="w-4 h-4 mr-1.5" />
+                        Scan or Import COA
+                      </Button>
+                    </div>
+                  </div>
                 </Card>
 
                 {strainText && <SessionHistoryCard memory={memory} />}
@@ -686,6 +733,11 @@ export default function LogSession() {
           </>
         )}
       </div>
+      <ImportCOAModal
+        open={showCoaImport}
+        onOpenChange={setShowCoaImport}
+        onImportComplete={handleCoaImported}
+      />
     </AppLayout>
   );
 }
