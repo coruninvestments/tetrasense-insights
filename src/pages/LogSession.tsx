@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Check, ChevronRight, ChevronDown, Zap } from "lucide-react";
+import { ArrowLeft, Check, ChevronRight, ChevronDown, Zap, QrCode } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { QuickLogCard } from "@/components/log/QuickLogCard";
+import { ImportCOAModal } from "@/components/product/ImportCOAModal";
+import type { CoaIngestionResult } from "@/lib/coaIngestion";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
