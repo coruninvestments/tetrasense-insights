@@ -24,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { PrivacyCommunitySection } from "@/components/profile/PrivacyCommunitySection";
 import { CalibrationScreen } from "@/components/onboarding/CalibrationScreen";
+import { LegalOnboardingFlow } from "@/components/onboarding/LegalOnboardingFlow";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { DISCLAIMER_LINES } from "@/utils/onboarding";
 import { FeedbackSection } from "@/components/profile/FeedbackSection";
@@ -45,7 +46,7 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { ReminderSettingsCard } from "@/components/settings/ReminderSettingsCard";
 import { format } from "date-fns";
 
-type Section = "main" | "edit" | "notifications" | "privacy" | "settings" | "calibration" | "onboarding";
+type Section = "main" | "edit" | "notifications" | "privacy" | "settings" | "calibration" | "onboarding" | "tutorial";
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 16 },
@@ -120,7 +121,17 @@ export default function Profile() {
   /* ── Sub-section views ── */
 
   if (activeSection === "onboarding") {
-    return <OnboardingFlow onComplete={() => setActiveSection("main")} />;
+    return <LegalOnboardingFlow onComplete={() => setActiveSection("main")} />;
+  }
+
+  if (activeSection === "tutorial") {
+    return (
+      <OnboardingFlow
+        isReplay
+        onComplete={() => setActiveSection("main")}
+        onSkip={() => setActiveSection("main")}
+      />
+    );
   }
 
   if (activeSection === "calibration") {
@@ -282,6 +293,7 @@ export default function Profile() {
                   <Sliders className="w-4 h-4 mr-2" /> Edit Scale Calibration
                 </Button>
                 <Button variant="outline" className="w-full" onClick={() => setActiveSection("onboarding")}>Re-run Onboarding</Button>
+                <Button variant="outline" className="w-full" onClick={() => setActiveSection("tutorial")}>Replay Tutorial</Button>
                 <Button
                   variant="outline"
                   className="w-full"

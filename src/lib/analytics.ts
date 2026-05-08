@@ -2,7 +2,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 type AnalyticsEvent =
   | "user_created"
+  | "onboarding_started"
   | "onboarding_completed"
+  | "onboarding_skipped"
   // Activation funnel
   | "session_logged"
   | "session_2_logged"
