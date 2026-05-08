@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useProfile } from "@/hooks/useProfile";
 import { isOnboardingComplete } from "@/utils/onboarding";
-import { OnboardingFlow } from "./OnboardingFlow";
+import { LegalOnboardingFlow } from "./LegalLegalOnboardingFlow";
 import { Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -39,5 +39,5 @@ export function OnboardingGate({ children }: OnboardingGateProps) {
 
   if (isOnboardingComplete(profile)) return <>{children}</>;
 
-  return <OnboardingFlow onComplete={() => setDismissed(true)} />;
+  return <LegalOnboardingFlow onComplete={() => setDismissed(true)} />;
 }
