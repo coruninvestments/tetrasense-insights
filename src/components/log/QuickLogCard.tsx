@@ -107,6 +107,8 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
     const input = buildSessionFromQuickLog({
       strainText,
       canonicalStrainId,
+      productId: importedProductId,
+      batchId: importedBatchId,
       method,
       dose,
       outcome: o,
