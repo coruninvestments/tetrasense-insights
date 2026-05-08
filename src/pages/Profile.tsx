@@ -294,6 +294,7 @@ export default function Profile() {
                   <Sliders className="w-4 h-4 mr-2" /> Edit Scale Calibration
                 </Button>
                 <Button variant="outline" className="w-full" onClick={() => setActiveSection("onboarding")}>Re-run Onboarding</Button>
+                <Button variant="outline" className="w-full" onClick={() => setActiveSection("tutorial")}>Replay Tutorial</Button>
                 <Button
                   variant="outline"
                   className="w-full"
