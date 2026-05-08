@@ -26,7 +26,6 @@ import { PrivacyCommunitySection } from "@/components/profile/PrivacyCommunitySe
 import { CalibrationScreen } from "@/components/onboarding/CalibrationScreen";
 import { LegalOnboardingFlow } from "@/components/onboarding/LegalOnboardingFlow";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
-import { useOnboarding } from "@/hooks/useOnboarding";
 import { DISCLAIMER_LINES } from "@/utils/onboarding";
 import { FeedbackSection } from "@/components/profile/FeedbackSection";
 import { SupportCenterCard } from "@/components/support/SupportCenterCard";
