@@ -403,6 +403,25 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
           )}
         </AnimatePresence>
       </CardContent>
+
+      <ImportCOAModal
+        open={showCoaImport}
+        onOpenChange={setShowCoaImport}
+        onImportComplete={(result: CoaIngestionResult) => {
+          if (result.productId) setImportedProductId(result.productId);
+          if (result.batchId) setImportedBatchId(result.batchId);
+          if (result.productName) {
+            setStrainText(result.productName);
+            setCanonicalStrainId(null);
+            setStep("method");
+          }
+          if (result.status === "partial") {
+            toast.success("COA imported for review — you can continue logging");
+          } else if (result.success) {
+            toast.success("Product added — pending admin review");
+          }
+        }}
+      />
     </Wrapper>
   );
 }
