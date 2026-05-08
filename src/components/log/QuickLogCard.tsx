@@ -54,6 +54,9 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
   const createSession = useCreateSessionLog();
 
   const [step, setStep] = useState<QuickStep>("strain");
+  const [showCoaImport, setShowCoaImport] = useState(false);
+  const [importedProductId, setImportedProductId] = useState<string | null>(null);
+  const [importedBatchId, setImportedBatchId] = useState<string | null>(null);
 
   // Strain
   const [search, setSearch] = useState("");
