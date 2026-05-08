@@ -47,7 +47,7 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { ReminderSettingsCard } from "@/components/settings/ReminderSettingsCard";
 import { format } from "date-fns";
 
-type Section = "main" | "edit" | "notifications" | "privacy" | "settings" | "calibration" | "onboarding";
+type Section = "main" | "edit" | "notifications" | "privacy" | "settings" | "calibration" | "onboarding" | "tutorial";
 
 const sectionVariants = {
   hidden: { opacity: 0, y: 16 },
