@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ChevronRight, Search, ThumbsUp, Minus, ThumbsDown, Zap } from "lucide-react";
+import { Check, ChevronRight, Search, ThumbsUp, Minus, ThumbsDown, Zap, QrCode } from "lucide-react";
+import { ImportCOAModal } from "@/components/product/ImportCOAModal";
+import type { CoaIngestionResult } from "@/lib/coaIngestion";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -52,6 +54,9 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
   const createSession = useCreateSessionLog();
 
   const [step, setStep] = useState<QuickStep>("strain");
+  const [showCoaImport, setShowCoaImport] = useState(false);
+  const [importedProductId, setImportedProductId] = useState<string | null>(null);
+  const [importedBatchId, setImportedBatchId] = useState<string | null>(null);
 
   // Strain
   const [search, setSearch] = useState("");
@@ -102,6 +107,8 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
     const input = buildSessionFromQuickLog({
       strainText,
       canonicalStrainId,
+      productId: importedProductId,
+      batchId: importedBatchId,
       method,
       dose,
       outcome: o,
@@ -193,6 +200,14 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
                   </button>
                 ) : null}
               </div>
+
+              <button
+                onClick={() => setShowCoaImport(true)}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border border-dashed border-border hover:border-primary hover:bg-accent/40 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <QrCode className="w-3.5 h-3.5" />
+                Scan or import COA
+              </button>
             </motion.div>
           )}
 
@@ -388,6 +403,25 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
           )}
         </AnimatePresence>
       </CardContent>
+
+      <ImportCOAModal
+        open={showCoaImport}
+        onOpenChange={setShowCoaImport}
+        onImportComplete={(result: CoaIngestionResult) => {
+          if (result.productId) setImportedProductId(result.productId);
+          if (result.batchId) setImportedBatchId(result.batchId);
+          if (result.productName) {
+            setStrainText(result.productName);
+            setCanonicalStrainId(null);
+            setStep("method");
+          }
+          if (result.status === "partial") {
+            toast.success("COA imported for review — you can continue logging");
+          } else if (result.success) {
+            toast.success("Product added — pending admin review");
+          }
+        }}
+      />
     </Wrapper>
   );
 }
