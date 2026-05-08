@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useProfile } from "@/hooks/useProfile";
 import { isOnboardingComplete } from "@/utils/onboarding";
-import { LegalOnboardingFlow } from "./LegalLegalOnboardingFlow";
+import { LegalOnboardingFlow } from "./LegalOnboardingFlow";
 import { Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
