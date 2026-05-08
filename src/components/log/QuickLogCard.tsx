@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ChevronRight, Search, ThumbsUp, Minus, ThumbsDown, Zap } from "lucide-react";
+import { Check, ChevronRight, Search, ThumbsUp, Minus, ThumbsDown, Zap, QrCode } from "lucide-react";
+import { ImportCOAModal } from "@/components/product/ImportCOAModal";
+import type { CoaIngestionResult } from "@/lib/coaIngestion";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
