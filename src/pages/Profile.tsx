@@ -122,7 +122,17 @@ export default function Profile() {
   /* ── Sub-section views ── */
 
   if (activeSection === "onboarding") {
-    return <OnboardingFlow onComplete={() => setActiveSection("main")} />;
+    return <LegalOnboardingFlow onComplete={() => setActiveSection("main")} />;
+  }
+
+  if (activeSection === "tutorial") {
+    return (
+      <OnboardingFlow
+        isReplay
+        onComplete={() => setActiveSection("main")}
+        onSkip={() => setActiveSection("main")}
+      />
+    );
   }
 
   if (activeSection === "calibration") {
