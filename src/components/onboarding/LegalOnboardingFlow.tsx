@@ -9,11 +9,11 @@ import { useUpdateProfile } from "@/hooks/useProfile";
 import { CURRENT_DISCLAIMER_VERSION, DISCLAIMER_LINES } from "@/utils/onboarding";
 import { logEvent } from "@/lib/analytics";
 
-interface OnboardingFlowProps {
+interface LegalOnboardingFlowProps {
   onComplete: () => void;
 }
 
-export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
+export function LegalOnboardingFlow({ onComplete }: LegalOnboardingFlowProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [ageConfirmed, setAgeConfirmed] = useState(false);
   const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
