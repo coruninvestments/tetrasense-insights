@@ -459,6 +459,18 @@ export default function LogSession() {
                   <p className="text-sm text-muted-foreground">
                     Method, level, and amount
                   </p>
+                  <div className="flex flex-wrap gap-3 pt-1">
+                    <InlineHelpTip
+                      tipType="log.method"
+                      label="About method"
+                      text="Method matters. Edibles, flower, vapes, and concentrates can feel very different at similar amounts."
+                    />
+                    <InlineHelpTip
+                      tipType="log.dose"
+                      label="About dose"
+                      text="More accurate dose details improve intensity and tolerance insights."
+                    />
+                  </div>
                 </div>
 
                 {/* Method selector */}
@@ -599,6 +611,12 @@ export default function LogSession() {
                   <p className="text-sm text-muted-foreground">
                     Rate each effect from 0 to 10
                   </p>
+                  <InlineHelpTip
+                    tipType="log.effects"
+                    label="Why log effects?"
+                    text="Logging effects consistently helps Signal Leaf learn what actually works for you."
+                    className="pt-1"
+                  />
                 </div>
 
                 <Card className="p-5 space-y-6">
@@ -671,6 +689,12 @@ export default function LogSession() {
                   <p className="text-sm text-muted-foreground">
                     Context helps identify what works best
                   </p>
+                  <InlineHelpTip
+                    tipType="log.context"
+                    label="Why context matters"
+                    text="Sleep, stress, food, and caffeine can change how a session feels."
+                    className="pt-1"
+                  />
                 </div>
 
                 <Card className="p-5 space-y-5">
