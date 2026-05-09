@@ -98,6 +98,27 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
     setStep("method");
   };
 
+  const handleStartRepeat = () => {
+    if (!lastSession) return;
+    const draft = buildRepeatSessionDraft(lastSession);
+    setStrainText(draft.strainText);
+    setCanonicalStrainId(draft.canonicalStrainId);
+    setImportedProductId(draft.productId);
+    setImportedBatchId(draft.batchId);
+    setMethod(draft.method);
+    setDose(draft.dose);
+    setIntent(draft.intent);
+    setContextTags(draft.contextTags);
+    setIsRepeat(true);
+    setRepeatLastLoggedAt(draft.lastLoggedAt);
+    setStep("repeat");
+    logEvent("repeat_session_started", {
+      method: draft.method,
+      has_product: !!draft.productId,
+      days_since_last_session: daysSince(draft.lastLoggedAt),
+    });
+  };
+
   const handleSelectMethod = (m: QuickMethod) => {
     setMethod(m);
     setStep("dose");
@@ -127,6 +148,13 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
 
     try {
       await createSession.mutateAsync(input);
+      if (isRepeat) {
+        logEvent("repeat_session_saved", {
+          method,
+          has_product: !!importedProductId,
+          days_since_last_session: repeatLastLoggedAt ? daysSince(repeatLastLoggedAt) : null,
+        });
+      }
       setStep("done");
     } catch {
       toast.error("Failed to save session");
