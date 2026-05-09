@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FlaskConical, ShieldCheck, Sparkles, BarChart3, Eye } from "lucide-react";
 import {
   Dialog,
@@ -70,13 +70,7 @@ interface COAEducationLinkProps {
 
 /** Small "What's a COA?" text link/button that opens the education modal. */
 export function COAEducationLink({ source, className }: COAEducationLinkProps) {
-  // Local state via uncontrolled approach using a ref-less pattern would force a wrapper.
-  // Simpler: expose a controlled component variant inline.
-  return <COAEducationLinkInner source={source} className={className} />;
-}
-
-function COAEducationLinkInner({ source, className }: COAEducationLinkProps) {
-  const [open, setOpen] = useStateLocal(false);
+  const [open, setOpen] = useState(false);
   return (
     <>
       <button
@@ -84,7 +78,7 @@ function COAEducationLinkInner({ source, className }: COAEducationLinkProps) {
         onClick={() => setOpen(true)}
         className={
           className ??
-          "text-xs text-primary hover:underline inline-flex items-center gap-1"
+          "text-[11px] text-primary hover:underline inline-flex items-center gap-1"
         }
       >
         What's a COA?
@@ -93,6 +87,3 @@ function COAEducationLinkInner({ source, className }: COAEducationLinkProps) {
     </>
   );
 }
-
-// tiny local useState to avoid extra import line shuffling
-import { useState as useStateLocal } from "react";
