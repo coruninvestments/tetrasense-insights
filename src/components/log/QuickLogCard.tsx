@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ChevronRight, Search, ThumbsUp, Minus, ThumbsDown, Zap, QrCode } from "lucide-react";
+import { Check, ChevronRight, Search, ThumbsUp, Minus, ThumbsDown, Zap, QrCode, RotateCcw } from "lucide-react";
 import { ImportCOAModal } from "@/components/product/ImportCOAModal";
 import { COAEducationLink } from "@/components/onboarding/COAEducationModal";
 import type { CoaIngestionResult } from "@/lib/coaIngestion";
@@ -10,19 +10,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { IntensityBadge } from "@/components/shared/IntensityBadge";
 import { useCanonicalStrains } from "@/hooks/useCanonicalStrains";
-import { useCreateSessionLog, type SessionIntent } from "@/hooks/useSessionLogs";
+import { useCreateSessionLog, useRecentSessions, type SessionIntent } from "@/hooks/useSessionLogs";
 import { computeIntensity } from "@/lib/psychoactiveIntensity";
 import {
   QUICK_METHODS,
   getDoseOptions,
   buildSessionFromQuickLog,
+  buildRepeatSessionDraft,
+  daysSince,
   type QuickMethod,
   type QuickOutcome,
   type QuickDoseOption,
 } from "@/lib/quickLog";
+import { logEvent } from "@/lib/analytics";
 import { toast } from "sonner";
 
-type QuickStep = "strain" | "method" | "dose" | "outcome" | "done";
+type QuickStep = "strain" | "method" | "dose" | "outcome" | "repeat" | "done";
 
 const INTENT_CHIPS: { id: SessionIntent; label: string; emoji: string }[] = [
   { id: "focus", label: "Focus", emoji: "🎯" },
@@ -58,6 +61,11 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
   const [showCoaImport, setShowCoaImport] = useState(false);
   const [importedProductId, setImportedProductId] = useState<string | null>(null);
   const [importedBatchId, setImportedBatchId] = useState<string | null>(null);
+  const [isRepeat, setIsRepeat] = useState(false);
+  const [repeatLastLoggedAt, setRepeatLastLoggedAt] = useState<string | null>(null);
+
+  const { data: recentSessions } = useRecentSessions(1);
+  const lastSession = recentSessions?.[0] ?? null;
 
   // Strain
   const [search, setSearch] = useState("");
@@ -90,6 +98,27 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
     setStep("method");
   };
 
+  const handleStartRepeat = () => {
+    if (!lastSession) return;
+    const draft = buildRepeatSessionDraft(lastSession);
+    setStrainText(draft.strainText);
+    setCanonicalStrainId(draft.canonicalStrainId);
+    setImportedProductId(draft.productId);
+    setImportedBatchId(draft.batchId);
+    setMethod(draft.method);
+    setDose(draft.dose);
+    setIntent(draft.intent);
+    setContextTags(draft.contextTags);
+    setIsRepeat(true);
+    setRepeatLastLoggedAt(draft.lastLoggedAt);
+    setStep("repeat");
+    logEvent("repeat_session_started", {
+      method: draft.method,
+      has_product: !!draft.productId,
+      days_since_last_session: daysSince(draft.lastLoggedAt),
+    });
+  };
+
   const handleSelectMethod = (m: QuickMethod) => {
     setMethod(m);
     setStep("dose");
@@ -119,6 +148,13 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
 
     try {
       await createSession.mutateAsync(input);
+      if (isRepeat) {
+        logEvent("repeat_session_saved", {
+          method,
+          has_product: !!importedProductId,
+          days_since_last_session: repeatLastLoggedAt ? daysSince(repeatLastLoggedAt) : null,
+        });
+      }
       setStep("done");
     } catch {
       toast.error("Failed to save session");
@@ -140,7 +176,7 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
         <div className="flex items-center gap-2 mb-4">
           <Zap className="w-4 h-4 text-primary" />
           <h3 className="text-sm font-medium text-foreground">Quick Log</h3>
-          {step !== "done" && step !== "strain" && (
+          {step !== "done" && step !== "strain" && step !== "repeat" && (
             <div className="ml-auto flex items-center gap-1">
               {(["strain", "method", "dose", "outcome"] as QuickStep[]).map((s, i) => (
                 <div
@@ -168,6 +204,27 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
               transition={{ duration: 0.2 }}
               className="space-y-3"
             >
+              {lastSession && (
+                <button
+                  type="button"
+                  onClick={handleStartRepeat}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-accent/30 hover:bg-accent/60 active:bg-accent text-left transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <RotateCcw className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-foreground truncate">
+                      Repeat last session
+                    </div>
+                    <div className="text-[11px] text-muted-foreground truncate">
+                      Same {lastSession.strain_name_text} — update how it felt
+                    </div>
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                </button>
+              )}
+
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -310,6 +367,68 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
             </motion.div>
           )}
 
+          {/* Repeat: summary + quick outcome */}
+          {step === "repeat" && method && dose && (
+            <motion.div
+              key="repeat"
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.2 }}
+              className="space-y-4"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded">
+                  New log
+                </span>
+                {repeatLastLoggedAt && (
+                  <span className="text-[11px] text-muted-foreground">
+                    {(() => {
+                      const d = daysSince(repeatLastLoggedAt);
+                      return d === 0 ? "Last logged today" : `Last logged ${d}d ago`;
+                    })()}
+                  </span>
+                )}
+              </div>
+
+              <div className="rounded-xl border border-border bg-accent/30 p-3 space-y-1.5">
+                <div className="text-sm font-medium text-foreground truncate">
+                  {strainText}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {QUICK_METHODS.find((m) => m.id === method)?.label} · {dose.label}
+                  {intent && ` · ${INTENT_CHIPS.find((i) => i.id === intent)?.label ?? intent}`}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs text-muted-foreground mb-2">How was it this time?</p>
+                <div className="grid grid-cols-3 gap-3">
+                  {OUTCOME_OPTIONS.map((o) => (
+                    <button
+                      key={o.id}
+                      onClick={() => handleSelectOutcome(o.id)}
+                      disabled={createSession.isPending}
+                      className="flex flex-col items-center gap-2 py-4 rounded-xl border border-border hover:border-primary hover:bg-accent/50 active:scale-95 transition-all disabled:opacity-50"
+                    >
+                      <o.icon className={`w-6 h-6 ${o.color}`} />
+                      <span className="text-xs font-medium text-foreground">{o.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setStep("method")}
+                className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors py-1"
+              >
+                Edit details before saving
+              </button>
+            </motion.div>
+          )}
+
           {/* Step 4: Outcome */}
           {step === "outcome" && (
             <motion.div
@@ -397,6 +516,10 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
                       setOutcome(null);
                       setIntent(null);
                       setContextTags([]);
+                      setIsRepeat(false);
+                      setRepeatLastLoggedAt(null);
+                      setImportedProductId(null);
+                      setImportedBatchId(null);
                     }
                   }}
                 >
