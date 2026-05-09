@@ -204,6 +204,27 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
               transition={{ duration: 0.2 }}
               className="space-y-3"
             >
+              {lastSession && (
+                <button
+                  type="button"
+                  onClick={handleStartRepeat}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-accent/30 hover:bg-accent/60 active:bg-accent text-left transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <RotateCcw className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-foreground truncate">
+                      Repeat last session
+                    </div>
+                    <div className="text-[11px] text-muted-foreground truncate">
+                      Same {lastSession.strain_name_text} — update how it felt
+                    </div>
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                </button>
+              )}
+
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
