@@ -176,7 +176,7 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
         <div className="flex items-center gap-2 mb-4">
           <Zap className="w-4 h-4 text-primary" />
           <h3 className="text-sm font-medium text-foreground">Quick Log</h3>
-          {step !== "done" && step !== "strain" && (
+          {step !== "done" && step !== "strain" && step !== "repeat" && (
             <div className="ml-auto flex items-center gap-1">
               {(["strain", "method", "dose", "outcome"] as QuickStep[]).map((s, i) => (
                 <div
