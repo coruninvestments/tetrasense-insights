@@ -22,6 +22,7 @@ import { QualityScorePill } from "@/components/product/QualityScore";
 import { ChemistryStatusBadge } from "@/components/product/ChemistryStatusBadge";
 import { CompareProductsDrawer, CompareSelectionBar, type CompareProduct } from "@/components/product/CompareProductsDrawer";
 import { ImportCOAModal } from "@/components/product/ImportCOAModal";
+import { COAEducationLink } from "@/components/onboarding/COAEducationModal";
 
 const TYPE_OPTIONS = ["Indica", "Sativa", "Hybrid"] as const;
 
@@ -244,6 +245,9 @@ export default function ProductLibrary() {
               </Button>
             </div>
           </motion.div>
+          <div className="flex justify-end -mt-2 mb-2">
+            <COAEducationLink source="product_library" />
+          </div>
         </header>
 
         {/* Filters */}
