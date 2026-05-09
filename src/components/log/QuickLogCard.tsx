@@ -61,6 +61,11 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
   const [showCoaImport, setShowCoaImport] = useState(false);
   const [importedProductId, setImportedProductId] = useState<string | null>(null);
   const [importedBatchId, setImportedBatchId] = useState<string | null>(null);
+  const [isRepeat, setIsRepeat] = useState(false);
+  const [repeatLastLoggedAt, setRepeatLastLoggedAt] = useState<string | null>(null);
+
+  const { data: recentSessions } = useRecentSessions(1);
+  const lastSession = recentSessions?.[0] ?? null;
 
   // Strain
   const [search, setSearch] = useState("");
