@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ChevronRight, Search, ThumbsUp, Minus, ThumbsDown, Zap, QrCode } from "lucide-react";
+import { Check, ChevronRight, Search, ThumbsUp, Minus, ThumbsDown, Zap, QrCode, RotateCcw } from "lucide-react";
 import { ImportCOAModal } from "@/components/product/ImportCOAModal";
 import { COAEducationLink } from "@/components/onboarding/COAEducationModal";
 import type { CoaIngestionResult } from "@/lib/coaIngestion";
@@ -10,19 +10,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { IntensityBadge } from "@/components/shared/IntensityBadge";
 import { useCanonicalStrains } from "@/hooks/useCanonicalStrains";
-import { useCreateSessionLog, type SessionIntent } from "@/hooks/useSessionLogs";
+import { useCreateSessionLog, useRecentSessions, type SessionIntent } from "@/hooks/useSessionLogs";
 import { computeIntensity } from "@/lib/psychoactiveIntensity";
 import {
   QUICK_METHODS,
   getDoseOptions,
   buildSessionFromQuickLog,
+  buildRepeatSessionDraft,
+  daysSince,
   type QuickMethod,
   type QuickOutcome,
   type QuickDoseOption,
 } from "@/lib/quickLog";
+import { logEvent } from "@/lib/analytics";
 import { toast } from "sonner";
 
-type QuickStep = "strain" | "method" | "dose" | "outcome" | "done";
+type QuickStep = "strain" | "method" | "dose" | "outcome" | "repeat" | "done";
 
 const INTENT_CHIPS: { id: SessionIntent; label: string; emoji: string }[] = [
   { id: "focus", label: "Focus", emoji: "🎯" },
