@@ -27,6 +27,10 @@ type AnalyticsEvent =
   // COA
   | "coa_import_started"
   | "coa_import_completed"
+  // Education
+  | "coa_education_opened"
+  | "signal_quality_explainer_opened"
+  | "inline_help_opened"
   // Retention
   | "returned_24h"
   | "returned_7d"

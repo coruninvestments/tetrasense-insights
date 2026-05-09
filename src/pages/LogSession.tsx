@@ -4,6 +4,8 @@ import { ArrowLeft, Check, ChevronRight, ChevronDown, Zap, QrCode } from "lucide
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { QuickLogCard } from "@/components/log/QuickLogCard";
 import { ImportCOAModal } from "@/components/product/ImportCOAModal";
+import { COAEducationLink } from "@/components/onboarding/COAEducationModal";
+import { InlineHelpTip } from "@/components/onboarding/InlineHelpTip";
 import type { CoaIngestionResult } from "@/lib/coaIngestion";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { Button } from "@/components/ui/button";
@@ -372,9 +374,22 @@ export default function LogSession() {
                         <QrCode className="w-4 h-4 mr-1.5" />
                         Scan or Import COA
                       </Button>
+                      <div className="mt-2 flex items-center justify-between">
+                        <COAEducationLink source="log_session_product_step" />
+                        <InlineHelpTip
+                          tipType="log.coa_import"
+                          label="Why?"
+                          text="COAs help connect your experience to verified chemistry."
+                        />
+                      </div>
                     </div>
                   </div>
                 </Card>
+
+                <InlineHelpTip
+                  tipType="log.product"
+                  text="Choose the exact product when possible. If it is missing, import the COA or add it manually."
+                />
 
                 {strainText && <SessionHistoryCard memory={memory} />}
 
@@ -444,6 +459,18 @@ export default function LogSession() {
                   <p className="text-sm text-muted-foreground">
                     Method, level, and amount
                   </p>
+                  <div className="flex flex-wrap gap-3 pt-1">
+                    <InlineHelpTip
+                      tipType="log.method"
+                      label="About method"
+                      text="Method matters. Edibles, flower, vapes, and concentrates can feel very different at similar amounts."
+                    />
+                    <InlineHelpTip
+                      tipType="log.dose"
+                      label="About dose"
+                      text="More accurate dose details improve intensity and tolerance insights."
+                    />
+                  </div>
                 </div>
 
                 {/* Method selector */}
@@ -584,6 +611,12 @@ export default function LogSession() {
                   <p className="text-sm text-muted-foreground">
                     Rate each effect from 0 to 10
                   </p>
+                  <InlineHelpTip
+                    tipType="log.effects"
+                    label="Why log effects?"
+                    text="Logging effects consistently helps Signal Leaf learn what actually works for you."
+                    className="pt-1"
+                  />
                 </div>
 
                 <Card className="p-5 space-y-6">
@@ -656,6 +689,12 @@ export default function LogSession() {
                   <p className="text-sm text-muted-foreground">
                     Context helps identify what works best
                   </p>
+                  <InlineHelpTip
+                    tipType="log.context"
+                    label="Why context matters"
+                    text="Sleep, stress, food, and caffeine can change how a session feels."
+                    className="pt-1"
+                  />
                 </div>
 
                 <Card className="p-5 space-y-5">

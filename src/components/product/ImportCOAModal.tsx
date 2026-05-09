@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { ingestCoaUrl, type CoaIngestionResult } from "@/lib/coaIngestion";
 import { detectLabSource } from "@/lib/coaLabRegistry";
 import { COAImportResultCard } from "./COAImportResultCard";
+import { COAEducationLink } from "@/components/onboarding/COAEducationModal";
 
 interface ImportCOAModalProps {
   open: boolean;
@@ -86,6 +87,9 @@ export function ImportCOAModal({ open, onOpenChange, onImportComplete }: ImportC
           <DialogDescription>
             Paste a lab report URL or QR code link to import batch chemistry data.
           </DialogDescription>
+          <div className="pt-1">
+            <COAEducationLink source="import_coa_modal" />
+          </div>
         </DialogHeader>
 
         {result ? (

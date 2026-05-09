@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { useSessionLogs } from "@/hooks/useSessionLogs";
 import { computeSignalStrength } from "@/lib/signalStrength";
+import { SignalQualityHelpButton } from "@/components/onboarding/SignalQualityExplainer";
 
 export function SignalStrengthCard() {
   const { data: sessions } = useSessionLogs();
@@ -44,6 +45,10 @@ export function SignalStrengthCard() {
             <span className="text-2xl font-serif font-medium text-foreground tabular-nums">
               {score}
             </span>
+          </div>
+
+          <div className="flex justify-end -mt-2">
+            <SignalQualityHelpButton source="signal_strength_card" />
           </div>
 
           {/* Meter bar */}
