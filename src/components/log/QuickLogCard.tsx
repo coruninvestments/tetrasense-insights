@@ -367,6 +367,68 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
             </motion.div>
           )}
 
+          {/* Repeat: summary + quick outcome */}
+          {step === "repeat" && method && dose && (
+            <motion.div
+              key="repeat"
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.2 }}
+              className="space-y-4"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded">
+                  New log
+                </span>
+                {repeatLastLoggedAt && (
+                  <span className="text-[11px] text-muted-foreground">
+                    {(() => {
+                      const d = daysSince(repeatLastLoggedAt);
+                      return d === 0 ? "Last logged today" : `Last logged ${d}d ago`;
+                    })()}
+                  </span>
+                )}
+              </div>
+
+              <div className="rounded-xl border border-border bg-accent/30 p-3 space-y-1.5">
+                <div className="text-sm font-medium text-foreground truncate">
+                  {strainText}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {QUICK_METHODS.find((m) => m.id === method)?.label} · {dose.label}
+                  {intent && ` · ${INTENT_CHIPS.find((i) => i.id === intent)?.label ?? intent}`}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs text-muted-foreground mb-2">How was it this time?</p>
+                <div className="grid grid-cols-3 gap-3">
+                  {OUTCOME_OPTIONS.map((o) => (
+                    <button
+                      key={o.id}
+                      onClick={() => handleSelectOutcome(o.id)}
+                      disabled={createSession.isPending}
+                      className="flex flex-col items-center gap-2 py-4 rounded-xl border border-border hover:border-primary hover:bg-accent/50 active:scale-95 transition-all disabled:opacity-50"
+                    >
+                      <o.icon className={`w-6 h-6 ${o.color}`} />
+                      <span className="text-xs font-medium text-foreground">{o.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setStep("method")}
+                className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors py-1"
+              >
+                Edit details before saving
+              </button>
+            </motion.div>
+          )}
+
           {/* Step 4: Outcome */}
           {step === "outcome" && (
             <motion.div
