@@ -1,4 +1,4 @@
-import type { CreateSessionLogInput, SessionIntent, SessionMethod, DoseLevel } from "@/hooks/useSessionLogs";
+import type { CreateSessionLogInput, SessionIntent, SessionMethod, DoseLevel, SessionLog } from "@/hooks/useSessionLogs";
 import type { SessionOutcome } from "@/lib/sessionOutcome";
 
 export type QuickOutcome = "good" | "neutral" | "bad";
