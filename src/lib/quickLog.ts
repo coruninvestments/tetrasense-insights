@@ -126,3 +126,84 @@ export function buildSessionFromQuickLog(input: QuickLogInput): CreateSessionLog
     caffeine: input.contextTags?.includes("caffeine") ?? false,
   };
 }
+
+/** Reverse-map a stored SessionMethod back to a QuickMethod approximation. */
+function inferQuickMethod(method: string | null | undefined, doseUnit?: string | null): QuickMethod {
+  switch (method) {
+    case "smoke":
+      return doseUnit === "dab" ? "concentrate" : "smoke";
+    case "vape": return "vape";
+    case "edible":
+      return doseUnit === "mg" || doseUnit === "ml" ? "edible" : "edible";
+    case "tincture": return "tincture";
+    default: return "smoke";
+  }
+}
+
+export interface RepeatSessionDraft {
+  sourceSessionId: string;
+  strainText: string;
+  canonicalStrainId: string | null;
+  strainId: string | null;
+  productId: string | null;
+  batchId: string | null;
+  method: QuickMethod;
+  dose: QuickDoseOption;
+  intent: SessionIntent | null;
+  contextTags: string[];
+  lastLoggedAt: string;
+}
+
+/** Build a prefilled draft from the user's last session for "Repeat Last Session". */
+export function buildRepeatSessionDraft(last: SessionLog): RepeatSessionDraft {
+  const method = inferQuickMethod(last.method, last.dose_unit);
+  const doseLevel = (last.dose_level ?? "medium") as DoseLevel;
+
+  // Reconstruct a label that matches the original dose
+  let label: string;
+  if (last.dose_amount_mg && last.dose_unit === "mg") {
+    label = `${last.dose_amount_mg} mg`;
+  } else if (last.dose_count && last.dose_unit) {
+    const unit = last.dose_count === 1 ? last.dose_unit : `${last.dose_unit}s`;
+    label = `${last.dose_count} ${unit}`;
+  } else {
+    label = doseLevel.charAt(0).toUpperCase() + doseLevel.slice(1);
+  }
+
+  const contextTags: string[] = [];
+  if (last.stress_before === "high") contextTags.push("high_stress");
+  else if (last.stress_before === "low") contextTags.push("low_stress");
+  if (last.sleep_quality === "poor") contextTags.push("tired");
+  if (last.caffeine) contextTags.push("caffeine");
+
+  const validIntents: SessionIntent[] = ["sleep","relaxation","creativity","focus","pain_relief","social","recreation","learning"];
+  const intent = validIntents.includes(last.intent as SessionIntent) && last.intent !== "recreation"
+    ? (last.intent as SessionIntent)
+    : null;
+
+  return {
+    sourceSessionId: last.id,
+    strainText: last.strain_name_text,
+    canonicalStrainId: last.canonical_strain_id,
+    strainId: last.strain_id,
+    productId: last.product_id,
+    batchId: last.batch_id,
+    method,
+    dose: {
+      label,
+      doseLevel,
+      doseUnit: last.dose_unit ?? undefined,
+      doseCount: last.dose_count ?? undefined,
+      doseAmountMg: last.dose_amount_mg ?? undefined,
+    },
+    intent,
+    contextTags,
+    lastLoggedAt: last.created_at,
+  };
+}
+
+export function daysSince(iso: string): number {
+  const ms = Date.now() - new Date(iso).getTime();
+  return Math.max(0, Math.floor(ms / (1000 * 60 * 60 * 24)));
+}
+
