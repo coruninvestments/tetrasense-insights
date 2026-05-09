@@ -516,6 +516,10 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
                       setOutcome(null);
                       setIntent(null);
                       setContextTags([]);
+                      setIsRepeat(false);
+                      setRepeatLastLoggedAt(null);
+                      setImportedProductId(null);
+                      setImportedBatchId(null);
                     }
                   }}
                 >
