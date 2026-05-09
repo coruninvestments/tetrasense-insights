@@ -31,6 +31,9 @@ type AnalyticsEvent =
   | "coa_education_opened"
   | "signal_quality_explainer_opened"
   | "inline_help_opened"
+  // Repeat session
+  | "repeat_session_started"
+  | "repeat_session_saved"
   // Retention
   | "returned_24h"
   | "returned_7d"
