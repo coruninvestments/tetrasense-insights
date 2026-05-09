@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronRight, Search, ThumbsUp, Minus, ThumbsDown, Zap, QrCode } from "lucide-react";
 import { ImportCOAModal } from "@/components/product/ImportCOAModal";
+import { COAEducationLink } from "@/components/onboarding/COAEducationModal";
 import type { CoaIngestionResult } from "@/lib/coaIngestion";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -208,6 +209,9 @@ export function QuickLogCard({ onClose, inline = false }: QuickLogCardProps) {
                 <QrCode className="w-3.5 h-3.5" />
                 Scan or import COA
               </button>
+              <div className="flex justify-center pt-1">
+                <COAEducationLink source="quick_log" />
+              </div>
             </motion.div>
           )}
 
