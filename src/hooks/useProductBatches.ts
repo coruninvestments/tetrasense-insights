@@ -36,6 +36,16 @@ export interface CreateDraftBatchInput {
   coa_file_path?: string;
   lab_panel_common?: Record<string, number>;
   lab_panel_custom?: LabPanelCustomEntry[];
+  // Package label / barcode submission fields
+  coa_source_type?: "manual" | "qr_scan" | "barcode_scan" | "manual_label";
+  barcode_value?: string;
+  facility_name?: string;
+  license_number?: string;
+  batch_number?: string;
+  lot_number?: string;
+  harvest_date?: string;
+  package_date?: string;
+  expiration_date?: string;
 }
 
 /** Fetch public library batches for a given product */
