@@ -157,6 +157,15 @@ export function useCreateDraftBatch() {
           coa_file_path: input.coa_file_path,
           lab_panel_common: input.lab_panel_common,
           lab_panel_custom: input.lab_panel_custom,
+          coa_source_type: input.coa_source_type,
+          barcode_value: input.barcode_value,
+          facility_name: input.facility_name,
+          license_number: input.license_number,
+          batch_number: input.batch_number,
+          lot_number: input.lot_number,
+          harvest_date: input.harvest_date,
+          package_date: input.package_date,
+          expiration_date: input.expiration_date,
         },
       });
 
