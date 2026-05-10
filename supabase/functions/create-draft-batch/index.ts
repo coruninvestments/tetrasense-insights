@@ -51,6 +51,16 @@ Deno.serve(async (req) => {
       coa_file_path,
       lab_panel_common,
       lab_panel_custom,
+      // Package-label / barcode fields
+      coa_source_type,
+      barcode_value,
+      facility_name,
+      license_number,
+      batch_number,
+      lot_number,
+      harvest_date,
+      package_date,
+      expiration_date,
     } = body;
 
     if (!product_name || typeof product_name !== "string" || !product_name.trim()) {
@@ -88,18 +98,45 @@ Deno.serve(async (req) => {
 
     // Create batch (user-owned draft)
     const hasCoa = !!(coa_url?.trim() || coa_file_path);
+    const resolvedSourceType = coa_source_type || (hasCoa ? "manual" : "manual");
+
+    // Stash package-label / barcode metadata in lab_panel_custom alongside any
+    // chemistry rows so we don't need a schema change. Admin reviewers can see
+    // these in the COA Review Queue.
+    const packageMeta: Record<string, unknown> = {};
+    if (barcode_value) packageMeta.barcode_value = String(barcode_value).trim();
+    if (facility_name) packageMeta.facility_name = String(facility_name).trim();
+    if (license_number) packageMeta.license_number = String(license_number).trim();
+    if (harvest_date) packageMeta.harvest_date = harvest_date;
+    if (package_date) packageMeta.package_date = package_date;
+
+    const customRows: any[] = Array.isArray(lab_panel_custom) ? [...lab_panel_custom] : [];
+    if (Object.keys(packageMeta).length > 0) {
+      customRows.push({
+        compound: "package_label_metadata",
+        value: 0,
+        unit: "%",
+        meta: packageMeta,
+      });
+    }
+
     const { data: batch, error: bErr } = await adminClient
       .from("product_batches")
       .insert({
         product_id: product.id,
         batch_code: batch_code?.trim() || null,
+        batch_number: batch_number?.trim() || batch_code?.trim() || null,
+        lot_number: lot_number?.trim() || null,
         tested_at: tested_at || null,
-        lab_name: lab_name?.trim() || null,
+        expiration_date: expiration_date || null,
+        lab_name: (lab_name?.trim() || facility_name?.trim()) || null,
         coa_url: coa_url?.trim() || null,
         coa_file_path: coa_file_path || null,
+        coa_source_type: resolvedSourceType,
         coa_status: hasCoa ? "pending" : "unverified",
+        verification_status: "draft",
         lab_panel_common: lab_panel_common || null,
-        lab_panel_custom: lab_panel_custom?.length ? lab_panel_custom : null,
+        lab_panel_custom: customRows.length ? customRows : null,
         created_by_user_id: user.id,
         is_public_library: false,
       })

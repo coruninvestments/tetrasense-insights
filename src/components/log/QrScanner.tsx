@@ -1,17 +1,32 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { BrowserQRCodeReader } from "@zxing/browser";
-import { NotFoundException } from "@zxing/library";
-import { Camera, X, AlertTriangle } from "lucide-react";
+import { BrowserMultiFormatReader } from "@zxing/browser";
+import { NotFoundException, BarcodeFormat, DecodeHintType } from "@zxing/library";
+import { X, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+export type ScannerMode = "qr" | "barcode" | "any";
+
 interface QrScannerProps {
-  onScan: (url: string) => void;
+  onScan: (text: string) => void;
   onClose: () => void;
+  mode?: ScannerMode;
 }
 
-export function QrScanner({ onScan, onClose }: QrScannerProps) {
+const BARCODE_FORMATS = [
+  BarcodeFormat.CODE_128,
+  BarcodeFormat.CODE_39,
+  BarcodeFormat.EAN_13,
+  BarcodeFormat.EAN_8,
+  BarcodeFormat.UPC_A,
+  BarcodeFormat.UPC_E,
+  BarcodeFormat.ITF,
+  BarcodeFormat.DATA_MATRIX,
+  BarcodeFormat.PDF_417,
+];
+
+export function QrScanner({ onScan, onClose, mode = "qr" }: QrScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const controlsRef = useRef<ReturnType<BrowserQRCodeReader["decodeFromVideoDevice"]> | null>(null);
+  const controlsRef = useRef<ReturnType<BrowserMultiFormatReader["decodeFromVideoDevice"]> | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const stop = useCallback(() => {
@@ -20,7 +35,17 @@ export function QrScanner({ onScan, onClose }: QrScannerProps) {
   }, []);
 
   useEffect(() => {
-    const reader = new BrowserQRCodeReader();
+    const hints = new Map<DecodeHintType, unknown>();
+    const formats =
+      mode === "qr"
+        ? [BarcodeFormat.QR_CODE]
+        : mode === "barcode"
+        ? BARCODE_FORMATS
+        : [BarcodeFormat.QR_CODE, ...BARCODE_FORMATS];
+    hints.set(DecodeHintType.POSSIBLE_FORMATS, formats);
+    hints.set(DecodeHintType.TRY_HARDER, true);
+
+    const reader = new BrowserMultiFormatReader(hints as any);
     let cancelled = false;
 
     const start = async () => {
@@ -38,19 +63,19 @@ export function QrScanner({ onScan, onClose }: QrScannerProps) {
               }
             }
             if (err && !(err instanceof NotFoundException)) {
-              // Ignore "not found" frames, they're normal
+              // ignore non-fatal frames
             }
           }
         );
         controlsRef.current = promise;
-        await promise; // will resolve with controls
+        await promise;
       } catch (e: any) {
         if (!cancelled) {
-          console.warn("QR camera error:", e);
+          console.warn("Scanner camera error:", e);
           setError(
             e?.name === "NotAllowedError"
-              ? "Camera access denied. Please paste the URL instead."
-              : "Could not access camera. Please paste the URL instead."
+              ? "Camera access denied. Please enter the code manually."
+              : "Could not access camera. Please enter the code manually."
           );
         }
       }
@@ -62,7 +87,7 @@ export function QrScanner({ onScan, onClose }: QrScannerProps) {
       cancelled = true;
       stop();
     };
-  }, [onScan, stop]);
+  }, [onScan, stop, mode]);
 
   if (error) {
     return (
@@ -78,6 +103,13 @@ export function QrScanner({ onScan, onClose }: QrScannerProps) {
     );
   }
 
+  const label =
+    mode === "barcode"
+      ? "Point at package barcode"
+      : mode === "any"
+      ? "Point at QR or barcode"
+      : "Point at COA QR code";
+
   return (
     <div className="relative rounded-xl overflow-hidden bg-black">
       <video
@@ -86,12 +118,11 @@ export function QrScanner({ onScan, onClose }: QrScannerProps) {
         muted
         playsInline
       />
-      {/* Scanning overlay */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-[15%] border-2 border-primary/60 rounded-lg" />
         <div className="absolute bottom-2 left-0 right-0 text-center">
           <span className="text-[10px] text-white/70 bg-black/40 px-2 py-0.5 rounded-full">
-            Point at COA QR code
+            {label}
           </span>
         </div>
       </div>

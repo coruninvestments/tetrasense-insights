@@ -36,6 +36,16 @@ export interface CreateDraftBatchInput {
   coa_file_path?: string;
   lab_panel_common?: Record<string, number>;
   lab_panel_custom?: LabPanelCustomEntry[];
+  // Package label / barcode submission fields
+  coa_source_type?: "manual" | "qr_scan" | "barcode_scan" | "manual_label";
+  barcode_value?: string;
+  facility_name?: string;
+  license_number?: string;
+  batch_number?: string;
+  lot_number?: string;
+  harvest_date?: string;
+  package_date?: string;
+  expiration_date?: string;
 }
 
 /** Fetch public library batches for a given product */
@@ -147,6 +157,15 @@ export function useCreateDraftBatch() {
           coa_file_path: input.coa_file_path,
           lab_panel_common: input.lab_panel_common,
           lab_panel_custom: input.lab_panel_custom,
+          coa_source_type: input.coa_source_type,
+          barcode_value: input.barcode_value,
+          facility_name: input.facility_name,
+          license_number: input.license_number,
+          batch_number: input.batch_number,
+          lot_number: input.lot_number,
+          harvest_date: input.harvest_date,
+          package_date: input.package_date,
+          expiration_date: input.expiration_date,
         },
       });
 
