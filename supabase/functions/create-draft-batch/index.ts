@@ -24,19 +24,18 @@ Deno.serve(async (req) => {
     const anonClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
     );
 
-    const {
-      data: { user },
-      error: authErr,
-    } = await anonClient.auth.getUser();
-    if (authErr || !user) {
+    const token = authHeader.replace(/^Bearer\s+/i, "");
+    const { data: claimsData, error: authErr } = await anonClient.auth.getClaims(token);
+    if (authErr || !claimsData?.claims?.sub) {
+      console.error("Auth error:", authErr);
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    const user = { id: claimsData.claims.sub as string };
 
     const body = await req.json();
     const {
